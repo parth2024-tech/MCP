@@ -283,6 +283,15 @@ const metricsServer = http.createServer((req, res) => {
     res.end();
   }
 });
+
+metricsServer.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    logger.warn('Server', 'Port 9090 is in use. Metrics server will not be available in this instance.');
+  } else {
+    logger.error('Server', `Metrics server error: ${err.message}`);
+  }
+});
+
 metricsServer.listen(9090, () => {
   logger.info('Server', 'Metrics server listening on port 9090');
 });
