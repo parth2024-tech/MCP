@@ -18,6 +18,8 @@ const fs = require('fs');
 const path = require('path');
 const { logAccess, warn } = require('../utils/logger');
 const { findMainMdSync } = require('../utils/fs-utils');
+// Canonical parseFrontmatter — imported from context-optimizer to avoid duplication
+const { parseFrontmatter } = require('../utils/context-optimizer');
 
 const SKILLS_DIR = path.join(__dirname, '../../');
 const CONFIG_PATH = path.join(__dirname, '../../../config/model-params.json');
@@ -115,39 +117,6 @@ function extractBigrams(prompt) {
 // ─────────────────────────────────────────────────────────────
 // STAGE 2: SCORE — Relevance scoring per skill
 // ─────────────────────────────────────────────────────────────
-
-/**
- * Parses YAML frontmatter from a skill markdown file.
- * Returns { name, description, category, risk } or null.
- */
-function parseFrontmatter(content) {
-  if (!content.startsWith('---')) return null;
-  const endIdx = content.indexOf('---', 3);
-  if (endIdx === -1) return null;
-
-  const fm = content.substring(3, endIdx);
-  const result = {};
-
-  const nameMatch = fm.match(/^name:\s*["']?(.+?)["']?\s*$/m);
-  if (nameMatch) result.name = nameMatch[1].trim();
-
-  const descMatch = fm.match(/^description:\s*["']?(.+?)["']?\s*$/m);
-  if (!descMatch) {
-    // Multi-line description
-    const multiMatch = fm.match(/^description:\s*["']?([\s\S]*?)["']?\s*(?:^[a-z]|\n---)/m);
-    if (multiMatch) result.description = multiMatch[1].trim().replace(/\n\s*/g, ' ');
-  } else {
-    result.description = descMatch[1].trim();
-  }
-
-  const catMatch = fm.match(/^category:\s*["']?(.+?)["']?\s*$/m);
-  if (catMatch) result.category = catMatch[1].trim();
-
-  const riskMatch = fm.match(/^risk:\s*["']?(.+?)["']?\s*$/m);
-  if (riskMatch) result.risk = riskMatch[1].trim();
-
-  return result;
-}
 
 /**
  * Scores a single skill against the extracted intent signals.

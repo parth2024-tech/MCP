@@ -18,16 +18,35 @@ module.exports = (deps) => ({
       max_skills: {
         type: 'number',
         description: 'Optional. Hard cap on number of skills returned. Defaults to 3.'
+      },
+      min_relevance: {
+        type: 'number',
+        description: 'Optional. Minimum relevance score (0.0–1.0) to include a skill. Skills below this threshold are excluded. Default: 0 (no filter).'
       }
     },
     required: ['request']
   },
   handler: async (args, extra) => {
     const maxSkills = args.max_skills || 3;
+    const minRelevance = (args.min_relevance !== undefined)
+      ? Math.max(0, Math.min(1, args.min_relevance))
+      : 0; // default: no filter
 
     // --- Primary path: semantic cosine search ---
     try {
-      const results = await deps.embeddingService.search(args.request, maxSkills);
+      let results = await deps.embeddingService.search(args.request, maxSkills);
+
+      // Apply min_relevance filter if specified
+      if (minRelevance > 0) {
+        const before = results.length;
+        results = results.filter(r => (r.score || 0) >= minRelevance);
+        if (results.length < before) {
+          (extra?.reqLogger || require('../utils/logger')).info(
+            'query_skills',
+            `min_relevance filter (${minRelevance}) dropped ${before - results.length} result(s).`
+          );
+        }
+      }
       (extra?.reqLogger || require('../utils/logger')).logAccess('mcp-client', 'query_skills', 'authorized', 0, { selected: results.map(s => s.name), method: 'semantic' });
       return {
         selected: results,

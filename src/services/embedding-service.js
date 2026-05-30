@@ -4,73 +4,19 @@ const crypto = require('crypto');
 const Database = require('better-sqlite3');
 const hnswlib = require('hnswlib-node');
 const { LRUCache } = require('lru-cache');
-const { parseFrontmatter } = require('./context-budget');
+const { parseFrontmatter, ContextOptimizer } = require('../utils/context-optimizer');
 const { findMainMd } = require('../utils/fs-utils');
 const { withRetry } = require('../utils/retry');
 const { warn, logger } = require('../utils/logger');
 const metrics = require('../utils/metrics');
+const CircuitBreaker = require('./circuit-breaker');
 
 const SKILLS_DIR = path.resolve(__dirname, '../../../../');
 const DB_PATH = path.join(__dirname, 'skills.db');
 const EMBEDDING_DIMENSIONS = 384;
 
 // ─────────────────────────────────────────────────────────────
-// Circuit Breaker
-// ─────────────────────────────────────────────────────────────
-class CircuitBreaker {
-  constructor({ failureThreshold = 3, recoveryMs = 60000 } = {}) {
-    this.failureThreshold = failureThreshold;
-    this.recoveryMs = recoveryMs;
-    this.failureCount = 0;
-    this.state = 'CLOSED';
-    this.openedAt = null;
-  }
-
-  get status() {
-    return {
-      state: this.state,
-      failureCount: this.failureCount,
-      openedAt: this.openedAt ? new Date(this.openedAt).toISOString() : null
-    };
-  }
-
-  async call(fn) {
-    if (this.state === 'OPEN') {
-      if (Date.now() - this.openedAt >= this.recoveryMs) {
-        this.state = 'HALF_OPEN';
-      } else {
-        throw new Error('CircuitBreaker OPEN — embedding worker unavailable');
-      }
-    }
-
-    try {
-      const result = await fn();
-      this._onSuccess();
-      return result;
-    } catch (err) {
-      this._onFailure(err);
-      throw err;
-    }
-  }
-
-  _onSuccess() {
-    this.failureCount = 0;
-    this.state = 'CLOSED';
-    this.openedAt = null;
-  }
-
-  _onFailure(err) {
-    this.failureCount++;
-    if (this.failureCount >= this.failureThreshold) {
-      this.state = 'OPEN';
-      this.openedAt = Date.now();
-      warn('CircuitBreaker', `Embedding worker circuit OPENED after ${this.failureCount} failures. Will retry in ${this.recoveryMs / 1000}s.`, { error: err.message });
-    }
-  }
-}
-
-// ─────────────────────────────────────────────────────────────
-// EmbeddingService
+// EmbeddingService — uses shared CircuitBreaker from circuit-breaker.js
 // ─────────────────────────────────────────────────────────────
 class EmbeddingService {
   constructor(workerPool) {
@@ -84,7 +30,7 @@ class EmbeddingService {
     this.db.pragma('temp_store = MEMORY');
     
     this._lastSyncAt = null;
-    this._breaker = new CircuitBreaker({ failureThreshold: 3, recoveryMs: 60000 });
+    this._breaker = new CircuitBreaker({ failureThreshold: 3, recoveryMs: 60_000, serviceName: 'embedding' });
     
     // LRU Cache for queries
     this._queryCache = new LRUCache({ max: 200, ttl: 1000 * 60 * 5 });
@@ -95,6 +41,7 @@ class EmbeddingService {
     this._nameToId = new Map();
     this._skillData = new Map();
     this._nextId = 0;
+    this.optimizer = new ContextOptimizer();
 
     this._initDb();
   }
@@ -278,7 +225,21 @@ class EmbeddingService {
     logger.info('EmbeddingService', 'Sync complete.');
   }
 
-  async search(query, limit = 3, reqLogger = null) {
+  async embed(text) {
+    try {
+      logger.info('EmbeddingService', 'Proactively warming up embedding model...');
+      const startMs = Date.now();
+      await withRetry(
+        () => this._breaker.call(() => this.workerPool.generateEmbeddingForeground(text)),
+        { attempts: 1, baseMs: 100, tag: 'Embeddings/warmup' }
+      );
+      logger.info('EmbeddingService', `Embedding model warmup complete in ${Date.now() - startMs}ms`);
+    } catch (err) {
+      warn('EmbeddingService', `Warmup failed: ${err.message}`);
+    }
+  }
+
+  async search(query, limit = 15, reqLogger = null) {
     const log = reqLogger || logger;
     const startMs = Date.now();
     metrics.inc('embedding_searches');
@@ -328,12 +289,17 @@ class EmbeddingService {
       });
     }
 
-    this._queryCache.set(cacheKey, scored);
+    const { optimized, totalTokens, savedTokens } = this.optimizer.optimize(scored);
+    
+    metrics.histogram('context.tokens_saved', savedTokens, { source: 'skills' });
+    metrics.histogram('context.total_tokens', totalTokens, { source: 'skills' });
+
+    this._queryCache.set(cacheKey, optimized);
 
     metrics.record('embedding_search_duration_ms', Date.now() - startMs);
-    log.info('EmbeddingService', `Search completed in ${Date.now() - startMs}ms via HNSW`, { limit });
+    log.info('EmbeddingService', `Search completed in ${Date.now() - startMs}ms. Optimized from ${scored.length} to ${optimized.length} items (saved ${savedTokens} tokens).`, { limit });
     
-    return scored;
+    return optimized;
   }
 }
 

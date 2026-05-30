@@ -96,4 +96,20 @@ function snapshot() {
   return { counters: counterSnapshot, histograms: histogramSnapshot };
 }
 
-module.exports = { inc, getCount, record, summarize, snapshot };
+function increment(name, tags = {}) {
+  let label = '';
+  if (tags && Object.keys(tags).length > 0) {
+    label = Object.entries(tags).map(([k, v]) => `${k}=${v}`).join(',');
+  }
+  inc(name, label);
+}
+
+function histogram(name, value, tags = {}) {
+  let label = '';
+  if (tags && Object.keys(tags).length > 0) {
+    label = Object.entries(tags).map(([k, v]) => `${k}=${v}`).join(',');
+  }
+  record(name, value, label);
+}
+
+module.exports = { inc, getCount, record, summarize, snapshot, increment, histogram };

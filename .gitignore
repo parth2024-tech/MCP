@@ -1,7 +1,17 @@
 node_modules/
-skills.db
-skills.db-shm
-skills.db-wal
+# SQLite databases and WAL files
+*.db
+*.db-shm
+*.db-wal
+# Environment secrets — NEVER commit
 .env
+# Logs
 *.log
+# macOS
 .DS_Store
+# Session state archive (can grow large)
+skills_session_state.archive.json
+# Vitest coverage output
+coverage/
+# Temporary test directories
+/tmp/ase-*/

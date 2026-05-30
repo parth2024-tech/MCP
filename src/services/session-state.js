@@ -2,7 +2,13 @@ const fs = require('fs');
 const path = require('path');
 const { logger } = require('../utils/logger');
 
-const STATE_FILE = path.join(process.cwd(), 'skills_session_state.json');
+// Path is configurable via ASE_STATE_FILE env var, defaulting to server working directory
+const STATE_FILE = process.env.ASE_STATE_FILE
+  || path.join(process.cwd(), 'skills_session_state.json');
+const ARCHIVE_FILE = STATE_FILE.replace(/\.json$/, '.archive.json');
+
+/** Maximum number of recent sessions to retain in the active state file */
+const MAX_SESSIONS = 20;
 
 class SessionState {
   constructor(sessionId) {
@@ -32,6 +38,44 @@ class SessionState {
 
   _saveState() {
     try {
+      // ── Session Rotation: keep only the most recent MAX_SESSIONS sessions ──
+      const allEntries = Object.entries(this.state);
+
+      if (allEntries.length > MAX_SESSIONS) {
+        // Sort by startedAt ascending (oldest first)
+        allEntries.sort((a, b) => {
+          const tA = new Date(a[1].startedAt || 0).getTime();
+          const tB = new Date(b[1].startedAt || 0).getTime();
+          return tA - tB;
+        });
+
+        const overflow = allEntries.length - MAX_SESSIONS;
+        const toArchive = allEntries.slice(0, overflow);
+        const toKeep   = allEntries.slice(overflow);
+
+        // Merge archived sessions into archive file
+        let archive = {};
+        try {
+          if (fs.existsSync(ARCHIVE_FILE)) {
+            archive = JSON.parse(fs.readFileSync(ARCHIVE_FILE, 'utf8'));
+          }
+        } catch (archErr) {
+          logger.warn('SessionState', `Failed to read archive file: ${archErr.message}`);
+        }
+
+        for (const [id, data] of toArchive) archive[id] = data;
+
+        try {
+          fs.writeFileSync(ARCHIVE_FILE, JSON.stringify(archive, null, 2), 'utf8');
+          logger.info('SessionState', `Archived ${toArchive.length} old session(s) to ${ARCHIVE_FILE}`);
+        } catch (archErr) {
+          logger.warn('SessionState', `Failed to write archive file: ${archErr.message}`);
+        }
+
+        // Rebuild state with only the recent sessions
+        this.state = Object.fromEntries(toKeep);
+      }
+
       fs.writeFileSync(STATE_FILE, JSON.stringify(this.state, null, 2), 'utf8');
     } catch (err) {
       logger.error('SessionState', `Failed to save state file: ${err.message}`);
