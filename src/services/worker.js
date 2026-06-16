@@ -10,10 +10,9 @@ try {
   const tid = stat.split(' ')[0];
   if (tid) {
     execSync(`taskset -cp 2,3 ${tid}`, { stdio: 'ignore' });
-    console.error(`[Worker] Pinned worker thread TID ${tid} to CPU cores 2,3`);
   }
 } catch (err) {
-  console.error(`[Worker] Skipping thread affinity pinning: ${err.message}`);
+  // Silent fallback
 }
 
 let embedder = null;

@@ -41,7 +41,7 @@ function assertSecureCredentials() {
 
     // Write to stderr directly — logger might not be initialized yet
     process.stderr.write(msg + '\n');
-    process.exit(1);
+    throw new Error('ASE Security Guard: Insecure Neo4j credentials detected in production.');
   }
 
   if (!password) {

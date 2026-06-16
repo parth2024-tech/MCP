@@ -32,6 +32,17 @@ class SessionToolCache {
       update_project_rules:          0,  // never cache — write operation
       remember_action:               0,  // never cache — write operation
       recall_memory:                 0,  // never cache — live memory retrieval
+      claim_task:                    0,  // write operation
+      complete_task:                 0,  // write operation
+      create_task:                   0,  // write operation
+      write_memory:                  0,  // write operation
+      read_memory:                   0,  // live state
+      acquire_file_lock:             0,  // live state
+      release_file_lock:             0,  // write operation
+      subscribe_events:              0,  // write operation
+      poll_events:                   0,  // live state
+      heartbeat:                     0,  // write operation
+      get_orchestration_state:       0,  // live state
     };
   }
 
@@ -99,9 +110,10 @@ function capOutput(content, options = {}) {
  *
  * @param {object} registry - ToolRegistry instance
  * @param {object} virtualKeyManager - VirtualKeyManager instance
+ * @param {object} sessionState - SessionState instance
  * @returns {Function} Async handler compatible with server.setRequestHandler()
  */
-function createToolCallHandler(registry, virtualKeyManager) {
+function createToolCallHandler(registry, virtualKeyManager, sessionState) {
   const toolCache = new SessionToolCache();
 
   return async (request, extra) => {
@@ -120,6 +132,9 @@ function createToolCallHandler(registry, virtualKeyManager) {
         const topK = toolArgs?.top_k || 4;
 
         if (!query) {
+          if (sessionState && typeof sessionState.logToolCall === 'function') {
+            sessionState.logToolCall('search_tools', Date.now() - startMs, true);
+          }
           return {
             content: [{ type: 'text', text: JSON.stringify({ error: "Missing required argument 'query'" }, null, 2) }],
             isError: true
@@ -133,12 +148,19 @@ function createToolCallHandler(registry, virtualKeyManager) {
         metrics.record('tool_call_duration_ms', durationMs, name);
         reqLogger.toolResult(name, durationMs, true, { tool: name });
 
+        if (sessionState && typeof sessionState.logToolCall === 'function') {
+          sessionState.logToolCall('search_tools', durationMs, false);
+        }
+
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       } catch (err) {
         const durationMs = Date.now() - startMs;
         metrics.inc('tool_errors_total', name);
         metrics.record('tool_call_duration_ms', durationMs, name);
         reqLogger.toolResult(name, durationMs, false, { tool: name, error: err.message });
+        if (sessionState && typeof sessionState.logToolCall === 'function') {
+          sessionState.logToolCall('search_tools', durationMs, true);
+        }
         return {
           content: [{ type: 'text', text: JSON.stringify({ error: err.message, req_id: reqId }) }],
           isError: true
@@ -154,6 +176,9 @@ function createToolCallHandler(registry, virtualKeyManager) {
       if (!virtualKeyManager.isAuthorized(virtualKey, tool_name)) {
         metrics.increment('security.unauthorized_access_attempt');
         reqLogger.warn('Gateway', `Unauthorized tool execution blocked: ${tool_name}`);
+        if (sessionState && typeof sessionState.logToolCall === 'function') {
+          sessionState.logToolCall('invoke_tool', 0, true);
+        }
         return {
           content: [{ type: 'text', text: `Gateway Security Error: Virtual Key is not authorized to invoke tool '${tool_name}'.` }],
           isError: true
@@ -166,6 +191,9 @@ function createToolCallHandler(registry, virtualKeyManager) {
 
       try {
         if (!tool_name || tool_input === undefined) {
+          if (sessionState && typeof sessionState.logToolCall === 'function') {
+            sessionState.logToolCall('invoke_tool', Date.now() - startMs, true);
+          }
           return {
             content: [{ type: 'text', text: JSON.stringify({ error: "Missing required arguments 'tool_name' or 'tool_input'" }, null, 2) }],
             isError: true
@@ -176,6 +204,9 @@ function createToolCallHandler(registry, virtualKeyManager) {
         if (!tool) {
           metrics.inc('tool_errors_total', tool_name);
           reqLogger.error('ToolDispatch', `Tool not found: ${tool_name}`);
+          if (sessionState && typeof sessionState.logToolCall === 'function') {
+            sessionState.logToolCall(tool_name, Date.now() - startMs, true);
+          }
           return {
             content: [{ type: 'text', text: `ERROR: Unknown tool '${tool_name}'. Call search_tools first.` }],
             isError: true
@@ -189,6 +220,11 @@ function createToolCallHandler(registry, virtualKeyManager) {
           let textResult = typeof cached === 'string' ? cached : JSON.stringify(cached, null, 2);
           metrics.histogram('tool_output.estimated_tokens', Math.ceil(textResult.length / 4), { tool: tool_name });
           textResult = capOutput(textResult, CAP_OPTIONS[tool_name] || {});
+          
+          if (sessionState && typeof sessionState.logToolCall === 'function') {
+            sessionState.logToolCall(tool_name, Date.now() - startMs, false);
+          }
+
           return { content: [{ type: 'text', text: `[CACHED]\n${textResult}` }] };
         }
         metrics.increment(`tool_cache.miss.${tool_name}`);
@@ -197,10 +233,15 @@ function createToolCallHandler(registry, virtualKeyManager) {
         const result = await tool.handler(tool_input || {}, enrichedExtra);
         const durationMs = Date.now() - startMs;
 
+        const hasError = result && (result.isError || result.error !== undefined);
+
         if (result && result.error) {
           metrics.inc('tool_errors_total', tool_name);
           metrics.record('tool_call_duration_ms', durationMs, tool_name);
           reqLogger.toolResult(tool_name, durationMs, false, { tool: tool_name, error: result.error });
+          if (sessionState && typeof sessionState.logToolCall === 'function') {
+            sessionState.logToolCall(tool_name, durationMs, true);
+          }
           return {
             content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
             isError: true
@@ -210,6 +251,10 @@ function createToolCallHandler(registry, virtualKeyManager) {
         toolCache.set(tool_name, tool_input || {}, result);
         metrics.record('tool_call_duration_ms', durationMs, tool_name);
         reqLogger.toolResult(tool_name, durationMs, true, { tool: tool_name });
+
+        if (sessionState && typeof sessionState.logToolCall === 'function') {
+          sessionState.logToolCall(tool_name, durationMs, hasError);
+        }
 
         let textResult = JSON.stringify(result, null, 2);
         metrics.histogram('tool_output.estimated_tokens', Math.ceil(textResult.length / 4), { tool: tool_name });
@@ -221,6 +266,9 @@ function createToolCallHandler(registry, virtualKeyManager) {
         metrics.inc('tool_errors_total', tool_name || name);
         metrics.record('tool_call_duration_ms', durationMs, name);
         reqLogger.toolResult(name, durationMs, false, { tool: name, error: err.message });
+        if (sessionState && typeof sessionState.logToolCall === 'function') {
+          sessionState.logToolCall(tool_name || name, durationMs, true);
+        }
         return {
           content: [{ type: 'text', text: JSON.stringify({ error: err.message, req_id: reqId }) }],
           isError: true
@@ -233,6 +281,9 @@ function createToolCallHandler(registry, virtualKeyManager) {
     if (!virtualKeyManager.isAuthorized(virtualKey, name)) {
       metrics.increment('security.unauthorized_access_attempt');
       reqLogger.warn('Gateway', `Unauthorized direct execution blocked: ${name}`);
+      if (sessionState && typeof sessionState.logToolCall === 'function') {
+        sessionState.logToolCall(name, 0, true);
+      }
       return {
         content: [{ type: 'text', text: `Gateway Security Error: Virtual Key is not authorized to execute tool '${name}'.` }],
         isError: true
@@ -243,6 +294,9 @@ function createToolCallHandler(registry, virtualKeyManager) {
     if (!tool) {
       metrics.inc('tool_errors_total', name);
       reqLogger.error('ToolDispatch', `Tool not found: ${name}`);
+      if (sessionState && typeof sessionState.logToolCall === 'function') {
+        sessionState.logToolCall(name, 0, true);
+      }
       return {
         content: [{ type: 'text', text: `Tool not found: ${name}` }],
         isError: true
@@ -261,6 +315,11 @@ function createToolCallHandler(registry, virtualKeyManager) {
         let textResult = typeof cached === 'string' ? cached : JSON.stringify(cached, null, 2);
         metrics.histogram('tool_output.estimated_tokens', Math.ceil(textResult.length / 4), { tool: name });
         textResult = capOutput(textResult, CAP_OPTIONS[name] || {});
+        
+        if (sessionState && typeof sessionState.logToolCall === 'function') {
+          sessionState.logToolCall(name, Date.now() - startMs, false);
+        }
+
         return { content: [{ type: 'text', text: `[CACHED]\n${textResult}` }] };
       }
       metrics.increment(`tool_cache.miss.${name}`);
@@ -269,10 +328,15 @@ function createToolCallHandler(registry, virtualKeyManager) {
       const result = await tool.handler(toolArgs || {}, enrichedExtra);
       const durationMs = Date.now() - startMs;
 
+      const hasError = result && (result.isError || result.error !== undefined);
+
       if (result && result.error) {
         metrics.inc('tool_errors_total', name);
         metrics.record('tool_call_duration_ms', durationMs, name);
         reqLogger.toolResult(name, durationMs, false, { tool: name, error: result.error });
+        if (sessionState && typeof sessionState.logToolCall === 'function') {
+          sessionState.logToolCall(name, durationMs, true);
+        }
         return {
           content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
           isError: true
@@ -282,6 +346,10 @@ function createToolCallHandler(registry, virtualKeyManager) {
       toolCache.set(name, toolArgs || {}, result);
       metrics.record('tool_call_duration_ms', durationMs, name);
       reqLogger.toolResult(name, durationMs, true, { tool: name });
+
+      if (sessionState && typeof sessionState.logToolCall === 'function') {
+        sessionState.logToolCall(name, durationMs, hasError);
+      }
 
       let textResult = JSON.stringify(result, null, 2);
       metrics.histogram('tool_output.estimated_tokens', Math.ceil(textResult.length / 4), { tool: name });
@@ -293,6 +361,9 @@ function createToolCallHandler(registry, virtualKeyManager) {
       metrics.inc('tool_errors_total', name);
       metrics.record('tool_call_duration_ms', durationMs, name);
       reqLogger.toolResult(name, durationMs, false, { tool: name, error: err.message });
+      if (sessionState && typeof sessionState.logToolCall === 'function') {
+        sessionState.logToolCall(name, durationMs, true);
+      }
       return {
         content: [{ type: 'text', text: JSON.stringify({ error: err.message, req_id: reqId }) }],
         isError: true

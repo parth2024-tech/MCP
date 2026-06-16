@@ -3,6 +3,7 @@ const path = require('path');
 const crypto = require('crypto');
 const Database = require('better-sqlite3');
 const hnswlib = require('hnswlib-node');
+const chokidar = require('chokidar');
 const { LRUCache } = require('lru-cache');
 const { parseFrontmatter, ContextOptimizer } = require('../utils/context-optimizer');
 const { findMainMd } = require('../utils/fs-utils');
@@ -15,9 +16,6 @@ const SKILLS_DIR = path.resolve(__dirname, '../../../../');
 const DB_PATH = path.join(__dirname, 'skills.db');
 const EMBEDDING_DIMENSIONS = 384;
 
-// ─────────────────────────────────────────────────────────────
-// EmbeddingService — uses shared CircuitBreaker from circuit-breaker.js
-// ─────────────────────────────────────────────────────────────
 class EmbeddingService {
   constructor(workerPool) {
     this.workerPool = workerPool;
@@ -44,6 +42,7 @@ class EmbeddingService {
     this.optimizer = new ContextOptimizer();
 
     this._initDb();
+    this._startWatcher();
   }
 
   _initDb() {
@@ -107,6 +106,90 @@ class EmbeddingService {
 
   _computeHash(content) {
     return crypto.createHash('md5').update(content).digest('hex');
+  }
+
+  _startWatcher() {
+    const watcher = chokidar.watch(SKILLS_DIR, {
+      ignored: [
+        /(^|[\/\\])\../,      // ignore dotfiles
+        '**/tools/**',        // ignore server tools
+        '**/docs/**',         // ignore docs
+        '**/node_modules/**'  // ignore node_modules
+      ],
+      persistent: true,
+      ignoreInitial: true,
+      depth: 2
+    });
+
+    watcher.on('all', async (event, filePath) => {
+      if (!filePath.endsWith('.md')) return;
+
+      const relative = path.relative(SKILLS_DIR, filePath);
+      const parts = relative.split(path.sep);
+      if (parts.length >= 2) {
+        const skillName = parts[0];
+        
+        if (event === 'unlink') {
+          try {
+            this.db.prepare('DELETE FROM skills WHERE name = ?').run(skillName);
+            this._rebuildHnswIndex();
+            this._queryCache.clear();
+            logger.info('EmbeddingService', `Removed skill from database and index: ${skillName}`);
+          } catch (err) {
+            warn('EmbeddingService', `Failed to delete skill ${skillName} on unlink: ${err.message}`);
+          }
+        } else {
+          logger.info('EmbeddingService', `Skill file change detected: ${relative}. Hot-reloading...`);
+          await this.hotReloadSkill(skillName);
+        }
+      }
+    });
+  }
+
+  async hotReloadSkill(skillName) {
+    const skillPath = path.join(SKILLS_DIR, skillName);
+    let mdFile;
+    try {
+      mdFile = await findMainMd(skillPath);
+    } catch (err) {
+      warn('EmbeddingService', `findMainMd failed for "${skillName}" during hot-reload: ${err.message}`);
+      return;
+    }
+    if (!mdFile) return;
+
+    try {
+      const content = await fs.readFile(mdFile, 'utf8');
+      const hash = this._computeHash(content);
+      const existing = this.db.prepare('SELECT hash FROM skills WHERE name = ?').get(skillName);
+      if (existing && existing.hash === hash) return;
+
+      const fm = parseFrontmatter(content);
+      const desc = (fm && fm.description) ? fm.description : '';
+      const tokenEstimate = Math.ceil(content.length / 4);
+      const textToEmbed = desc || content.substring(0, 800);
+
+      const embeddingArray = await withRetry(
+        () => this._breaker.call(() => this.workerPool.generateEmbeddingBackground(textToEmbed)),
+        { attempts: 3, baseMs: 300, tag: `Embeddings/${skillName}` }
+      );
+
+      const embeddingBlob = Buffer.from(new Float32Array(embeddingArray).buffer);
+      this._addOrUpdateHnsw(skillName, embeddingArray, desc, tokenEstimate);
+
+      this.db.prepare(`
+        INSERT INTO skills (name, description, embedding, tokenEstimate, hash)
+        VALUES (@name, @desc, @emb, @tokens, @hash)
+        ON CONFLICT(name) DO UPDATE SET
+          description = excluded.description,
+          embedding = excluded.embedding,
+          tokenEstimate = excluded.tokenEstimate,
+          hash = excluded.hash
+      `).run({ name: skillName, desc, emb: embeddingBlob, tokens: tokenEstimate, hash });
+
+      logger.info('EmbeddingService', `Hot-reloaded skill: ${skillName}`);
+    } catch (err) {
+      warn('EmbeddingService', `Failed to hot-reload skill ${skillName}: ${err.message}`);
+    }
   }
 
   get healthSnapshot() {
@@ -223,20 +306,6 @@ class EmbeddingService {
 
     this._lastSyncAt = new Date().toISOString();
     logger.info('EmbeddingService', 'Sync complete.');
-  }
-
-  async embed(text) {
-    try {
-      logger.info('EmbeddingService', 'Proactively warming up embedding model...');
-      const startMs = Date.now();
-      await withRetry(
-        () => this._breaker.call(() => this.workerPool.generateEmbeddingForeground(text)),
-        { attempts: 1, baseMs: 100, tag: 'Embeddings/warmup' }
-      );
-      logger.info('EmbeddingService', `Embedding model warmup complete in ${Date.now() - startMs}ms`);
-    } catch (err) {
-      warn('EmbeddingService', `Warmup failed: ${err.message}`);
-    }
   }
 
   async search(query, limit = 15, reqLogger = null) {

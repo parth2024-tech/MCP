@@ -21,6 +21,8 @@
 'use strict';
 
 const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env'), quiet: true });
+
 const crypto = require('crypto');
 const http = require('http');
 
@@ -41,6 +43,7 @@ const ASTIndexer       = require('./src/services/ast-indexer');
 const MCTSEngine       = require('./src/services/mcts-engine');
 const MemoryService    = require('./src/services/memory-service');
 const VirtualKeyManager = require('./src/services/virtual-key-manager');
+const OrchestrationDB = require('./src/services/orchestration-db');
 
 const { logger }     = require('./src/utils/logger');
 const metrics        = require('./src/utils/metrics');
@@ -75,6 +78,7 @@ const astIndexer    = new ASTIndexer(knowledgeGraphService);
 const mctsEngine    = new MCTSEngine(knowledgeGraphService, embeddingService);
 const memoryService = new MemoryService(workerPool);
 const virtualKeyManager = new VirtualKeyManager();
+const orchestrationDb = OrchestrationDB.getInstance();
 
 const deps = {
   workerPool,
@@ -85,7 +89,8 @@ const deps = {
   astIndexer,
   mctsEngine,
   memoryService,
-  virtualKeyManager
+  virtualKeyManager,
+  orchestrationDb
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -162,7 +167,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
 // Tool calls: full dispatch logic in handlers.js
 server.setRequestHandler(
   CallToolRequestSchema,
-  createToolCallHandler(registry, virtualKeyManager)
+  createToolCallHandler(registry, virtualKeyManager, sessionState)
 );
 
 // Resources: health, metrics, skills

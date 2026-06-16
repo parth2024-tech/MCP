@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { logAccess } = require('../utils/logger');
+const { logAccess, logger } = require('../utils/logger');
+const { toolError } = require('../utils/errors');
 
 const SKILLS_DIR = path.resolve(__dirname, '../../../../');
 const AUTH_FILE = '/home/thor/.agents/auth.json';
@@ -12,7 +13,7 @@ if (fs.existsSync(AUTH_FILE)) {
   try {
     authRegistry = JSON.parse(fs.readFileSync(AUTH_FILE, 'utf8'));
   } catch (err) {
-    console.error(`ASE MCP Server: Failed to parse auth.json: ${err.message}`);
+    logger.error('load_skill', `Failed to parse auth.json: ${err.message}`);
   }
 }
 
@@ -51,7 +52,7 @@ function resolveUserTier(token) {
     }
   }
   
-  // S-5: Timing-safe token comparison for registry
+  // Timing-safe token comparison for registry
   for (const [registeredToken, client] of Object.entries(authRegistry.tokens)) {
     if (token.length === registeredToken.length) {
       if (crypto.timingSafeEqual(Buffer.from(token), Buffer.from(registeredToken))) {
@@ -91,18 +92,47 @@ module.exports = (deps) => ({
     const { skill_name, auth_token } = args;
     const startTime = Date.now();
     
-    // S-4: Canonical path traversal prevention
+    // Canonical path traversal prevention
     const resolvedPath = path.resolve(SKILLS_DIR, skill_name);
     const resolvedRoot = path.resolve(SKILLS_DIR);
     if (!resolvedPath.startsWith(resolvedRoot + path.sep) && resolvedPath !== resolvedRoot) {
-      return { error: 'Security Policy Violation: Path traversal detected.' };
+      if (deps.sessionState && typeof deps.sessionState.logToolCall === 'function') {
+        deps.sessionState.logToolCall('load_skill', Date.now() - startTime, true);
+      }
+      return toolError({
+        error_code: 'INVALID_INPUT',
+        message: 'Security Policy Violation: Path traversal detected.',
+        retryable: false,
+        fix_hint: 'Ensure the skill name contains only valid alphanumeric characters and does not navigate out of the root folder.'
+      });
+    }
+
+    // Check if skill is pruned
+    if (deps.sessionState && typeof deps.sessionState.isPruned === 'function' && deps.sessionState.isPruned(skill_name)) {
+      if (deps.sessionState && typeof deps.sessionState.logToolCall === 'function') {
+        deps.sessionState.logToolCall('load_skill', Date.now() - startTime, true);
+      }
+      return toolError({
+        error_code: 'SKILL_PRUNED',
+        message: `Skill "${skill_name}" has been marked as completed/pruned for this session.`,
+        retryable: false,
+        fix_hint: 'Reactivate the skill by clearing the session state or starting a new agent workflow.'
+      });
     }
     
     const skillData = await deps.skillCache.getSkillContent(skill_name);
 
     if (!skillData) {
       (extra?.reqLogger || require('../utils/logger')).logAccess('mcp-client', skill_name, 'not_found', Date.now() - startTime);
-      return { error: `Skill "${skill_name}" does not exist in local registry or has no markdown file.` };
+      if (deps.sessionState && typeof deps.sessionState.logToolCall === 'function') {
+        deps.sessionState.logToolCall('load_skill', Date.now() - startTime, true);
+      }
+      return toolError({
+        error_code: 'SKILL_NOT_FOUND',
+        message: `Skill "${skill_name}" does not exist in local registry or has no markdown file.`,
+        retryable: false,
+        fix_hint: 'Call query_skills first to discover available skills.'
+      });
     }
 
     const content = skillData.content;
@@ -114,9 +144,15 @@ module.exports = (deps) => ({
     
     if (!hasAccess(userTier, requiredTier)) {
       (extra?.reqLogger || require('../utils/logger')).logAccess('mcp-client', skill_name, 'denied', Date.now() - startTime, { required_tier: requiredTier, user_tier: userTier });
-      return { 
-        error: `Access Denied! Skill "${skill_name}" requires "${requiredTier}" credentials. Your current access level is "${userTier}". Please provide a valid auth_token in the request parameters to unlock.` 
-      };
+      if (deps.sessionState && typeof deps.sessionState.logToolCall === 'function') {
+        deps.sessionState.logToolCall('load_skill', Date.now() - startTime, true);
+      }
+      return toolError({
+        error_code: 'ACCESS_DENIED',
+        message: `Access Denied! Skill "${skill_name}" requires "${requiredTier}" credentials. Your current access level is "${userTier}".`,
+        retryable: false,
+        fix_hint: 'Provide a valid auth_token parameter to unlock this skill.'
+      });
     }
 
     (extra?.reqLogger || require('../utils/logger')).logAccess('mcp-client', skill_name, 'authorized', Date.now() - startTime, { required_tier: requiredTier, user_tier: userTier });
@@ -133,8 +169,12 @@ module.exports = (deps) => ({
       try {
         deps.sessionState.initSkill(skill_name, stepIds);
       } catch (err) {
-        console.error(`ASE MCP Server: Failed to init skill session state: ${err.message}`);
+        logger.error('load_skill', `Failed to init skill session state: ${err.message}`);
       }
+    }
+
+    if (deps.sessionState && typeof deps.sessionState.logToolCall === 'function') {
+      deps.sessionState.logToolCall('load_skill', Date.now() - startTime, false);
     }
 
     return { 

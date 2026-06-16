@@ -1,84 +1,163 @@
+const Database = require('better-sqlite3');
 const fs = require('fs');
 const path = require('path');
 const { logger } = require('../utils/logger');
 
-// Path is configurable via ASE_STATE_FILE env var, defaulting to server working directory
-const STATE_FILE = process.env.ASE_STATE_FILE
-  || path.join(process.cwd(), 'skills_session_state.json');
-const ARCHIVE_FILE = STATE_FILE.replace(/\.json$/, '.archive.json');
+const DB_PATH = process.env.ASE_STATE_DB
+  || path.join(__dirname, 'session_state.db');
+const ARCHIVE_FILE = (process.env.ASE_STATE_FILE || path.join(process.cwd(), 'skills_session_state.json'))
+  .replace(/\.json$/, '.archive.json');
 
-/** Maximum number of recent sessions to retain in the active state file */
 const MAX_SESSIONS = 20;
 
 class SessionState {
   constructor(sessionId) {
     this.sessionId = sessionId;
-    this.state = this._loadState();
+    this.db = new Database(DB_PATH);
     
-    if (!this.state[this.sessionId]) {
-      this.state[this.sessionId] = {
-        startedAt: new Date().toISOString(),
-        skills: {}
-      };
-      this._saveState();
+    // Enable WAL mode
+    this.db.pragma('journal_mode = WAL');
+    this.db.pragma('synchronous = NORMAL');
+
+    this._initDb();
+
+    // Create session if not exists
+    const sessionExists = this.db.prepare('SELECT 1 FROM sessions WHERE session_id = ?').get(this.sessionId);
+    if (!sessionExists) {
+      this.db.prepare('INSERT INTO sessions (session_id, started_at) VALUES (?, ?)')
+        .run(this.sessionId, new Date().toISOString());
+      
+      this._rotateSessions();
     }
   }
 
-  _loadState() {
-    try {
-      if (fs.existsSync(STATE_FILE)) {
-        const data = fs.readFileSync(STATE_FILE, 'utf8');
-        return JSON.parse(data);
-      }
-    } catch (err) {
-      logger.error('SessionState', `Failed to load state file: ${err.message}`);
-    }
-    return {};
+  _initDb() {
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS sessions (
+        session_id TEXT PRIMARY KEY,
+        started_at TEXT NOT NULL
+      );
+
+      CREATE TABLE IF NOT EXISTS session_skills (
+        session_id TEXT,
+        skill_name TEXT,
+        loaded_at TEXT NOT NULL,
+        PRIMARY KEY (session_id, skill_name),
+        FOREIGN KEY (session_id) REFERENCES sessions (session_id) ON DELETE CASCADE
+      );
+
+      CREATE TABLE IF NOT EXISTS session_steps (
+        session_id TEXT,
+        skill_name TEXT,
+        step_id TEXT,
+        status TEXT NOT NULL,
+        PRIMARY KEY (session_id, skill_name, step_id),
+        FOREIGN KEY (session_id, skill_name) REFERENCES session_skills (session_id, skill_name) ON DELETE CASCADE
+      );
+
+      CREATE TABLE IF NOT EXISTS session_step_history (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        session_id TEXT,
+        skill_name TEXT,
+        step_id TEXT,
+        status TEXT NOT NULL,
+        timestamp TEXT NOT NULL,
+        context TEXT,
+        FOREIGN KEY (session_id, skill_name, step_id) REFERENCES session_steps (session_id, skill_name, step_id) ON DELETE CASCADE
+      );
+
+      CREATE TABLE IF NOT EXISTS pruned_skills (
+        session_id TEXT,
+        skill_name TEXT,
+        pruned_at TEXT NOT NULL,
+        PRIMARY KEY (session_id, skill_name),
+        FOREIGN KEY (session_id) REFERENCES sessions (session_id) ON DELETE CASCADE
+      );
+
+      CREATE TABLE IF NOT EXISTS tool_call_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        tool_name TEXT NOT NULL,
+        duration_ms INTEGER,
+        is_error INTEGER DEFAULT 0,
+        called_at INTEGER NOT NULL DEFAULT (unixepoch())
+      );
+    `);
   }
 
-  _saveState() {
+  _rotateSessions() {
     try {
-      // ── Session Rotation: keep only the most recent MAX_SESSIONS sessions ──
-      const allEntries = Object.entries(this.state);
+      const allSessions = this.db.prepare('SELECT session_id, started_at FROM sessions ORDER BY started_at ASC').all();
+      if (allSessions.length > MAX_SESSIONS) {
+        const overflowCount = allSessions.length - MAX_SESSIONS;
+        const toArchive = allSessions.slice(0, overflowCount);
 
-      if (allEntries.length > MAX_SESSIONS) {
-        // Sort by startedAt ascending (oldest first)
-        allEntries.sort((a, b) => {
-          const tA = new Date(a[1].startedAt || 0).getTime();
-          const tB = new Date(b[1].startedAt || 0).getTime();
-          return tA - tB;
+        let archive = {};
+        if (fs.existsSync(ARCHIVE_FILE)) {
+          try {
+            archive = JSON.parse(fs.readFileSync(ARCHIVE_FILE, 'utf8'));
+          } catch (archErr) {
+            logger.warn('SessionState', `Failed to read archive file: ${archErr.message}`);
+          }
+        }
+
+        // Export data for each session being rotated
+        for (const session of toArchive) {
+          const sessionObj = {
+            startedAt: session.started_at,
+            skills: {}
+          };
+
+          const skills = this.db.prepare('SELECT skill_name, loaded_at FROM session_skills WHERE session_id = ?')
+            .all(session.session_id);
+
+          for (const skill of skills) {
+            const stepsObj = {};
+            const steps = this.db.prepare('SELECT step_id, status FROM session_steps WHERE session_id = ? AND skill_name = ?')
+              .all(session.session_id, skill.skill_name);
+
+            for (const step of steps) {
+              const history = this.db.prepare('SELECT status, timestamp, context FROM session_step_history WHERE session_id = ? AND skill_name = ? AND step_id = ? ORDER BY timestamp ASC')
+                .all(session.session_id, skill.skill_name, step.step_id);
+
+              stepsObj[step.step_id] = {
+                status: step.status,
+                history: history.map(h => ({
+                  status: h.status,
+                  timestamp: h.timestamp,
+                  context: h.context || ''
+                }))
+              };
+            }
+
+            sessionObj.skills[skill.skill_name] = {
+              loadedAt: skill.loaded_at,
+              steps: stepsObj
+            };
+          }
+
+          archive[session.session_id] = sessionObj;
+        }
+
+        // Write archive
+        fs.writeFileSync(ARCHIVE_FILE, JSON.stringify(archive, null, 2), 'utf8');
+        logger.info('SessionState', `Archived ${toArchive.length} old session(s) to ${ARCHIVE_FILE}`);
+
+        // Delete from database
+        const deleteTx = this.db.transaction((sessionsToDelete) => {
+          for (const s of sessionsToDelete) {
+            // Delete steps history -> steps -> skills -> session
+            this.db.prepare('DELETE FROM session_step_history WHERE session_id = ?').run(s.session_id);
+            this.db.prepare('DELETE FROM session_steps WHERE session_id = ?').run(s.session_id);
+            this.db.prepare('DELETE FROM session_skills WHERE session_id = ?').run(s.session_id);
+            this.db.prepare('DELETE FROM pruned_skills WHERE session_id = ?').run(s.session_id);
+            this.db.prepare('DELETE FROM sessions WHERE session_id = ?').run(s.session_id);
+          }
         });
 
-        const overflow = allEntries.length - MAX_SESSIONS;
-        const toArchive = allEntries.slice(0, overflow);
-        const toKeep   = allEntries.slice(overflow);
-
-        // Merge archived sessions into archive file
-        let archive = {};
-        try {
-          if (fs.existsSync(ARCHIVE_FILE)) {
-            archive = JSON.parse(fs.readFileSync(ARCHIVE_FILE, 'utf8'));
-          }
-        } catch (archErr) {
-          logger.warn('SessionState', `Failed to read archive file: ${archErr.message}`);
-        }
-
-        for (const [id, data] of toArchive) archive[id] = data;
-
-        try {
-          fs.writeFileSync(ARCHIVE_FILE, JSON.stringify(archive, null, 2), 'utf8');
-          logger.info('SessionState', `Archived ${toArchive.length} old session(s) to ${ARCHIVE_FILE}`);
-        } catch (archErr) {
-          logger.warn('SessionState', `Failed to write archive file: ${archErr.message}`);
-        }
-
-        // Rebuild state with only the recent sessions
-        this.state = Object.fromEntries(toKeep);
+        deleteTx(toArchive);
       }
-
-      fs.writeFileSync(STATE_FILE, JSON.stringify(this.state, null, 2), 'utf8');
     } catch (err) {
-      logger.error('SessionState', `Failed to save state file: ${err.message}`);
+      logger.error('SessionState', `Failed during session rotation: ${err.message}`);
     }
   }
 
@@ -88,25 +167,26 @@ class SessionState {
    * @param {string[]} stepIds 
    */
   initSkill(skillName, stepIds = []) {
-    const session = this.state[this.sessionId];
-    
-    // Don't overwrite if already initialized, but we could append new steps if needed
-    if (!session.skills[skillName]) {
-      const stepsState = {};
-      for (const id of stepIds) {
-        stepsState[id] = {
-          status: 'pending',
-          history: [] // { status, timestamp, context }
-        };
+    try {
+      const skillExists = this.db.prepare('SELECT 1 FROM session_skills WHERE session_id = ? AND skill_name = ?')
+        .get(this.sessionId, skillName);
+
+      if (!skillExists) {
+        const tx = this.db.transaction(() => {
+          this.db.prepare('INSERT INTO session_skills (session_id, skill_name, loaded_at) VALUES (?, ?, ?)')
+            .run(this.sessionId, skillName, new Date().toISOString());
+
+          for (const stepId of stepIds) {
+            this.db.prepare('INSERT INTO session_steps (session_id, skill_name, step_id, status) VALUES (?, ?, ?, ?)')
+              .run(this.sessionId, skillName, stepId, 'pending');
+          }
+        });
+
+        tx();
+        logger.info('SessionState', `Initialized telemetry for skill: ${skillName} (${stepIds.length} steps)`);
       }
-      
-      session.skills[skillName] = {
-        loadedAt: new Date().toISOString(),
-        steps: stepsState
-      };
-      
-      this._saveState();
-      logger.info('SessionState', `Initialized telemetry for skill: ${skillName} (${stepIds.length} steps)`);
+    } catch (err) {
+      logger.error('SessionState', `Failed to initialize skill ${skillName}: ${err.message}`);
     }
   }
 
@@ -118,92 +198,158 @@ class SessionState {
    * @param {string} context - optional context/reason
    */
   logStep(skillName, stepId, status, context = '') {
-    const session = this.state[this.sessionId];
-    if (!session.skills[skillName]) {
-      throw new Error(`Skill ${skillName} has not been loaded in this session.`);
+    try {
+      const skillExists = this.db.prepare('SELECT 1 FROM session_skills WHERE session_id = ? AND skill_name = ?')
+        .get(this.sessionId, skillName);
+
+      if (!skillExists) {
+        throw new Error(`Skill ${skillName} has not been loaded in this session.`);
+      }
+
+      const tx = this.db.transaction(() => {
+        // Upsert step status
+        this.db.prepare(`
+          INSERT INTO session_steps (session_id, skill_name, step_id, status)
+          VALUES (?, ?, ?, ?)
+          ON CONFLICT(session_id, skill_name, step_id) DO UPDATE SET status = excluded.status
+        `).run(this.sessionId, skillName, stepId, status);
+
+        // Record history
+        this.db.prepare(`
+          INSERT INTO session_step_history (session_id, skill_name, step_id, status, timestamp, context)
+          VALUES (?, ?, ?, ?, ?, ?)
+        `).run(this.sessionId, skillName, stepId, status, new Date().toISOString(), context);
+      });
+
+      tx();
+      logger.info('SessionState', `Logged step ${stepId} as ${status} [${skillName}]`);
+    } catch (err) {
+      logger.error('SessionState', `Failed to log step ${stepId}: ${err.message}`);
+      throw err;
     }
+  }
 
-    const skill = session.skills[skillName];
-    if (!skill.steps[stepId]) {
-      // Allow dynamic steps just in case, though they should be initialized
-      skill.steps[stepId] = { status: 'pending', history: [] };
+  /**
+   * Prune a skill in this session.
+   * @param {string} skillName 
+   */
+  pruneSkill(skillName) {
+    try {
+      this.db.prepare(`
+        INSERT OR IGNORE INTO pruned_skills (session_id, skill_name, pruned_at)
+        VALUES (?, ?, ?)
+      `).run(this.sessionId, skillName, new Date().toISOString());
+      logger.info('SessionState', `Pruned skill: ${skillName}`);
+    } catch (err) {
+      logger.error('SessionState', `Failed to prune skill ${skillName}: ${err.message}`);
     }
+  }
 
-    const timestamp = new Date().toISOString();
-    
-    skill.steps[stepId].status = status;
-    skill.steps[stepId].history.push({
-      status,
-      timestamp,
-      context
-    });
+  /**
+   * Check if a skill is pruned in this session.
+   * @param {string} skillName 
+   */
+  isPruned(skillName) {
+    try {
+      const row = this.db.prepare('SELECT 1 FROM pruned_skills WHERE session_id = ? AND skill_name = ?')
+        .get(this.sessionId, skillName);
+      return !!row;
+    } catch (err) {
+      logger.error('SessionState', `Failed to check pruned status for ${skillName}: ${err.message}`);
+      return false;
+    }
+  }
 
-    this._saveState();
-    logger.info('SessionState', `Logged step ${stepId} as ${status} [${skillName}]`);
+  /**
+   * Log a tool call.
+   */
+  logToolCall(toolName, durationMs, isError) {
+    try {
+      this.db.prepare('INSERT INTO tool_call_log (tool_name, duration_ms, is_error) VALUES (?, ?, ?)')
+        .run(toolName, durationMs, isError ? 1 : 0);
+    } catch (err) {
+      logger.error('SessionState', `Failed to log tool call: ${err.message}`);
+    }
   }
 
   /**
    * Get a report of the current session's skill progression.
    */
   getReport() {
-    const session = this.state[this.sessionId];
-    const report = {
-      sessionId: this.sessionId,
-      uptime_seconds: Math.floor((Date.now() - new Date(session.startedAt).getTime()) / 1000),
-      active_skills: Object.keys(session.skills),
-      skills: {}
-    };
+    try {
+      const session = this.db.prepare('SELECT started_at FROM sessions WHERE session_id = ?')
+        .get(this.sessionId);
 
-    for (const [skillName, skillData] of Object.entries(session.skills)) {
-      const steps = skillData.steps;
-      let completed = 0;
-      let skipped = 0;
-      let failed = 0;
-      let pending = 0;
-      let blocked = 0;
-      
-      const stepDetails = {};
-      
-      for (const [stepId, stepData] of Object.entries(steps)) {
-        if (stepData.status === 'completed') completed++;
-        else if (stepData.status === 'skipped') skipped++;
-        else if (stepData.status === 'failed') failed++;
-        else if (stepData.status === 'blocked') blocked++;
-        else pending++;
-        
-        // Calculate time spent if completed/skipped/failed from 'started'
-        let timeSpentMs = 0;
-        let startedTime = null;
-        for (const evt of stepData.history) {
-          if (evt.status === 'started') {
-            startedTime = new Date(evt.timestamp).getTime();
-          } else if (startedTime && ['completed', 'skipped', 'failed', 'blocked'].includes(evt.status)) {
-            timeSpentMs += new Date(evt.timestamp).getTime() - startedTime;
-            startedTime = null;
+      if (!session) return { sessionId: this.sessionId, skills: {} };
+
+      const activeSkills = this.db.prepare('SELECT skill_name, loaded_at FROM session_skills WHERE session_id = ?')
+        .all(this.sessionId);
+
+      const report = {
+        sessionId: this.sessionId,
+        uptime_seconds: Math.floor((Date.now() - new Date(session.started_at).getTime()) / 1000),
+        active_skills: activeSkills.map(s => s.skill_name),
+        skills: {}
+      };
+
+      for (const skill of activeSkills) {
+        const steps = this.db.prepare('SELECT step_id, status FROM session_steps WHERE session_id = ? AND skill_name = ?')
+          .all(this.sessionId, skill.skill_name);
+
+        let completed = 0;
+        let skipped = 0;
+        let failed = 0;
+        let pending = 0;
+        let blocked = 0;
+
+        const stepDetails = {};
+
+        for (const step of steps) {
+          if (step.status === 'completed') completed++;
+          else if (step.status === 'skipped') skipped++;
+          else if (step.status === 'failed') failed++;
+          else if (step.status === 'blocked') blocked++;
+          else pending++;
+
+          const history = this.db.prepare('SELECT status, timestamp FROM session_step_history WHERE session_id = ? AND skill_name = ? AND step_id = ? ORDER BY timestamp ASC')
+            .all(this.sessionId, skill.skill_name, step.step_id);
+
+          let timeSpentMs = 0;
+          let startedTime = null;
+          for (const evt of history) {
+            if (evt.status === 'started') {
+              startedTime = new Date(evt.timestamp).getTime();
+            } else if (startedTime && ['completed', 'skipped', 'failed', 'blocked'].includes(evt.status)) {
+              timeSpentMs += new Date(evt.timestamp).getTime() - startedTime;
+              startedTime = null;
+            }
           }
+
+          stepDetails[step.step_id] = {
+            current_status: step.status,
+            time_spent_seconds: Math.round(timeSpentMs / 1000),
+            transitions: history.length
+          };
         }
-        
-        stepDetails[stepId] = {
-          current_status: stepData.status,
-          time_spent_seconds: Math.round(timeSpentMs / 1000),
-          transitions: stepData.history.length
+
+        report.skills[skill.skill_name] = {
+          summary: {
+            total_steps: steps.length,
+            completed,
+            skipped,
+            failed,
+            blocked,
+            pending
+          },
+          steps: stepDetails
         };
       }
-      
-      report.skills[skillName] = {
-        summary: {
-          total_steps: Object.keys(steps).length,
-          completed,
-          skipped,
-          failed,
-          blocked,
-          pending
-        },
-        steps: stepDetails
-      };
-    }
 
-    return report;
+      return report;
+    } catch (err) {
+      logger.error('SessionState', `Failed to generate session report: ${err.message}`);
+      return { sessionId: this.sessionId, error: err.message };
+    }
   }
 }
 

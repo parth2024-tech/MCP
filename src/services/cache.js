@@ -63,7 +63,8 @@ class SkillCache {
       this.cache.set(skillName, result);
       return result;
     } catch (err) {
-      console.error(`[Cache] Failed to read ${mdFile}: ${err.message}`);
+      // Silently swallow cache load failures instead of polluting stdout
+      // logger.error('Cache', `Failed to read ${mdFile}: ${err.message}`);
       return null;
     }
   }

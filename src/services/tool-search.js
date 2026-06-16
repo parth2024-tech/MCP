@@ -18,7 +18,18 @@ const TOOL_KEYWORDS = {
   ],
   query_skills: ["query", "skills", "semantic", "search", "cosine", "similarity", "tf-idf", "rank", "match", "find", "score"],
   update_project_rules: ["update", "rules", "project", "conventions", "custom", "preferences", "learn", "style", "ase-project", "json"],
-  validate_output: ["validate", "output", "lint", "typecheck", "typescript", "tests", "verify", "build", "compile", "check", "errors"]
+  validate_output: ["validate", "output", "lint", "typecheck", "typescript", "tests", "verify", "build", "compile", "check", "errors"],
+  claim_task: ["claim", "task", "next", "assign", "work", "queue", "graph"],
+  complete_task: ["complete", "finish", "task", "done", "output", "unlock", "downstream"],
+  create_task: ["create", "task", "seed", "graph", "dag", "dependency", "depends"],
+  write_memory: ["write", "memory", "shared", "context", "state", "namespace", "save"],
+  read_memory: ["read", "memory", "shared", "context", "state", "namespace", "load"],
+  acquire_file_lock: ["acquire", "lock", "file", "conflict", "exclusive", "shared", "prevent", "overwrite"],
+  release_file_lock: ["release", "lock", "file", "unlock", "free"],
+  subscribe_events: ["subscribe", "events", "bus", "listen", "react", "notification"],
+  poll_events: ["poll", "events", "bus", "read", "notification", "messages"],
+  heartbeat: ["heartbeat", "ping", "alive", "liveness", "dead", "recovery", "timeout"],
+  get_orchestration_state: ["orchestration", "state", "dashboard", "snapshot", "tasks", "agents", "locks", "bottleneck"]
 };
 
 // Common stopwords to filter out from query
