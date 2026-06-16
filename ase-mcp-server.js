@@ -2,9 +2,13 @@
 const { spawn } = require('child_process');
 const path = require('path');
 
-const child = spawn('npx', ['tsx', 'ase-mcp-server.ts'], {
+const child = spawn('node', [
+    '-r',
+    'tsx',
+    path.join(__dirname, 'ase-mcp-server.ts')
+], {
     cwd: __dirname,
-    stdio: 'inherit' // Inherit stdin, stdout, stderr for MCP communication
+    stdio: 'inherit' // Inherit stdin, stdout, stderr for direct MCP communication
 });
 
 child.on('error', (err) => {
