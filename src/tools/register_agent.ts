@@ -1,0 +1,56 @@
+import { z } from 'zod';
+import crypto from 'crypto';
+import { BaseTool, ToolContext } from '../core/BaseTool';
+
+export default class RegisterAgentTool extends BaseTool<any> {
+  name = 'register_agent';
+  description = 'Register a new agent connection with specific role and capabilities, returning a signed session token. Call this bootstrap tool first to obtain an agent_token.';
+  
+  schema = z.object({
+    role: z.string().describe('The role of the registering agent (e.g., developer, audit, reviewer)'),
+    capabilities: z.array(z.string()).describe('List of authorized tool names, or ["*"] for full wildcard access'),
+    ttl_seconds: z.number().optional().default(3600).describe('Time-to-live for the token in seconds')
+  });
+
+  protected async execute(args: any, context: ToolContext): Promise<any> {
+    const { role, capabilities, ttl_seconds } = args;
+    const tokenSecret = context.container.resolve<string>('TokenSecret');
+    const sessionId = crypto.randomUUID();
+    
+    const now = Math.floor(Date.now() / 1000);
+    const expiresAt = now + ttl_seconds;
+
+    const payload = {
+      role,
+      capabilities,
+      issued_at: now,
+      expires_at: expiresAt,
+      session_id: sessionId
+    };
+
+    const base64Payload = Buffer.from(JSON.stringify(payload)).toString('base64');
+    
+    const signature = crypto
+      .createHmac('sha256', tokenSecret)
+      .update(base64Payload)
+      .digest('base64');
+
+    const token = `${base64Payload}.${signature}`;
+
+    // Register agent in DB/Redis
+    const dbManager = context.container.resolve<any>('OrchestrationDB');
+    const db = dbManager.getDB();
+    db.prepare(`
+      INSERT OR REPLACE INTO agents (agent_id, last_heartbeat, status)
+      VALUES (?, unixepoch(), 'active')
+    `).run(sessionId);
+
+    return {
+      agent_id: sessionId,
+      agent_token: token,
+      expires_at: expiresAt,
+      role,
+      capabilities
+    };
+  }
+}

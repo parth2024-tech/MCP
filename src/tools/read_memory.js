@@ -20,29 +20,10 @@ module.exports = function createReadMemory(deps) {
       if (!key) throw new Error('key is required');
 
       const orch = OrchestrationDB.getInstance();
-      const db = orch.getDB();
+      const result = await orch.readMemory(key, scope);
 
-      // Clean up expired entries first
-      orch.expireMemory();
-
-      const row = db.prepare(`
-        SELECT * FROM shared_memory
-        WHERE key = ? AND scope = ?
-          AND (expires_at IS NULL OR expires_at > unixepoch())
-      `).get(key, scope);
-
-      if (!row) {
-        return { found: false };
-      }
-
-      const result = {
-        found: true,
-        value: JSON.parse(row.value),
-        written_by: row.written_by,
-        version: row.version,
-      };
-
-      if (include_history) {
+      if (result.found && include_history) {
+        const db = orch.getDB();
         result.history = db.prepare(`
           SELECT changed_by, old_value, new_value, changed_at
           FROM memory_changelog

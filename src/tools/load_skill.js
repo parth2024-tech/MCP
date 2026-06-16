@@ -3,6 +3,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { logAccess, logger } = require('../utils/logger');
 const { toolError } = require('../utils/errors');
+const { parseFrontmatter } = require('../utils/context-optimizer');
 
 const SKILLS_DIR = path.resolve(__dirname, '../../../../');
 const AUTH_FILE = '/home/thor/.agents/auth.json';
@@ -120,23 +121,42 @@ module.exports = (deps) => ({
       });
     }
     
-    const skillData = await deps.skillCache.getSkillContent(skill_name);
-
-    if (!skillData) {
-      (extra?.reqLogger || require('../utils/logger')).logAccess('mcp-client', skill_name, 'not_found', Date.now() - startTime);
-      if (deps.sessionState && typeof deps.sessionState.logToolCall === 'function') {
-        deps.sessionState.logToolCall('load_skill', Date.now() - startTime, true);
-      }
-      return toolError({
-        error_code: 'SKILL_NOT_FOUND',
-        message: `Skill "${skill_name}" does not exist in local registry or has no markdown file.`,
-        retryable: false,
-        fix_hint: 'Call query_skills first to discover available skills.'
-      });
+    let content, mdFile, version;
+    let pinned = null;
+    if (deps.sessionState) {
+      pinned = deps.sessionState.getPinnedSkill(skill_name);
     }
 
-    const content = skillData.content;
-    const mdFile = skillData.path;
+    if (pinned && pinned.content) {
+      content = pinned.content;
+      version = pinned.version;
+      mdFile = path.resolve(SKILLS_DIR, skill_name, 'SKILL.md');
+    } else {
+      const skillData = await deps.skillCache.getSkillContent(skill_name);
+
+      if (!skillData) {
+        (extra?.reqLogger || require('../utils/logger')).logAccess('mcp-client', skill_name, 'not_found', Date.now() - startTime);
+        if (deps.sessionState && typeof deps.sessionState.logToolCall === 'function') {
+          deps.sessionState.logToolCall('load_skill', Date.now() - startTime, true);
+        }
+        return toolError({
+          error_code: 'SKILL_NOT_FOUND',
+          message: `Skill "${skill_name}" does not exist in local registry or has no markdown file.`,
+          retryable: false,
+          fix_hint: 'Call query_skills first to discover available skills.'
+        });
+      }
+
+      content = skillData.content;
+      mdFile = skillData.path;
+
+      const fm = parseFrontmatter(content);
+      version = (fm && fm.version) ? fm.version : '1.0.0';
+
+      if (deps.sessionState) {
+        deps.sessionState.pinSkill(skill_name, version, content);
+      }
+    }
 
     // Enforce Access Control boundaries (RBAC)
     const requiredTier = getRequiredTier(skill_name, content);
@@ -181,6 +201,7 @@ module.exports = (deps) => ({
       skill_name: skill_name, 
       path: mdFile,
       required_tier: requiredTier,
+      version: version,
       content: content 
     };
   }

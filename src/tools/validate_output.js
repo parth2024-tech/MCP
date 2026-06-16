@@ -1,5 +1,7 @@
 const fs = require('fs').promises;
 const path = require('path');
+const crypto = require('crypto');
+const OrchestrationDB = require('../services/orchestration-db');
 const { validateWithAST } = require('../services/ast-validator');
 const { toolError } = require('../utils/errors');
 const { logAccess } = require('../utils/logger');
@@ -46,117 +48,118 @@ module.exports = (deps) => ({
     const projectDir = args.project_dir || process.cwd();
     const timeoutMs = args.timeout_ms || 30000;
     const startMs = Date.now();
+    const runId = crypto.randomUUID();
+    const db = OrchestrationDB.getInstance().getDB();
 
-    // ── Pre-flight Checks (Code-level validation) ──
-    if (args.code !== undefined) {
-      const filename = args.file_path || 'file.tsx';
-      
-      // Load .ase-project.json never_do rules
-      let neverDo = [];
+    // Insert placeholder validation run record
+    db.prepare(`
+      INSERT INTO validation_runs (id, project_dir, passed, details)
+      VALUES (?, ?, 0, ?)
+    `).run(runId, projectDir, JSON.stringify({ status: 'running' }));
+
+    // Run validation in the background
+    (async () => {
       try {
-        const configPath = path.join(projectDir, '.ase-project.json');
-        const raw = await fs.readFile(configPath, 'utf8');
-        const config = JSON.parse(raw);
-        neverDo = config.never_do || [];
-      } catch (err) {
-        // Fallback or ignore if file doesn't exist
-      }
-
-      // 1. Fast regex checks
-      const regexViolations = runRegexChecks(args.code, filename, neverDo);
-
-      // 2. AST structural analysis
-      const astViolations = validateWithAST(args.code, filename);
-
-      const durationMs = Date.now() - startMs;
-      const hasErrors = regexViolations.length > 0 || astViolations.length > 0;
-
-      // Log tool call metrics
-      if (deps.sessionState && typeof deps.sessionState.logToolCall === 'function') {
-        deps.sessionState.logToolCall('validate_output', durationMs, hasErrors);
-      }
-
-      if (hasErrors) {
-        return toolError({
-          error_code: 'VALIDATION_FAILED',
-          message: `Pre-flight validation failed in ${durationMs}ms. Code violates project rules.`,
-          retryable: true,
-          fix_hint: 'Review the rule violations, fix the code structure/types/styles, and try again.',
-          details: {
-            regex_violations: regexViolations,
-            ast_violations: astViolations
+        if (args.code !== undefined) {
+          const filename = args.file_path || 'file.tsx';
+          let neverDo = [];
+          try {
+            const configPath = path.join(projectDir, '.ase-project.json');
+            const raw = await fs.readFile(configPath, 'utf8');
+            const config = JSON.parse(raw);
+            neverDo = config.never_do || [];
+          } catch (err) {
+            // Ignore if file doesn't exist
           }
-        });
-      }
 
-      return {
-        content: [{
-          type: 'text',
-          text: `✅ Pre-flight validation passed in ${durationMs}ms. ${filename} is clean.`
-        }]
-      };
-    }
+          const regexViolations = runRegexChecks(args.code, filename, neverDo);
+          const astViolations = validateWithAST(args.code, filename);
+          const hasErrors = regexViolations.length > 0 || astViolations.length > 0;
+          const durationMs = Date.now() - startMs;
 
-    // ── Full project validation check (Standard mode) ──
-    const { validateStream } = require('../services/streaming-validator');
-    const chunks = [];
-    let finalSummary = null;
-    let stepIndex = 0;
+          if (deps.sessionState && typeof deps.sessionState.logToolCall === 'function') {
+            deps.sessionState.logToolCall('validate_output', durationMs, hasErrors);
+          }
 
-    try {
-      for await (const chunk of validateStream(projectDir, timeoutMs)) {
-        chunks.push(chunk);
-
-        if (chunk.type === 'summary') {
-          finalSummary = chunk;
+          db.prepare(`
+            UPDATE validation_runs SET passed = ?, details = ? WHERE id = ?
+          `).run(hasErrors ? 0 : 1, JSON.stringify({
+            status: 'completed',
+            passed: !hasErrors,
+            filename,
+            regex_violations: regexViolations,
+            ast_violations: astViolations,
+            duration_ms: durationMs
+          }), runId);
         } else {
-          stepIndex++;
+          const { validateStream } = require('../services/streaming-validator');
+          const chunks = [];
+          let finalSummary = null;
+          let stepIndex = 0;
 
-          if (extra && typeof extra.sendNotification === 'function') {
-            try {
-              const progressToken = extra._meta && extra._meta.progressToken;
-              if (progressToken !== undefined) {
-                await extra.sendNotification({
-                  method: 'notifications/progress',
-                  params: {
-                    progressToken,
-                    progress: stepIndex,
-                    total: chunk.totalSteps,
-                    message: `[${chunk.status || 'skipped'}] ${chunk.step}`
+          for await (const chunk of validateStream(projectDir, timeoutMs)) {
+            chunks.push(chunk);
+            if (chunk.type === 'summary') {
+              finalSummary = chunk;
+            } else {
+              stepIndex++;
+              if (extra && typeof extra.sendNotification === 'function') {
+                try {
+                  const progressToken = extra._meta && extra._meta.progressToken;
+                  if (progressToken !== undefined) {
+                    await extra.sendNotification({
+                      method: 'notifications/progress',
+                      params: {
+                        progressToken,
+                        progress: stepIndex,
+                        total: chunk.totalSteps,
+                        message: `[${chunk.status || 'skipped'}] ${chunk.step}`
+                      }
+                    });
                   }
-                });
+                } catch (notifErr) {
+                  // Ignore notification errors in background
+                }
               }
-            } catch (notifErr) {
-              (extra?.reqLogger || require('../utils/logger').logger).warn('ValidateOutput', `Failed to send progress notification: ${notifErr.message}`);
             }
           }
+
+          const passed = finalSummary ? finalSummary.passed : false;
+          const result = {
+            status: 'completed',
+            passed: passed,
+            project_type: finalSummary ? finalSummary.project_type : 'unknown',
+            project_dir: projectDir,
+            critical_failure: finalSummary ? finalSummary.critical_failure : false,
+            results: chunks.filter(c => c.type === 'step_result'),
+            skipped: finalSummary ? finalSummary.skipped : [],
+            summary: finalSummary ? finalSummary.summary : 'Validation did not complete.'
+          };
+
+          const durationMs = Date.now() - startMs;
+          if (deps.sessionState && typeof deps.sessionState.logToolCall === 'function') {
+            deps.sessionState.logToolCall('validate_output', durationMs, !passed);
+          }
+
+          db.prepare(`
+            UPDATE validation_runs SET passed = ?, details = ? WHERE id = ?
+          `).run(passed ? 1 : 0, JSON.stringify(result), runId);
         }
+      } catch (err) {
+        const durationMs = Date.now() - startMs;
+        if (deps.sessionState && typeof deps.sessionState.logToolCall === 'function') {
+          deps.sessionState.logToolCall('validate_output', durationMs, true);
+        }
+        db.prepare(`
+          UPDATE validation_runs SET passed = 0, details = ? WHERE id = ?
+        `).run(JSON.stringify({ status: 'failed', error: err.message }), runId);
       }
+    })();
 
-      const result = {
-        project_type: finalSummary ? finalSummary.project_type : 'unknown',
-        project_dir: projectDir,
-        passed: finalSummary ? finalSummary.passed : false,
-        critical_failure: finalSummary ? finalSummary.critical_failure : false,
-        results: chunks.filter(c => c.type === 'step_result'),
-        skipped: finalSummary ? finalSummary.skipped : [],
-        summary: finalSummary ? finalSummary.summary : 'Validation did not complete.'
-      };
-
-      const durationMs = Date.now() - startMs;
-      if (deps.sessionState && typeof deps.sessionState.logToolCall === 'function') {
-        deps.sessionState.logToolCall('validate_output', durationMs, !result.passed);
-      }
-
-      (extra?.reqLogger || require('../utils/logger')).logAccess('mcp-client', 'validate_output', 'authorized', 0, { passed: result.passed, project_type: result.project_type });
-      return result;
-
-    } catch (err) {
-      const durationMs = Date.now() - startMs;
-      if (deps.sessionState && typeof deps.sessionState.logToolCall === 'function') {
-        deps.sessionState.logToolCall('validate_output', durationMs, true);
-      }
-      return { error: `Streaming validation failed: ${err.message}` };
-    }
+    return {
+      status: 'running',
+      validation_job_id: runId,
+      validation_run_id: runId
+    };
   }
 });

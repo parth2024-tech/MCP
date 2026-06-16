@@ -5,7 +5,7 @@ const { logAccess, warn } = require('../utils/logger');
 const { findMainMd } = require('../utils/fs-utils');
 const metrics = require('../utils/metrics');
 
-const SKILLS_DIR = path.resolve(__dirname, '../../../');
+const SKILLS_DIR = path.resolve(__dirname, '../../../../');
 
 class SkillCache {
   constructor() {

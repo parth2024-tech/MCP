@@ -14,7 +14,7 @@ const TOOL_KEYWORDS = {
   log_skill_step: [
     'log', 'record', 'step', 'write step', 'written', 'action entry', 'execution step',
     'pipeline step', 'append log', 'mark step', 'track action',
-    'current step', 'this step', 'just happened', 'now running', 'active step'
+    'current step', 'this step', 'just happened', 'now running', 'active step', 'file'
   ],
   query_skills: ["query", "skills", "semantic", "search", "cosine", "similarity", "tf-idf", "rank", "match", "find", "score"],
   update_project_rules: ["update", "rules", "project", "conventions", "custom", "preferences", "learn", "style", "ase-project", "json"],
@@ -67,10 +67,10 @@ function getFrequencies(words) {
 function scoreTool(queryTokens, queryFreq, tool) {
   const toolNameLower = tool.name.toLowerCase();
   const toolDescLower = tool.description.toLowerCase();
-  const keywords = TOOL_KEYWORDS[tool.name] || [];
+  const keywords = (TOOL_KEYWORDS[tool.name] || []).flatMap(k => tokenize(k));
   
   // Combine all text representations of the tool
-  const toolText = `${toolNameLower} ${toolDescLower} ${keywords.join(" ")}`;
+  const toolText = `${toolNameLower} ${toolDescLower} ${(TOOL_KEYWORDS[tool.name] || []).join(" ")}`;
   const toolTokens = tokenize(toolText);
   const toolFreq = getFrequencies(toolTokens);
   
@@ -137,19 +137,20 @@ function findRelevantTools(query, topK, registry, virtualKeyManager = null, virt
       name: tool.name,
       description: tool.description,
       inputSchema: tool.inputSchema,
-      relevance_score: Math.min(1.0, parseFloat(score.toFixed(4)))
+      relevance_score: Math.min(1.0, parseFloat(score.toFixed(4))),
+      raw_score: score
     };
   });
   
-  // Sort descending by score, fallback to alphabetical on tie
+  // Sort descending by raw score, fallback to alphabetical on tie
   scoredTools.sort((a, b) => {
-    if (b.relevance_score !== a.relevance_score) {
-      return b.relevance_score - a.relevance_score;
+    if (b.raw_score !== a.raw_score) {
+      return b.raw_score - a.raw_score;
     }
     return a.name.localeCompare(b.name);
   });
   
-  return scoredTools.slice(0, topK);
+  return scoredTools.slice(0, topK).map(({ raw_score, ...rest }) => rest);
 }
 
 module.exports = {

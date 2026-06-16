@@ -81,7 +81,64 @@ class SessionState {
         is_error INTEGER DEFAULT 0,
         called_at INTEGER NOT NULL DEFAULT (unixepoch())
       );
+
+      CREATE TABLE IF NOT EXISTS skill_versions (
+        skill_name TEXT,
+        version TEXT,
+        content TEXT NOT NULL,
+        saved_at TEXT NOT NULL,
+        PRIMARY KEY (skill_name, version)
+      );
     `);
+
+    try {
+      this.db.exec('ALTER TABLE session_skills ADD COLUMN pinned_version TEXT');
+    } catch (e) {
+      // Ignored if column already exists
+    }
+  }
+
+  getPinnedSkill(skillName) {
+    try {
+      const row = this.db.prepare('SELECT pinned_version FROM session_skills WHERE session_id = ? AND skill_name = ?')
+        .get(this.sessionId, skillName);
+      if (!row || !row.pinned_version) {
+        return null;
+      }
+      const version = row.pinned_version;
+      const verRow = this.db.prepare('SELECT content FROM skill_versions WHERE skill_name = ? AND version = ?')
+        .get(skillName, version);
+      if (verRow) {
+        return { version, content: verRow.content };
+      }
+      return { version, content: null };
+    } catch (err) {
+      logger.error('SessionState', `Failed to get pinned skill ${skillName}: ${err.message}`);
+      return null;
+    }
+  }
+
+  pinSkill(skillName, version, content) {
+    try {
+      const tx = this.db.transaction(() => {
+        // Upsert session_skills with pinned_version
+        this.db.prepare(`
+          INSERT INTO session_skills (session_id, skill_name, loaded_at, pinned_version)
+          VALUES (?, ?, ?, ?)
+          ON CONFLICT(session_id, skill_name) DO UPDATE SET pinned_version = excluded.pinned_version
+        `).run(this.sessionId, skillName, new Date().toISOString(), version);
+
+        // Insert into skill_versions
+        this.db.prepare(`
+          INSERT OR IGNORE INTO skill_versions (skill_name, version, content, saved_at)
+          VALUES (?, ?, ?, ?)
+        `).run(skillName, version, content, new Date().toISOString());
+      });
+      tx();
+      logger.info('SessionState', `Pinned skill ${skillName} to version ${version}`);
+    } catch (err) {
+      logger.error('SessionState', `Failed to pin skill ${skillName} to ${version}: ${err.message}`);
+    }
   }
 
   _rotateSessions() {

@@ -1,0 +1,128 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const promises_1 = __importDefault(require("fs/promises"));
+const zod_1 = require("zod");
+const crypto_1 = require("crypto");
+const BaseTool_1 = require("../core/BaseTool");
+const code_loops_1 = require("../loops/code-loops");
+class RefineAndWriteTool extends BaseTool_1.BaseTool {
+    name = 'refine_and_write';
+    description = 'Submit code through 5-loop refinement pipeline. Only writes file if all loops pass.';
+    schema = zod_1.z.object({
+        task_id: zod_1.z.string(),
+        agent_id: zod_1.z.string(),
+        file_path: zod_1.z.string(),
+        code: zod_1.z.string(),
+        dry_run: zod_1.z.boolean().optional().default(false),
+    });
+    async execute(args, context) {
+        const { task_id, agent_id, file_path, code, dry_run = false } = args;
+        const dbManager = context.container.resolve('OrchestrationDB');
+        const db = dbManager.getDB();
+        const sessionId = (0, crypto_1.randomUUID)();
+        const redis = await dbManager.getRedisClient();
+        const lockData = await redis.get(`ase:lock:${file_path}`);
+        let lockHolder = null;
+        if (lockData) {
+            const lockObj = JSON.parse(lockData);
+            lockHolder = lockObj.locked_by || (lockObj.locks && lockObj.locks[0] && lockObj.locks[0].locked_by);
+        }
+        if (!lockHolder || lockHolder !== agent_id) {
+            throw new Error(`Agent ${agent_id} does not hold exclusive lock on ${file_path}`);
+        }
+        // Capture snapshot of the current file content
+        const snapshotId = (0, crypto_1.randomUUID)();
+        let currentContent = null;
+        try {
+            currentContent = await promises_1.default.readFile(file_path, 'utf8');
+        }
+        catch (err) {
+            if (err.code !== 'ENOENT') {
+                throw err;
+            }
+        }
+        const now = Math.floor(Date.now() / 1000);
+        if (!dry_run) {
+            db.prepare(`
+        INSERT INTO file_snapshots (id, file_path, content, timestamp)
+        VALUES (?, ?, ?, ?)
+      `).run(snapshotId, file_path, currentContent, now);
+        }
+        const ctx = {
+            file_path,
+            task_id,
+            never_do_rules: [], // Extendable in the future
+            ast_rules: [], // Extendable in the future
+            previous_loops: [],
+        };
+        let current = code;
+        const loopResults = [];
+        for (const loopDef of code_loops_1.CODE_LOOP_TRANSFORMS) {
+            const result = await loopDef.transform(current, ctx);
+            if (!dry_run) {
+                await dbManager.recordCodeLoop(sessionId, task_id, loopDef.number, loopDef.name, current, result.code, result.changes, now);
+            }
+            loopResults.push({ number: loopDef.number, changes: result.changes });
+            ctx.previous_loops = loopResults;
+            current = result.code;
+        }
+        const hasViolations = current.includes("⚠️ ASE_VIOLATION") ||
+            current.includes("⚠️ ASE_TYPE") ||
+            current.includes("⚠️ ASE_UNUSED_IMPORT");
+        if (hasViolations) {
+            throw new Error(`Unresolved violations found after 5 loops. File not written. Refined code: ${current}`);
+        }
+        if (dry_run) {
+            return {
+                status: "DRY_RUN_PREVIEW",
+                file_path,
+                original_code: currentContent,
+                refined_code: current,
+                loops_run: 5,
+                loop_summary: loopResults,
+                index_updated: false,
+                index_staleness: "none"
+            };
+        }
+        await promises_1.default.writeFile(file_path, current, "utf-8");
+        // T4-C: Synchronously re-index the written file in the AST database
+        let indexUpdated = false;
+        let indexStaleness = "none";
+        let estimatedReindexTime = 0;
+        try {
+            const astIndexer = context.container.has('ASTIndexer') ? context.container.resolve('ASTIndexer') : null;
+            if (astIndexer && astIndexer.indexFile) {
+                await astIndexer.indexFile(file_path, current);
+                indexUpdated = true;
+            }
+        }
+        catch (err) {
+            indexStaleness = "warning";
+            estimatedReindexTime = 5;
+            const log = context.container.has('reqLogger') ? context.container.resolve('reqLogger') : require('../utils/logger').logger;
+            log.warn('RefineAndWrite', `Synchronous indexing failed for ${file_path}: ${err.message}`);
+        }
+        db.prepare(`
+      INSERT INTO events (type, payload, source_agent, task_id)
+      VALUES ('file_written', ?, ?, ?)
+    `).run(JSON.stringify({ file_path, session_id: sessionId, snapshot_id: snapshotId, loops_run: 5 }), agent_id, task_id);
+        const response = {
+            status: "WRITTEN",
+            file_path,
+            session_id: sessionId,
+            snapshot_id: snapshotId,
+            loops_run: 5,
+            loop_summary: loopResults,
+            index_updated: indexUpdated
+        };
+        if (indexStaleness === "warning") {
+            response.index_staleness = "warning";
+            response.estimated_reindex_time_seconds = estimatedReindexTime;
+        }
+        return response;
+    }
+}
+exports.default = RefineAndWriteTool;

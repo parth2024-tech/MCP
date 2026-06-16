@@ -19,13 +19,8 @@ module.exports = function createReleaseFileLock(deps) {
       if (!file_path || !agent_id) throw new Error('file_path and agent_id are required');
 
       const orch = OrchestrationDB.getInstance();
-      const db = orch.getDB();
-
-      const changes = db.prepare(
-        `DELETE FROM file_locks WHERE file_path = ? AND locked_by = ?`
-      ).run(file_path, agent_id);
-
-      return { released: changes.changes > 0, file_path };
+      const result = await orch.releaseFileLock(file_path, agent_id);
+      return result;
     }
   };
 };

@@ -24,37 +24,7 @@ module.exports = function createAcquireFileLock(deps) {
       }
 
       const orch = OrchestrationDB.getInstance();
-      const db = orch.getDB();
-
-      const result = db.transaction(() => {
-        // Expire stale locks first
-        orch.expireStaleLocks();
-
-        const existing = db.prepare(
-          `SELECT * FROM file_locks WHERE file_path = ?`
-        ).get(file_path);
-
-        if (existing) {
-          // Shared locks can coexist with other shared locks, not with exclusive
-          if (existing.lock_type === 'exclusive' || lock_type === 'exclusive') {
-            return {
-              granted: false,
-              blocked_by: existing.locked_by,
-              blocked_by_task: existing.task_id,
-              retry_after_seconds: Math.max(0, existing.expires_at - Math.floor(Date.now() / 1000)),
-            };
-          }
-        }
-
-        const expiresAt = Math.floor(Date.now() / 1000) + ttl_seconds;
-        db.prepare(`
-          INSERT OR REPLACE INTO file_locks (file_path, locked_by, task_id, lock_type, expires_at)
-          VALUES (?, ?, ?, ?, ?)
-        `).run(file_path, agent_id, task_id, lock_type, expiresAt);
-
-        return { granted: true, expires_at: expiresAt };
-      })();
-
+      const result = await orch.acquireFileLock(file_path, agent_id, task_id, lock_type, ttl_seconds);
       return result;
     }
   };

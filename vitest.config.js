@@ -5,7 +5,7 @@ export default defineConfig({
     // Run tests in Node environment (no DOM needed)
     environment: 'node',
     // Test file patterns
-    include: ['tests/**/*.test.js'],
+    include: ['tests/**/*.test.{js,ts}'],
     // Reporter
     reporter: 'verbose',
     // Coverage (optional, run with: npx vitest run --coverage)

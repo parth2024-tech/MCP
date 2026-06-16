@@ -44,7 +44,19 @@ module.exports = (deps) => ({
       background: stats.background.utilization || 0
     };
 
+    let systemStatus = 'healthy';
+    if (deps.orchestrationDb) {
+      try {
+        const redis = deps.orchestrationDb.getRedisClient();
+        const isDegraded = await redis.get('ase:system_degraded') === 'true';
+        if (isDegraded) {
+          systemStatus = 'degraded';
+        }
+      } catch (e) {}
+    }
+
     const report = {
+      status: systemStatus,
       embedding_service: embState,
       worker_pool_utilization: worker_pool_utilization,
       skill_count: skillCount,

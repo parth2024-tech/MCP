@@ -23,36 +23,9 @@ module.exports = function createWriteMemory(deps) {
       if (!key || !agent_id) throw new Error('key and agent_id are required');
 
       const orch = OrchestrationDB.getInstance();
-      const db = orch.getDB();
       const fullScope = scope_id ? `${scope}:${scope_id}` : scope;
-      const expiresAt = ttl_seconds
-        ? Math.floor(Date.now() / 1000) + ttl_seconds
-        : null;
 
-      const result = db.transaction(() => {
-        const existing = db.prepare(
-          `SELECT value, version FROM shared_memory WHERE key = ? AND scope = ?`
-        ).get(key, fullScope);
-
-        db.prepare(`
-          INSERT INTO shared_memory (key, scope, value, written_by, expires_at, version)
-          VALUES (?, ?, ?, ?, ?, 1)
-          ON CONFLICT(key, scope) DO UPDATE SET
-            value = excluded.value,
-            written_by = excluded.written_by,
-            expires_at = excluded.expires_at,
-            version = shared_memory.version + 1
-        `).run(key, fullScope, JSON.stringify(value), agent_id, expiresAt);
-
-        // Audit trail
-        db.prepare(`
-          INSERT INTO memory_changelog (key, scope, old_value, new_value, changed_by)
-          VALUES (?, ?, ?, ?, ?)
-        `).run(key, fullScope, existing ? existing.value : null, JSON.stringify(value), agent_id);
-
-        const newVersion = existing ? existing.version + 1 : 1;
-        return { key, scope: fullScope, version: newVersion };
-      })();
+      const result = await orch.writeMemory(key, fullScope, value, agent_id, scope === 'task' ? scope_id : null, ttl_seconds);
 
       orch.emitEvent('memory_updated', { key, scope: fullScope }, agent_id);
       return result;

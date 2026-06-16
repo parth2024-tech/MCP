@@ -29,15 +29,20 @@ module.exports = (deps) => ({
         type: 'boolean',
         description: 'Optional. If true, writes the rule to a rule_proposals.jsonl file for human review instead of applying it immediately. Defaults to true to prevent AI from polluting config.',
         default: true
+      },
+      dry_run: {
+        type: 'boolean',
+        description: 'Optional. Run validation but do not commit any updates or proposals to disk.',
+        default: false
       }
     },
     required: ['rule_type', 'action', 'content']
   },
   handler: async (args, extra) => {
-    const { rule_type, action, content, project_dir, draft_mode } = args;
+    const { rule_type, action, content, project_dir, draft_mode, dry_run = false } = args;
     const isDraft = draft_mode !== undefined ? draft_mode : true;
-    const result = await updateProjectRules(rule_type, action, content, project_dir || process.cwd(), isDraft);
-    (extra?.reqLogger || require('../utils/logger')).logAccess('mcp-client', 'update_project_rules', 'authorized', 0, { success: !result.error, draft_mode: isDraft });
+    const result = await updateProjectRules(rule_type, action, content, project_dir || process.cwd(), isDraft, dry_run);
+    (extra?.reqLogger || require('../utils/logger')).logAccess('mcp-client', 'update_project_rules', 'authorized', 0, { success: !result.error, draft_mode: isDraft, dry_run });
     return result;
   }
 });

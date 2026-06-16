@@ -2,13 +2,13 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": "ase-mcp-server.js",
+  "main": "ase-mcp-server.ts",
   "scripts": {
-    "start": "node ase-mcp-server.js",
-    "dev": "NODE_ENV=development node ase-mcp-server.js",
+    "start": "tsx ase-mcp-server.ts",
+    "dev": "NODE_ENV=development tsx ase-mcp-server.ts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "verify": "node verify-all.js && node verify-jit-mcp.js"
+    "verify": "tsx verify-all.js && tsx verify-jit-mcp.js"
   },
   "keywords": [],
   "author": "",
@@ -23,12 +23,17 @@
     "chokidar": "^5.0.0",
     "dotenv": "^17.4.2",
     "hnswlib-node": "^3.0.0",
+    "ioredis": "^5.11.1",
     "lru-cache": "^11.5.1",
     "neo4j-driver": "^6.0.1",
     "pino": "^10.3.1",
-    "piscina": "^5.1.4"
+    "piscina": "^5.1.4",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@types/node": "^25.9.3",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3",
     "vitest": "^2.1.9"
   }
 }
