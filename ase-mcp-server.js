@@ -8,8 +8,13 @@ const child = spawn('node', [
     path.join(__dirname, 'ase-mcp-server.ts')
 ], {
     cwd: __dirname,
-    stdio: 'inherit' // Inherit stdin, stdout, stderr for direct MCP communication
+    stdio: ['pipe', 'pipe', 'pipe'] // Pipe stdin, stdout, and stderr explicitly
 });
+
+// Explicitly pipe streams to ensure no buffering or timeout blocks
+process.stdin.pipe(child.stdin);
+child.stdout.pipe(process.stdout);
+child.stderr.pipe(process.stderr);
 
 child.on('error', (err) => {
     console.error('Failed to start MCP server:', err);
