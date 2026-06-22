@@ -1,0 +1,11 @@
+---
+description: API route and server action patterns
+globs: ["src/app/api/**/*.ts", "src/actions/**/*.ts", "app/api/**/*.ts", "actions/**/*.ts"]
+alwaysApply: false
+---
+
+- Validate all inputs with Zod before processing
+- Return typed responses, never plain objects
+- Use try/catch with structured error responses
+- Server actions use the 'use server' directive
+- No secrets in route handlers — use environment variables

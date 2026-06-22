@@ -1,0 +1,19 @@
+{
+  "servers": {
+    "ase": {
+      "type": "stdio",
+      "command": "/home/thor/.local/bin/mcp-compressor",
+      "args": ["--compression-level", "medium", "npx", "tsx", "/home/thor/skiils/tools/server/ase-mcp-server.ts"]
+    },
+    "web-search": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"]
+    },
+    "toonify": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "toonify-mcp"]
+    }
+  }
+}

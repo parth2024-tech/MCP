@@ -1,0 +1,64 @@
+{
+  "name": "skiils",
+  "version": "1.0.0",
+  "description": "One-paragraph description of what this project does.",
+  "tech_stack": [
+    "Next.js 15 (App Router)",
+    "TypeScript 5.4",
+    "PostgreSQL 16 via Drizzle ORM",
+    "Tailwind CSS v4",
+    "Vercel Deployment"
+  ],
+  "conventions": [
+    "All components use named exports, never default exports",
+    "Database queries live exclusively in /lib/db/*.ts",
+    "API routes are in /app/api/**/*.ts using Next.js Route Handlers",
+    "Zod schemas for all external input validation"
+  ],
+  "architecture_patterns": [
+    "Server Components for data fetching, Client Components for interactivity only",
+    "Repository pattern for database access",
+    "Feature-based folder structure under /features"
+  ],
+  "never_do": [
+    "Never use useEffect for data fetching — use React Server Components",
+    "Never store secrets in environment files committed to git",
+    "Never use inline styles — always use Tailwind classes",
+    "Never use any TypeScript type — always type explicitly",
+    "Never instantiate THREE objects (Vector3, Color, Matrix4, etc.) inside requestAnimationFrame or useFrame — always pre-allocate outside the loop",
+    "Never set renderer.setPixelRatio above 2 — always cap with Math.min(devicePixelRatio, 2)",
+    "Never ship a Three.js scene without calling .dispose() on all geometries, materials, and textures on unmount",
+    "Never use separate meshes for repeated identical objects — always use THREE.InstancedMesh or THREE.Points",
+    "Never build a 3D scene without checking renderer.info.render.calls — must stay within draw call budget"
+  ],
+  "preferred_patterns": [
+    "Use Zod for all schema validation",
+    "Use Drizzle ORM for all database access",
+    "Use server actions for mutations",
+    "For 3D: always use powerPreference: 'high-performance' in WebGLRenderer",
+    "For 3D: always use ACESFilmicToneMapping + SRGBColorSpace on the renderer",
+    "For 3D: use UnrealBloomPass or @react-three/postprocessing Bloom for all glowing effects",
+    "For 3D: use getGPUTier() from detect-gpu to serve adaptive quality levels",
+    "For 3D: use GSAP ScrollTrigger with scrub:1.5 for cinematic scroll-driven animation",
+    "For 3D shaders: use /* glsl */ template literal tags for syntax highlighting",
+    "For 3D assets: always run optimize-3d-assets.sh before adding any .glb to /public"
+  ],
+  "agent_skills": {
+    "directory": "/home/thor/skiils",
+    "default_skills": [
+      "lifecycle/using-agent-skills",
+      "lifecycle/context-engineering"
+    ],
+    "mandatory_skills": {
+      "api": "lifecycle/api-and-interface-design",
+      "auth": "lifecycle/security-and-hardening"
+    },
+    "session_reporting_preference": true
+  },
+  "sprint_focus": "Building the user onboarding flow with email verification and profile setup.",
+  "sprint_skills": [
+    "lifecycle/security-and-hardening",
+    "lifecycle/api-and-interface-design",
+    "lifecycle/test-driven-development"
+  ]
+}

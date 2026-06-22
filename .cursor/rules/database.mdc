@@ -1,0 +1,10 @@
+---
+description: Database and Drizzle ORM patterns
+globs: ["src/lib/db/**/*.ts", "lib/db/**/*.ts", "drizzle/**/*"]
+alwaysApply: false
+---
+
+- All DB calls go through the lib/db abstraction layer
+- Use Drizzle transactions for multi-step writes
+- Always select specific fields, never select *
+- Add indexes on all foreign keys and query filters

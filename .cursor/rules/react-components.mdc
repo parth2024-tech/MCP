@@ -1,0 +1,11 @@
+---
+description: React component conventions
+globs: ["src/components/**/*.tsx", "src/app/**/*.tsx"]
+alwaysApply: false
+---
+
+- Use server components by default
+- Client components require 'use client' at top
+- Props interface must be defined above the component
+- Use Tailwind CSS v4 classes, never raw HTML elements for UI style overrides
+- No useEffect for data fetching — use server components or SWR

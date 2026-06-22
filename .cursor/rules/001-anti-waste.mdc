@@ -1,0 +1,25 @@
+---
+description: Prevents the single biggest source of token waste
+alwaysApply: true
+---
+
+## Before writing any code
+- Do not write implementation until you have 95%+ confidence in the approach
+- If requirements are unclear, ask up to 3 targeted clarifying questions first
+- For tasks over 50 lines, outline the plan and get approval before coding
+- If you make a mistake, I will edit the original message — do not ask me to confirm the fix
+
+## Conversation History & Token Control Habits
+- Keep conversations scoped: Proactively advise the user to clear or start a new chat (Ctrl+L / Cmd+L) between unrelated tasks to prevent context build-up.
+- Promote editing over follow-up: If requirements change or a mistake is made, remind the user that editing the original message and regenerating is more token-efficient than follow-up messages.
+- Batch instructions: Encourage batching instructions into single combined prompts instead of sending multiple sequential messages.
+- Clean context actively: Advise the user to remove irrelevant open files from the chat context chips to minimize token waste.
+
+## Codebase Retrieval & Context Optimization
+- Use specific file paths: Proactively advise the user to use direct file references (e.g. `@filename`) instead of wide codebase searches (e.g. `@codebase`) when the target files are already known.
+- Limit `@codebase` searches: Use `@codebase` only for genuine discovery of unknown modules. Once relevant files are identified, suggest starting a clean chat referencing those files directly.
+- Close irrelevant tabs: Remind the user to keep the editor clean and close inactive tabs so they are not auto-included in context sweeps.
+
+## Prompt Caching & Static Context Optimization
+- Cache-friendly structure: Structure prompts and context by keeping static content (system prompt, schemas, project configurations) at the very top of the call payloads.
+- Minimize conversation churn: Keep the static header identical between sequential requests to leverage Anthropic prompt caching (break-point ephemeral caching), reducing input costs by up to 90%.

@@ -1,0 +1,10 @@
+---
+description: Use when doing large refactors or editing files over 500 lines
+alwaysApply: false
+---
+
+When editing large files:
+- Use SEARCH/REPLACE blocks, never full file rewrites
+- Confirm the surrounding context before making changes
+- Make one logical change at a time and wait for confirmation
+- If unsure where a block belongs, show the surrounding 10 lines and ask

@@ -1,0 +1,24 @@
+{
+  "servers": {
+    "ase": {
+      "type": "stdio",
+      "command": "/home/thor/.local/bin/mcp-compressor",
+      "args": ["--compression-level", "medium", "npx", "tsx", "/home/thor/skiils/tools/server/ase-mcp-server.ts"]
+    },
+    "postgres-db": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "postgresql://localhost:5432/skiils"]
+    },
+    "browser": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-playwright"]
+    },
+    "toonify": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "toonify-mcp"]
+    }
+  }
+}

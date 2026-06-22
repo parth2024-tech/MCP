@@ -1,0 +1,10 @@
+---
+description: Testing patterns and structure
+globs: ["**/*.test.ts", "**/*.spec.ts", "**/*.test.tsx", "**/*.spec.tsx", "**/__tests__/**"]
+alwaysApply: false
+---
+
+- Describe blocks map 1:1 to module/function names
+- Mock external dependencies, never real network calls
+- Test happy path + at least one error case per function
+- Use data-testid attributes for DOM queries

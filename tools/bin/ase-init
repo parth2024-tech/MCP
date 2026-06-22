@@ -1,0 +1,181 @@
+#!/usr/bin/env node
+/**
+ * ase-init — Global CLI Tool for the Antigravity Skills Engine
+ * 
+ * Usage:
+ *   ase-init          → Initialize ASE in the current project directory
+ *   ase-init --check  → Check if ASE is already configured
+ *   ase-init --update → Regenerate/update the .ase-project.json config
+ *   ase-init --validate → Run the output validator on the current project
+ *   ase-init --route "your request text" → Get the recommended model+temperature
+ *   ase-init --budget "your request text" → Get the top-3 relevant skills
+ */
+
+const fs = require('fs');
+const path = require('path');
+const readline = require('readline');
+
+// Path to the ASE tools directory
+const ASE_ROOT = '/home/thor/skiils/tools';
+
+const { generateProjectPrompt, getConfigTemplate } = require(`${ASE_ROOT}/server/project-prompt-generator`);
+const { validate, detectProjectType } = require(`${ASE_ROOT}/server/output-validator`);
+const { routeModel } = require(`${ASE_ROOT}/server/model-router`);
+const { selectTopSkills } = require(`${ASE_ROOT}/server/context-budget`);
+
+const CONFIG_FILE = '.ase-project.json';
+const cwd = process.cwd();
+const args = process.argv.slice(2);
+
+// ──────────────────────────────────────────────────────────
+// ANSI Colors
+// ──────────────────────────────────────────────────────────
+const c = {
+  reset: '\x1b[0m',
+  bold: '\x1b[1m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  cyan: '\x1b[36m',
+  red: '\x1b[31m',
+  gray: '\x1b[90m',
+  blue: '\x1b[34m',
+};
+
+function log(color, symbol, msg) {
+  console.log(`${color}${symbol}${c.reset} ${msg}`);
+}
+
+// ──────────────────────────────────────────────────────────
+// --check
+// ──────────────────────────────────────────────────────────
+if (args.includes('--check')) {
+  const configPath = path.join(cwd, CONFIG_FILE);
+  if (fs.existsSync(configPath)) {
+    log(c.green, '✅', `ASE is configured for this project.`);
+    const cfg = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    log(c.cyan, '📦', `Project: ${c.bold}${cfg.name}${c.reset}`);
+    log(c.gray, '🛠 ', `Tech stack: ${(cfg.tech_stack || []).join(', ')}`);
+  } else {
+    log(c.yellow, '⚠️ ', `No ${CONFIG_FILE} found. Run ${c.bold}ase-init${c.reset} to initialize.`);
+  }
+  process.exit(0);
+}
+
+// ──────────────────────────────────────────────────────────
+// --validate
+// ──────────────────────────────────────────────────────────
+if (args.includes('--validate')) {
+  log(c.cyan, '🔍', `Running output validation for: ${c.bold}${cwd}${c.reset}\n`);
+  const result = validate(cwd);
+  console.log(`Project type: ${c.bold}${result.project_type}${c.reset}\n`);
+  for (const step of result.results) {
+    const icon = step.passed ? `${c.green}✅${c.reset}` : `${c.red}❌${c.reset}`;
+    console.log(`${icon} ${step.step} (exit: ${step.exit_code})`);
+    if (!step.passed && step.output) {
+      console.log(`${c.gray}${step.output.slice(0, 500)}${c.reset}`);
+    }
+  }
+  console.log(`\n${result.summary}`);
+  process.exit(result.passed ? 0 : 1);
+}
+
+// ──────────────────────────────────────────────────────────
+// --route "request text"
+// ──────────────────────────────────────────────────────────
+const routeIdx = args.indexOf('--route');
+if (routeIdx !== -1) {
+  const request = args[routeIdx + 1] || '';
+  if (!request) { console.error('Usage: ase-init --route "your request text"'); process.exit(1); }
+  const config = routeModel(request);
+  console.log(`\n${c.bold}Model Recommendation:${c.reset}`);
+  log(c.blue,  '🤖', `Model:       ${c.bold}${config.model}${c.reset}`);
+  log(c.cyan,  '🌡 ', `Temperature: ${c.bold}${config.temperature}${c.reset}`);
+  log(c.green, '📏', `Max tokens:  ${c.bold}${config.max_tokens}${c.reset}`);
+  log(c.gray,  '🏷 ', `Task type:   ${config.task_type}`);
+  log(c.gray,  '💬', `Rationale:   ${config.rationale}`);
+  process.exit(0);
+}
+
+// ──────────────────────────────────────────────────────────
+// --budget "request text"
+// ──────────────────────────────────────────────────────────
+const budgetIdx = args.indexOf('--budget');
+if (budgetIdx !== -1) {
+  const request = args[budgetIdx + 1] || '';
+  if (!request) { console.error('Usage: ase-init --budget "your request text"'); process.exit(1); }
+  const SKILLS_DIR = '/home/thor/skiils';
+  const allSkills = fs.readdirSync(SKILLS_DIR).filter(e => {
+    try { return fs.statSync(path.join(SKILLS_DIR, e)).isDirectory() && !e.startsWith('.') && e !== 'tools' && e !== 'docs'; }
+    catch(_) { return false; }
+  });
+  const budget = selectTopSkills(allSkills, request, 3);
+  console.log(`\n${c.bold}Context Budget (top 3 skills):${c.reset}`);
+  budget.selected.forEach((s, i) => {
+    log(c.green, `${i+1}.`, `${c.bold}${s.name}${c.reset} — score: ${s.score} (~${s.tokenEstimate} tokens)`);
+  });
+  log(c.gray, '📊', `Total estimated: ${budget.totalBudgetTokens} tokens | Dropped: ${budget.dropped.length} skills`);
+  process.exit(0);
+}
+
+// ──────────────────────────────────────────────────────────
+// DEFAULT — Initialize project (ase-init or ase-init --update)
+// ──────────────────────────────────────────────────────────
+const configPath = path.join(cwd, CONFIG_FILE);
+const isUpdate = args.includes('--update');
+const projectType = detectProjectType(cwd);
+
+if (fs.existsSync(configPath) && !isUpdate) {
+  log(c.green, '✅', `${CONFIG_FILE} already exists. Use ${c.bold}ase-init --update${c.reset} to regenerate.`);
+  const existing = generateProjectPrompt(cwd);
+  if (existing.prompt) {
+    console.log(`\n${c.gray}${existing.prompt.slice(0, 300)}...${c.reset}`);
+  }
+  process.exit(0);
+}
+
+console.log(`\n${c.bold}${c.cyan}🚀 ASE Project Initializer${c.reset}\n`);
+log(c.gray, '📁', `Directory: ${cwd}`);
+log(c.gray, '🔍', `Detected project type: ${c.bold}${projectType}${c.reset}`);
+
+// Auto-detect project name from package.json or directory name
+let autoName = path.basename(cwd);
+let autoVersion = '1.0.0';
+let autoDescription = '';
+let autoStack = [];
+
+try {
+  const pkg = JSON.parse(fs.readFileSync(path.join(cwd, 'package.json'), 'utf8'));
+  autoName = pkg.name || autoName;
+  autoVersion = pkg.version || autoVersion;
+  autoDescription = pkg.description || '';
+  // Infer stack from deps
+  const deps = { ...pkg.dependencies, ...pkg.devDependencies };
+  if (deps['next']) autoStack.push(`Next.js ${deps['next']?.replace(/[\^~]/,'')} (App Router)`);
+  if (deps['react']) autoStack.push(`React ${deps['react']?.replace(/[\^~]/,'')}`);
+  if (deps['typescript']) autoStack.push(`TypeScript ${deps['typescript']?.replace(/[\^~]/,'')}`);
+  if (deps['tailwindcss']) autoStack.push(`Tailwind CSS ${deps['tailwindcss']?.replace(/[\^~]/,'')}`);
+  if (deps['drizzle-orm']) autoStack.push('Drizzle ORM (PostgreSQL)');
+  if (deps['prisma'] || deps['@prisma/client']) autoStack.push('Prisma ORM');
+  if (deps['express']) autoStack.push(`Express.js ${deps['express']?.replace(/[\^~]/,'')}`);
+  if (deps['fastapi'] || deps['uvicorn']) autoStack.push('FastAPI (Python)');
+  if (deps['firebase']) autoStack.push('Firebase');
+  if (deps['@supabase/supabase-js']) autoStack.push('Supabase');
+} catch (_) {}
+
+// Build the config from the template and auto-detected values
+const template = getConfigTemplate();
+const config = {
+  ...template,
+  name: autoName,
+  version: autoVersion,
+  description: autoDescription || template.description,
+  tech_stack: autoStack.length > 0 ? autoStack : template.tech_stack,
+};
+
+fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+
+log(c.green, '✅', `Created ${c.bold}${CONFIG_FILE}${c.reset} — edit it to add your project's conventions.`);
+console.log(`\n${c.gray}Next steps:${c.reset}`);
+console.log(`  ${c.bold}1.${c.reset} Open ${c.cyan}${configPath}${c.reset} and fill in your tech stack, conventions, and never-do rules.`);
+console.log(`  ${c.bold}2.${c.reset} Run ${c.bold}ase-init --validate${c.reset} after generating code to check for issues.`);
+console.log(`  ${c.bold}3.${c.reset} Run ${c.bold}ase-init --route "your task"${c.reset} to get the optimal model config.\n`);

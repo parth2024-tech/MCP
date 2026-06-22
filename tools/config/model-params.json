@@ -1,0 +1,424 @@
+{
+  "version": "2.0.0",
+  "description": "ASE Task Taxonomy & Model Parameter Config. This file is the single source of truth for task classification, model routing, and sampling parameters. The router reads this at startup — nothing is hardcoded.",
+  "task_types": {
+    "architecture": {
+      "model": "claude-sonnet-4-5",
+      "temperature": 0.1,
+      "top_p": 0.95,
+      "max_tokens": 8192,
+      "description": "System design, ADRs, service boundaries, database schema design, dependency graphs, and API contract decisions.",
+      "signals": {
+        "keywords": [
+          "architecture",
+          "design",
+          "system design",
+          "adr",
+          "schema design",
+          "service boundary",
+          "api contract",
+          "data model",
+          "database schema",
+          "dependency graph",
+          "module structure",
+          "monolith",
+          "microservice",
+          "event-driven",
+          "cqrs",
+          "domain model"
+        ],
+        "phrases": [
+          "how should I structure",
+          "what's the best approach for",
+          "design decision",
+          "trade-off between",
+          "should I split",
+          "which pattern"
+        ]
+      },
+      "rationale": "Low temperature for precise structural decisions. Architecture mistakes compound — the model needs to be deterministic and thorough, not creative.",
+      "lifecycle_phase": "plan",
+      "recommended_skills": [
+        "lifecycle/spec-driven-development",
+        "lifecycle/planning-and-task-breakdown"
+      ],
+      "loop_executor_model": "claude-haiku-3-5"
+    },
+    "debugging": {
+      "model": "claude-sonnet-4-5",
+      "temperature": 0.1,
+      "top_p": 0.95,
+      "max_tokens": 8192,
+      "description": "Root cause analysis, stack trace interpretation, race condition diagnosis, memory leak investigation, and production incident triage.",
+      "signals": {
+        "keywords": [
+          "debug",
+          "bug",
+          "error",
+          "fix",
+          "crash",
+          "exception",
+          "stack trace",
+          "traceback",
+          "segfault",
+          "race condition",
+          "deadlock",
+          "memory leak",
+          "oom",
+          "null pointer",
+          "undefined is not",
+          "cannot read property",
+          "unhandled rejection"
+        ],
+        "phrases": [
+          "why is this",
+          "root cause",
+          "it broke",
+          "doesn't work",
+          "stopped working",
+          "throwing error",
+          "fails when",
+          "investigate why",
+          "what's causing",
+          "how to fix"
+        ]
+      },
+      "rationale": "Debugging requires precise, logical reasoning. Low temperature prevents the model from guessing when it should be methodically tracing execution flow.",
+      "lifecycle_phase": "verify",
+      "recommended_skills": [
+        "lifecycle/debugging-and-error-recovery"
+      ],
+      "loop_executor_model": "claude-haiku-3-5"
+    },
+    "coding": {
+      "model": "claude-sonnet-4-5",
+      "temperature": 0.15,
+      "top_p": 0.95,
+      "max_tokens": 8192,
+      "description": "Standard feature implementation, bug fixes, adding endpoints, writing business logic, component creation.",
+      "signals": {
+        "keywords": [
+          "implement",
+          "build",
+          "create",
+          "add feature",
+          "write function",
+          "add endpoint",
+          "add route",
+          "add component",
+          "add page",
+          "new feature",
+          "connect",
+          "integrate",
+          "hook up",
+          "wire up"
+        ],
+        "phrases": [
+          "build me a",
+          "implement this",
+          "add a new",
+          "create a function",
+          "write the code for",
+          "I need a"
+        ]
+      },
+      "rationale": "Slightly above zero to allow minor creative variation in implementation details while staying deterministic on logic.",
+      "lifecycle_phase": "build",
+      "recommended_skills": [
+        "lifecycle/incremental-implementation",
+        "lifecycle/test-driven-development"
+      ],
+      "loop_executor_model": "claude-haiku-3-5"
+    },
+    "refactoring": {
+      "model": "claude-sonnet-4-5",
+      "temperature": 0.1,
+      "top_p": 0.95,
+      "max_tokens": 8192,
+      "description": "Code restructuring without behavior change. Extract method, rename symbol, decompose class, reduce complexity, improve readability.",
+      "signals": {
+        "keywords": [
+          "refactor",
+          "restructure",
+          "extract",
+          "decompose",
+          "simplify",
+          "clean up",
+          "cleanup",
+          "reduce complexity",
+          "consolidate",
+          "decouple",
+          "abstract",
+          "modularize",
+          "improve readability",
+          "dry",
+          "solid"
+        ],
+        "phrases": [
+          "clean this up",
+          "make this more readable",
+          "extract into",
+          "too complex",
+          "reduce duplication",
+          "break this apart",
+          "split this into"
+        ]
+      },
+      "rationale": "Refactoring must preserve existing behavior exactly. Low temperature prevents the model from accidentally changing semantics while restructuring.",
+      "lifecycle_phase": "build",
+      "recommended_skills": [
+        "lifecycle/code-simplification"
+      ],
+      "loop_executor_model": "claude-haiku-3-5"
+    },
+    "boilerplate": {
+      "model": "claude-haiku-3-5",
+      "temperature": 0,
+      "top_p": 1,
+      "max_tokens": 4096,
+      "description": "Scaffolding, file generation, config files, package.json init, project setup, repetitive code patterns.",
+      "signals": {
+        "keywords": [
+          "scaffold",
+          "boilerplate",
+          "template",
+          "generate file",
+          "create file",
+          "init",
+          "setup project",
+          "config file",
+          "package.json",
+          "tsconfig",
+          "eslint config",
+          "dockerfile",
+          "docker-compose",
+          "makefile",
+          "gitignore"
+        ],
+        "phrases": [
+          "set up a new",
+          "initialize",
+          "generate the boilerplate",
+          "create a starter",
+          "scaffold out"
+        ]
+      },
+      "rationale": "Zero temperature. Boilerplate must be identical on every generation. Fast, cheap model because the task has zero ambiguity.",
+      "lifecycle_phase": "build",
+      "recommended_skills": [
+        "lifecycle/incremental-implementation"
+      ],
+      "loop_executor_model": "claude-haiku-3-5"
+    },
+    "testing": {
+      "model": "claude-sonnet-4-5",
+      "temperature": 0.1,
+      "top_p": 0.95,
+      "max_tokens": 8192,
+      "description": "Writing unit tests, integration tests, test fixtures, mocking strategies, test-driven development.",
+      "signals": {
+        "keywords": [
+          "test",
+          "unit test",
+          "integration test",
+          "e2e test",
+          "mock",
+          "stub",
+          "fixture",
+          "assertion",
+          "expect",
+          "describe",
+          "jest",
+          "vitest",
+          "pytest",
+          "mocha",
+          "playwright",
+          "cypress",
+          "coverage",
+          "tdd"
+        ],
+        "phrases": [
+          "write tests for",
+          "add test coverage",
+          "test this function",
+          "how do I test",
+          "mock this dependency",
+          "test driven"
+        ]
+      },
+      "rationale": "Tests must be precise and exhaustive. Low temperature ensures the model generates correct assertions rather than creative but wrong expectations.",
+      "lifecycle_phase": "verify",
+      "recommended_skills": [
+        "lifecycle/test-driven-development",
+        "lifecycle/browser-testing-with-devtools"
+      ],
+      "loop_executor_model": "claude-haiku-3-5"
+    },
+    "security_audit": {
+      "model": "minimax-m3-cloud",
+      "temperature": 0.05,
+      "top_p": 0.9,
+      "max_tokens": 8192,
+      "description": "Vulnerability scanning, OWASP analysis, penetration test planning, threat modeling, security review, dependency auditing.",
+      "signals": {
+        "keywords": [
+          "security",
+          "audit",
+          "vulnerability",
+          "owasp",
+          "penetration",
+          "pentest",
+          "threat model",
+          "cve",
+          "injection",
+          "xss",
+          "csrf",
+          "ssrf",
+          "authentication bypass",
+          "authorization",
+          "rbac",
+          "encryption",
+          "secrets",
+          "exploit"
+        ],
+        "phrases": [
+          "security review",
+          "is this secure",
+          "find vulnerabilities",
+          "check for",
+          "audit this code",
+          "threat assessment"
+        ]
+      },
+      "rationale": "Near-zero temperature. Security findings must be deterministic and repeatable. False positives from creative temperature are dangerous.",
+      "lifecycle_phase": "review",
+      "recommended_skills": [
+        "lifecycle/security-and-hardening"
+      ],
+      "loop_executor_model": "minimax-m3-cloud"
+    },
+    "documentation": {
+      "model": "claude-sonnet-4-5",
+      "temperature": 0.3,
+      "top_p": 0.95,
+      "max_tokens": 8192,
+      "description": "Writing READMEs, API documentation, JSDoc/TSDoc, inline comments, architectural decision records, runbooks.",
+      "signals": {
+        "keywords": [
+          "document",
+          "documentation",
+          "readme",
+          "jsdoc",
+          "tsdoc",
+          "docstring",
+          "api docs",
+          "swagger",
+          "openapi",
+          "runbook",
+          "changelog",
+          "comment",
+          "explain",
+          "annotate"
+        ],
+        "phrases": [
+          "write documentation for",
+          "document this",
+          "add comments to",
+          "explain this code",
+          "write a readme",
+          "generate docs"
+        ]
+      },
+      "rationale": "Moderate temperature. Documentation benefits from natural language fluency. Too low makes it robotic, too high makes it wordy.",
+      "lifecycle_phase": "meta",
+      "recommended_skills": [
+        "lifecycle/documentation-and-adrs"
+      ],
+      "loop_executor_model": "claude-haiku-3-5"
+    },
+    "ideation": {
+      "model": "claude-sonnet-4-5",
+      "temperature": 0.7,
+      "top_p": 0.95,
+      "max_tokens": 4096,
+      "description": "Feature brainstorming, product ideation, UX exploration, technical spike proposals, naming, creative problem solving.",
+      "signals": {
+        "keywords": [
+          "brainstorm",
+          "idea",
+          "suggest",
+          "propose",
+          "concept",
+          "explore",
+          "innovate",
+          "creative",
+          "alternatives",
+          "what if",
+          "name",
+          "naming",
+          "branding"
+        ],
+        "phrases": [
+          "give me ideas",
+          "what are some ways",
+          "brainstorm options",
+          "how might we",
+          "suggest alternatives",
+          "think outside the box",
+          "explore approaches"
+        ]
+      },
+      "rationale": "High temperature for genuine creative variation. Brainstorming sessions need diverse output, not deterministic repetition.",
+      "lifecycle_phase": "define",
+      "recommended_skills": [
+        "lifecycle/idea-refine",
+        "lifecycle/doubt-driven-development"
+      ],
+      "loop_executor_model": "claude-haiku-3-5"
+    },
+    "long_context": {
+      "model": "gemini-2.5-pro",
+      "temperature": 0.1,
+      "top_p": 0.95,
+      "max_tokens": 65536,
+      "description": "Entire codebase analysis, large file summarization, cross-file migration, bulk rename across repository, dependency graph construction.",
+      "signals": {
+        "keywords": [
+          "entire codebase",
+          "all files",
+          "across files",
+          "repository-wide",
+          "bulk",
+          "migration",
+          "large file",
+          "summarize project",
+          "codebase analysis",
+          "find all",
+          "grep all",
+          "search everywhere",
+          "every file"
+        ],
+        "phrases": [
+          "look at the whole",
+          "scan the entire",
+          "across the entire project",
+          "find every instance",
+          "migrate all"
+        ]
+      },
+      "rationale": "Gemini's 1M context window handles full-repo analysis. Low temperature keeps the output factual rather than summarizing creatively.",
+      "lifecycle_phase": "meta",
+      "recommended_skills": [
+        "lifecycle/source-driven-development"
+      ],
+      "loop_executor_model": "gemini-2.5-flash"
+    }
+  },
+  "fallback": "coding",
+  "global_constraints": {
+    "context_budget_max_skills": 3,
+    "context_budget_warn_tokens": 6000,
+    "context_budget_hard_limit_tokens": 12000,
+    "min_confidence_score": 2
+  }
+}

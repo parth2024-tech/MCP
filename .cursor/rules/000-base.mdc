@@ -1,0 +1,18 @@
+---
+description: Core project identity — always loaded
+alwaysApply: true
+---
+
+# Project: skiils
+Stack: Next.js 15 (App Router), TypeScript 5.4, PostgreSQL 16 via Drizzle ORM, Tailwind CSS v4, Vercel
+Package manager: npm
+Style: Tailwind only, no inline styles, no CSS modules
+Test runner: Jest / Vitest
+
+## Non-negotiable rules
+- TypeScript strict mode, no `any` type ever
+- All async IO must be async/await
+- No console.log in production code
+- Prefer server components unless useState/useEffect is required
+- Ask clarifying questions before writing large implementations
+- Use SEARCH/REPLACE blocks when editing files over 300 lines

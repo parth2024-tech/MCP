@@ -1,0 +1,42 @@
+{
+  "_meta": {
+    "description": "Starter .ase-project.json config for a Next.js 15 project. Copy this to your project root and customize.",
+    "docs": "https://github.com/thor/skiils#project-config"
+  },
+  "name": "my-nextjs-app",
+  "version": "1.0.0",
+  "description": "A full-stack Next.js application with PostgreSQL backend.",
+  "tech_stack": [
+    "Next.js 15 (App Router)",
+    "TypeScript 5.4",
+    "PostgreSQL 16 via Drizzle ORM",
+    "Tailwind CSS v4",
+    "Vercel Deployment"
+  ],
+  "conventions": [
+    "All components use named exports, never default exports",
+    "Database queries live exclusively in /lib/db/*.ts",
+    "API routes use Next.js Route Handlers in /app/api/**/*.ts",
+    "Zod schemas for all external input validation",
+    "Error boundaries at the feature root level"
+  ],
+  "architecture_patterns": [
+    "Server Components for data fetching, Client Components for interactivity only",
+    "Repository pattern for database access",
+    "Feature-based folder structure under /features",
+    "Server Actions for all mutations"
+  ],
+  "never_do": [
+    "Never use useEffect for data fetching — use React Server Components or SWR",
+    "Never store secrets in .env files committed to git",
+    "Never use inline styles — always use Tailwind classes",
+    "Never use `any` TypeScript type — always type explicitly",
+    "Never mix database access logic into components"
+  ],
+  "preferred_patterns": [
+    "Use Zod for all schema validation",
+    "Use Drizzle ORM for all database access",
+    "Use server actions for mutations",
+    "Use Next.js Image component for all images"
+  ]
+}

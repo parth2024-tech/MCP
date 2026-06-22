@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+# ase-setup-project — One-shot setup for any existing project
+# Run this once from inside a project directory to wire up ASE fully.
+# Usage: curl-free, no internet needed. Just run: bash /home/thor/skiils/tools/bin/ase-setup-project
+
+set -e
+
+C_RESET='\033[0m'
+C_BOLD='\033[1m'
+C_GREEN='\033[32m'
+C_YELLOW='\033[33m'
+C_CYAN='\033[36m'
+C_GRAY='\033[90m'
+
+banner() { echo -e "\n${C_BOLD}${C_CYAN}$1${C_RESET}"; }
+ok()     { echo -e "${C_GREEN}✅${C_RESET} $1"; }
+warn()   { echo -e "${C_YELLOW}⚠️ ${C_RESET} $1"; }
+info()   { echo -e "${C_GRAY}  $1${C_RESET}"; }
+
+PROJECT_DIR="${1:-$(pwd)}"
+
+banner "ASE Project Setup — $PROJECT_DIR"
+
+# 1. Create .ase-project.json if missing
+if [ ! -f "$PROJECT_DIR/.ase-project.json" ]; then
+  node /home/thor/skiils/tools/bin/ase-init "$PROJECT_DIR" 2>/dev/null || ase-init 2>/dev/null
+  ok ".ase-project.json created (fill it in with your conventions)"
+else
+  ok ".ase-project.json already exists"
+fi
+
+# 2. Create .cursorrules for this project (imports global rules + adds project override note)
+if [ ! -f "$PROJECT_DIR/.cursorrules" ]; then
+  cat > "$PROJECT_DIR/.cursorrules" << 'CURSORRULES'
+# Project-specific Cursor rules
+# The global ASE rules at ~/.cursor/rules/ase-global.mdc are always active.
+# Add project-specific overrides here.
+
+## Project-Specific Overrides
+# (Customize based on your .ase-project.json conventions)
+CURSORRULES
+  ok ".cursorrules created"
+else
+  info ".cursorrules already exists, skipping"
+fi
+
+# 3. Create .vscode/mcp.json for VS Code / Windsurf / Cline (project-level)
+mkdir -p "$PROJECT_DIR/.vscode"
+if [ ! -f "$PROJECT_DIR/.vscode/mcp.json" ]; then
+  cat > "$PROJECT_DIR/.vscode/mcp.json" << 'VSCODEMCP'
+{
+  "servers": {
+    "ase": {
+      "type": "stdio",
+      "command": "/home/thor/.local/bin/mcp-compressor",
+      "args": ["--compression-level", "medium", "node", "/home/thor/skiils/tools/server/ase-mcp-server.js"]
+    },
+    "toonify": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "toonify-mcp"]
+    }
+  }
+}
+VSCODEMCP
+  ok ".vscode/mcp.json created (activates ASE in VS Code, Windsurf, Cline)"
+else
+  info ".vscode/mcp.json already exists, skipping"
+fi
+
+# 4. Create AGENTS.md for Codex/OpenAI agents
+if [ ! -f "$PROJECT_DIR/AGENTS.md" ]; then
+  cat > "$PROJECT_DIR/AGENTS.md" << 'AGENTSMD'
+# ASE Agent Instructions
+
+## Context
+This project uses the Antigravity Skills Engine (ASE).
+ASE MCP server: `node /home/thor/skiils/tools/server/ase-mcp-server.js`
+
+## Workflow
+1. Call `get_project_prompt` to load project conventions from `.ase-project.json`
+2. Call `query_skills_ranked` with the task description to select top-3 relevant skills
+3. Call `get_model_config` to get the correct temperature for the task type
+4. Generate code using loaded skills and project conventions
+5. Call `validate_output` to verify linting, types, and tests pass
+
+## Rules
+- Never load more than 3 skills per session
+- Always run validate_output before presenting code
+- Follow .ase-project.json never_do rules strictly
+AGENTSMD
+  ok "AGENTS.md created (for Codex, Claude agents)"
+else
+  info "AGENTS.md already exists, skipping"
+fi
+
+# 5. Add .ase-project.json to .gitignore if a .gitignore exists (it's project-local config)
+# Actually, we WANT it committed — it's the project's convention document
+# But add the log files to gitignore
+if [ -f "$PROJECT_DIR/.gitignore" ]; then
+  if ! grep -q "ase-audit.log" "$PROJECT_DIR/.gitignore" 2>/dev/null; then
+    echo -e "\n# ASE — Antigravity Skills Engine\nase-audit.log\n.ase-cache/" >> "$PROJECT_DIR/.gitignore"
+    ok "Added ASE log entries to .gitignore"
+  fi
+fi
+
+banner "✅ Setup Complete"
+echo -e "${C_GRAY}Your project is now ASE-enabled:${C_RESET}"
+info "• .ase-project.json  — Edit with your tech stack, conventions, and never-do rules"
+info "• .cursorrules       — Cursor project overrides (global rules always active)"
+info "• .vscode/mcp.json   — ASE active in VS Code, Windsurf, and Cline"
+info "• AGENTS.md          — Agent instructions for Codex/OpenAI tools"
+echo ""
+info "Run: ${C_BOLD}ase-init --validate${C_RESET} to test output validation"
+info "Run: ${C_BOLD}ase-init --route \"your task\"${C_RESET} to get model recommendation"
+info "Run: ${C_BOLD}ase-init --budget \"your task\"${C_RESET} to get top-3 skills"
+echo ""
