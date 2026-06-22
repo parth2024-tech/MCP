@@ -1,0 +1,5 @@
+{
+  "vk_researcher": ["search_tools", "invoke_tool", "search_codebase", "query_skills"],
+  "vk_coder": ["*"],
+  "vk_restricted": ["get_health"]
+}
