@@ -23,7 +23,7 @@
  * WHAT RUNS HERE vs. MAIN THREAD
  * ───────────────────────────────
  * Worker (this file):
- *   - createTask transaction (INSERT tasks + INSERT task_dependencies)
+ *   - createTask transaction (Fix 6: cycle detection + INSERT tasks + INSERT task_dependencies)
  *   - writeMemory transaction (UPSERT shared_memory + INSERT memory_changelog)
  *   - completeTask transaction (UPDATE tasks + DELETE from claimed set)
  *   - runTaskLoop INSERT
@@ -62,10 +62,103 @@ function getDb() {
 }
 
 // ─────────────────────────────────────────────────────────────
+// Fix 6: Cycle detection helper
+//
+// PROBLEM: The task_dependencies table stores directed edges. The schema
+// enforces a composite PK (no duplicate edges) but has no constraint or
+// trigger preventing cycles. A cycle (A → B → C → A) means no task in
+// the cycle can ever be claimed — each waits on the next. The system
+// deadlocks silently with tasks stuck in 'pending' forever.
+//
+// FIX: Before inserting edge (upstream → downstream), run a recursive CTE
+// that walks the existing graph from `downstream` forward (following
+// upstream_task_id → downstream_task_id edges). If any reachable node
+// equals `upstream`, inserting this edge would create a cycle.
+//
+// The check runs INSIDE the same db.transaction() as the INSERT, so no
+// concurrent writer can create a cycle between the check and the insert.
+//
+// SQLite supports recursive CTEs since 3.8.3 (2014). better-sqlite3
+// requires SQLite >= 3.31.0, so this is guaranteed available.
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Check whether inserting edge (upstreamId → downstreamId) into
+ * `task_dependencies` would create a directed cycle.
+ *
+ * Uses a recursive CTE to find all nodes reachable FROM `downstreamId`
+ * by following existing dependency edges. If `upstreamId` is reachable,
+ * the new edge would close a cycle.
+ *
+ * Must be called inside an open transaction to guarantee the read is
+ * consistent with any prior writes in the same transaction.
+ *
+ * @param {Database} d           - better-sqlite3 Database instance
+ * @param {string}   upstreamId  - The task that must complete first
+ * @param {string}   downstreamId - The task that depends on upstreamId
+ * @returns {{ cycle: boolean, path: string[] }}
+ */
+function checkForCycle(d, upstreamId, downstreamId) {
+  // Walk the graph from downstreamId forward: if we can reach upstreamId,
+  // the proposed edge closes a cycle.
+  //
+  // The CTE also tracks the path so we can surface a useful error message.
+  //
+  // Note: SQLite recursive CTEs use a FIFO queue (breadth-first). The depth
+  // is bounded by the number of existing tasks, which is always finite.
+  const rows = d.prepare(`
+    WITH RECURSIVE reachable(node_id, path) AS (
+      -- Base case: start from the node that will become the downstream task.
+      SELECT
+        td.downstream_task_id,
+        $downstreamId || ' → ' || td.downstream_task_id
+      FROM task_dependencies td
+      WHERE td.upstream_task_id = $downstreamId
+
+      UNION ALL
+
+      -- Recursive case: follow edges forward.
+      SELECT
+        td.downstream_task_id,
+        r.path || ' → ' || td.downstream_task_id
+      FROM task_dependencies td
+      INNER JOIN reachable r ON td.upstream_task_id = r.node_id
+      -- Guard: stop if we've already found the upstream (avoid full traversal).
+      WHERE r.node_id != $upstreamId
+    )
+    SELECT node_id, path FROM reachable WHERE node_id = $upstreamId LIMIT 1
+  `).all({ upstreamId, downstreamId });
+
+  if (rows.length > 0) {
+    // The CTE found a path from downstreamId back to upstreamId.
+    // The full cycle would be: upstreamId → downstreamId → ... → upstreamId
+    return {
+      cycle: true,
+      path: upstreamId + ' → ' + rows[0].path
+    };
+  }
+
+  return { cycle: false, path: null };
+}
+
+// ─────────────────────────────────────────────────────────────
 // Task: createTask
 // ─────────────────────────────────────────────────────────────
 function handleCreateTask({ id, title, description, dependsOn, blocks, skillIds, priority, now }) {
   const d = getDb();
+
+  // All edges to validate and insert, collected before the transaction
+  // so error messages are clear about which edge caused the cycle.
+  //
+  // dependsOn[i] means: upstreamId=dependsOn[i], downstreamId=id
+  //   (id waits for dependsOn[i] to complete)
+  // blocks[i] means: upstreamId=id, downstreamId=blocks[i]
+  //   (blocks[i] waits for id to complete)
+  const edges = [
+    ...dependsOn.map(upstreamId => ({ upstreamId, downstreamId: id })),
+    ...blocks.map(downstreamId => ({ upstreamId: id, downstreamId }))
+  ];
+
   d.transaction(() => {
     d.prepare(`
       INSERT INTO tasks (id, title, description, status, depends_on, blocks, skill_ids, validation_status, created_at, priority, deadlock_broken)
@@ -75,13 +168,26 @@ function handleCreateTask({ id, title, description, dependsOn, blocks, skillIds,
     const insertDep = d.prepare(
       `INSERT OR IGNORE INTO task_dependencies (upstream_task_id, downstream_task_id) VALUES (?, ?)`
     );
-    for (const upstreamId of dependsOn) {
-      insertDep.run(upstreamId, id);
-    }
-    for (const downstreamId of blocks) {
-      insertDep.run(id, downstreamId);
+
+    for (const { upstreamId, downstreamId } of edges) {
+      // Fix 6: Cycle detection before every edge insert.
+      // The check runs inside the transaction — no concurrent writer can
+      // create a cycle between the check and the INSERT.
+      const { cycle, path } = checkForCycle(d, upstreamId, downstreamId);
+      if (cycle) {
+        // Throwing inside db.transaction() causes automatic rollback.
+        throw Object.assign(
+          new Error(
+            `Dependency cycle detected: inserting edge (${upstreamId} → ${downstreamId}) ` +
+            `would create the cycle: ${path}. Task "${id}" was not created.`
+          ),
+          { code: 'ERR_TASK_DEPENDENCY_CYCLE', cycleEdge: { upstreamId, downstreamId }, cyclePath: path }
+        );
+      }
+      insertDep.run(upstreamId, downstreamId);
     }
   })();
+
   return { ok: true };
 }
 

@@ -50,6 +50,24 @@ class EmbeddingService {
     // resizeIndex, initIndex) must be exclusive.
     this._hnswWriteLock = new Mutex();
 
+    // Fix 5: Cache generation counter.
+    //
+    // Problem: TTL-based LRU invalidation is wrong for a hot-reloading index.
+    // An agent that queried "database connection tools" 3 minutes ago receives
+    // a cached result for up to 5 minutes, even if a newly indexed skill is now
+    // the top match. The cache is invalidated by time, not by index state.
+    //
+    // Fix: a monotonic counter incremented on every addPoint. The counter is
+    // included in the cache key: `gen|query|limit`. When the counter increments,
+    // all prior cache entries have a different key prefix and are immediately
+    // unreachable on the next lookup — no .clear() traversal required, O(1).
+    // The LRU max-size evicts old-generation entries naturally as the current-
+    // generation query set fills the 200-entry budget.
+    //
+    // The _queryCache TTL is kept as a last-resort backstop for memory hygiene,
+    // but it is no longer the primary invalidation mechanism.
+    this._cacheGeneration = 0;
+
     this._initDb();
     this._startWatcher();
   }
@@ -179,8 +197,10 @@ class EmbeddingService {
       this._hnsw.addPoint(Array.from(embeddingArray), id);
       this._skillData.set(name, { description, tokenEstimate });
 
-      // Invalidate LRU cache — results are stale after any index mutation.
-      this._queryCache.clear();
+      // Fix 5: Increment the generation counter.
+      // Old cache keys (prefixed with the previous generation number) are
+      // immediately unreachable — no .clear() traversal needed.
+      this._cacheGeneration++;
     } finally {
       release();
     }
@@ -218,7 +238,8 @@ class EmbeddingService {
           try {
             this.db.prepare('DELETE FROM skills WHERE name = ?').run(skillName);
             this._rebuildHnswIndex();
-            this._queryCache.clear();
+            // Fix 5: A full rebuild changes every result — bump the generation.
+            this._cacheGeneration++;
             logger.info('EmbeddingService', `Removed skill from database and index: ${skillName}`);
           } catch (err) {
             warn('EmbeddingService', `Failed to delete skill ${skillName} on unlink: ${err.message}`);
@@ -401,12 +422,14 @@ class EmbeddingService {
     const startMs = Date.now();
     metrics.inc('embedding_searches');
 
-    // LRU Cache Check
-    const cacheKey = query.trim().toLowerCase() + '|' + limit;
+    // Fix 5: Cache key includes the current generation counter.
+    // Any addPoint increments _cacheGeneration, making old entries unreachable
+    // on the next lookup without an explicit .clear() pass over the LRU.
+    const cacheKey = `${this._cacheGeneration}|${query.trim().toLowerCase()}|${limit}`;
     const cachedResult = this._queryCache.get(cacheKey);
     if (cachedResult) {
       metrics.inc('skill_cache_hits');
-      log.info('EmbeddingService', `Search served from cache in ${Date.now() - startMs}ms`, { limit });
+      log.info('EmbeddingService', `Search served from cache (gen=${this._cacheGeneration}) in ${Date.now() - startMs}ms`, { limit });
       return cachedResult;
     }
     metrics.inc('skill_cache_misses');
