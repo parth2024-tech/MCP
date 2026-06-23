@@ -11,12 +11,22 @@
  * Uses a SEPARATE database file (orchestration.db) from session_state.db
  * to avoid schema collisions. Lazy-initialized — zero startup cost if
  * orchestration tools are never called.
+ *
+ * FIX 3 — SQLite Write Offloading
+ * ────────────────────────────────
+ * All db.transaction() write calls that previously blocked the main thread
+ * event loop are now dispatched to orchestration-worker.js via Piscina.
+ * The main thread awaits the Piscina Promise (non-blocking — it yields to
+ * the event loop while the worker thread executes the synchronous SQLite
+ * transaction). Read operations (.get, .all) remain on the main thread:
+ * they are fast single-row fetches and do not stall the transport layer.
  */
 
 'use strict';
 
 const Database = require('better-sqlite3');
 const Redis = require('ioredis');
+const Piscina = require('piscina');
 const path = require('path');
 const { logger } = require('../utils/logger');
 const metrics = require('../utils/metrics');
@@ -42,6 +52,17 @@ class OrchestrationDB {
     this.db.pragma('journal_mode = WAL');
     this.db.pragma('synchronous = NORMAL');
     this.db.pragma('foreign_keys = ON');
+
+    // Fix 3: Dedicated single-thread Piscina pool for SQLite write transactions.
+    // minThreads:1 keeps the worker warm and avoids spawn latency on first write.
+    // maxThreads:1 serialises all writes — SQLite WAL handles concurrency at
+    // the file level, but a single writer is simpler and sufficient here.
+    this._writePool = new Piscina({
+      filename: path.join(__dirname, 'orchestration-worker.js'),
+      maxThreads: 1,
+      minThreads: 1,
+      idleTimeout: 60_000
+    });
 
     this._initSchema();
     this.listeners = [];
@@ -489,17 +510,11 @@ class OrchestrationDB {
       await this.redis.set(memKey, JSON.stringify(memObj));
     }
 
-    this.db.transaction(() => {
-      this.db.prepare(`
-        INSERT OR REPLACE INTO shared_memory (key, scope, value, written_by, task_id, version, expires_at, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `).run(key, scope, JSON.stringify(value), agentId, taskId, version, expiresAt, now);
-
-      this.db.prepare(`
-        INSERT INTO memory_changelog (key, scope, old_value, new_value, changed_by, changed_at)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `).run(key, scope, oldValue, JSON.stringify(value), agentId, now);
-    })();
+    // Fix 3: Write transaction dispatched to worker thread.
+    await this._writePool.run({
+      type: 'writeMemory',
+      payload: { key, scope, value, agentId, taskId, version, expiresAt, oldValue, now }
+    });
 
     return { key, scope, version, written_by: agentId };
   }
@@ -544,22 +559,13 @@ class OrchestrationDB {
       deadlock_broken: 0
     };
 
-    this.db.transaction(() => {
-      this.db.prepare(`
-        INSERT INTO tasks (id, title, description, status, depends_on, blocks, skill_ids, validation_status, created_at, priority, deadlock_broken)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
-      `).run(id, title, description, 'pending', JSON.stringify(dependsOn), JSON.stringify(blocks), JSON.stringify(skillIds), 'pending', now, priority);
-
-      const insertDep = this.db.prepare(
-        `INSERT OR IGNORE INTO task_dependencies (upstream_task_id, downstream_task_id) VALUES (?, ?)`
-      );
-      for (const upstreamId of dependsOn) {
-        insertDep.run(upstreamId, id);
-      }
-      for (const downstreamId of blocks) {
-        insertDep.run(id, downstreamId);
-      }
-    })();
+    // Fix 3: Dispatch the INSERT transaction to the write worker.
+    // This yields the event loop during the synchronous SQLite call,
+    // preventing MCP transport stalls under concurrent agent activity.
+    await this._writePool.run({
+      type: 'createTask',
+      payload: { id, title, description, dependsOn, blocks, skillIds, priority, now }
+    });
 
     await this.redis.set(taskKey, JSON.stringify(taskObj));
     await this.redis.sadd('ase:tasks:pending', id);
@@ -640,16 +646,13 @@ class OrchestrationDB {
         const results = await multi.exec();
         const remPending = results[0][1];
         const remRevision = results[1][1];
-        
+
         if (remPending > 0 || remRevision > 0) {
-          this.db.prepare(`
-            UPDATE tasks SET
-              status = 'claimed',
-              assigned_to = ?,
-              claimed_at = ?,
-              timeout_at = ?
-            WHERE id = ?
-          `).run(agentId, now, timeoutAt, task.id);
+          // Fix 3: Claim write-back goes to the worker thread.
+          await this._writePool.run({
+            type: 'claimTaskWriteback',
+            payload: { taskId: task.id, agentId, now, timeoutAt }
+          });
 
           await this.checkForDeadlocks();
           return updatedTask;
@@ -807,10 +810,11 @@ class OrchestrationDB {
     };
     await this.redis.set(key, JSON.stringify(loopObj));
 
-    this.db.prepare(`
-      INSERT OR REPLACE INTO code_loops (session_id, task_id, loop_number, loop_name, input_code, output_code, changes_made, completed_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(sessionId, taskId, loopNumber, loopName, inputCode, outputCode, JSON.stringify(changesMade), completedAt);
+    // Fix 3: Write to SQLite via worker thread.
+    await this._writePool.run({
+      type: 'recordCodeLoop',
+      payload: { sessionId, taskId, loopNumber, loopName, inputCode, outputCode, changes: changesMade, now: completedAt }
+    });
 
     return loopObj;
   }
