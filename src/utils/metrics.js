@@ -13,6 +13,20 @@
 // ── Counters ─────────────────────────────────────────────────────────────────
 const counters = new Map();
 
+// ── Gauges ───────────────────────────────────────────────────────────────────
+// Point-in-time values (e.g. active connections, queue depth).
+const gauges = new Map();
+
+/**
+ * Set a gauge to an absolute value.
+ * Used for point-in-time measurements like active concurrency count.
+ * @param {string} name
+ * @param {number} value
+ */
+function gauge(name, value) {
+  gauges.set(name, value);
+}
+
 /**
  * Increment a counter.
  * @param {string} name   - Metric name (e.g. 'tool_calls_total')
@@ -86,6 +100,9 @@ function snapshot() {
   const counterSnapshot = {};
   for (const [key, val] of counters) counterSnapshot[key] = val;
 
+  const gaugeSnapshot = {};
+  for (const [key, val] of gauges) gaugeSnapshot[key] = val;
+
   const histogramSnapshot = {};
   for (const [key] of histograms) {
     const name = key.includes('{') ? key.split('{')[0] : key;
@@ -93,7 +110,7 @@ function snapshot() {
     histogramSnapshot[key] = summarize(name, label);
   }
 
-  return { counters: counterSnapshot, histograms: histogramSnapshot };
+  return { counters: counterSnapshot, gauges: gaugeSnapshot, histograms: histogramSnapshot };
 }
 
 function increment(name, tags = {}) {
@@ -112,4 +129,4 @@ function histogram(name, value, tags = {}) {
   record(name, value, label);
 }
 
-module.exports = { inc, getCount, record, summarize, snapshot, increment, histogram };
+module.exports = { inc, getCount, record, summarize, snapshot, increment, histogram, gauge };

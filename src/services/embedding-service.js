@@ -80,7 +80,23 @@ class EmbeddingService {
         embedding BLOB,
         tokenEstimate INTEGER,
         hash TEXT
-      )
+      );
+
+      -- Fix 10: Model metadata guard.
+      -- Stores the model name and output dimension that produced the current
+      -- embeddings in the skills table and HNSW index. On startup, the actual
+      -- output dimension is measured by running one real embedding through the
+      -- worker and comparing it to this stored value. On mismatch, the entire
+      -- skills table and HNSW index are wiped and a full re-index is triggered
+      -- from scratch with the new model/dimensions. Without this guard, a model
+      -- change causes the HNSW index to be initialised with the wrong dimension
+      -- count, causing hnswlib-node to silently truncate or corrupt vectors.
+      CREATE TABLE IF NOT EXISTS model_metadata (
+        id          INTEGER PRIMARY KEY CHECK (id = 1),  -- singleton row
+        model_name  TEXT NOT NULL,
+        dimensions  INTEGER NOT NULL,
+        indexed_at  TEXT NOT NULL
+      );
     `);
     // Rebuild the full index from SQLite, then cross-validate for integrity.
     this._rebuildHnswIndex();
@@ -300,6 +316,114 @@ class EmbeddingService {
     }
   }
 
+  /**
+   * Fix 10 — Model dimension validation.
+   *
+   * The HNSW index is initialised with EMBEDDING_DIMENSIONS (384) as a startup
+   * default. This method runs once per server start, after the worker pool is
+   * warm, and:
+   *
+   *   1. Generates one real embedding with a sentinel string to measure the
+   *      model's ACTUAL output dimension (not the hardcoded constant).
+   *   2. Reads the stored (model_name, dimensions) row from model_metadata.
+   *   3a. If no stored row → first run. Store current model + real dimension.
+   *   3b. If stored model_name differs OR stored dimensions differ from the
+   *       real dimension:
+   *       - Log a prominent warning with the old and new model/dimension.
+   *       - Wipe the skills table entirely (all stored embeddings are invalid).
+   *       - Reinitialise the HNSW index with the correct dimension.
+   *       - Bump _cacheGeneration so no stale results are served.
+   *       - Update model_metadata to the new model + dimension.
+   *       - The caller (syncSkillsBackground) then re-indexes every skill from
+   *         scratch with the new model — this is the correct behaviour.
+   *   3c. If model and dimensions match → no action, proceed normally.
+   *
+   * Called at the top of syncSkillsBackground(), which runs 2 seconds after
+   * startup on the async path, after the worker pool is initialised.
+   */
+  async _validateModelMetadataAsync() {
+    const MODEL_NAME = 'Xenova/all-MiniLM-L6-v2';
+
+    // Generate one real embedding to measure actual output dimension.
+    // This round-trips to the embedding worker — cheap (one short string).
+    let realDimensions;
+    try {
+      const sentinelEmbedding = await this.workerPool.generateEmbeddingForeground('__dimension_probe__');
+      realDimensions = Array.isArray(sentinelEmbedding)
+        ? sentinelEmbedding.length
+        : sentinelEmbedding.length; // Float32Array also has .length
+    } catch (err) {
+      warn('EmbeddingService',
+        `_validateModelMetadataAsync: Could not probe embedding dimension — ` +
+        `skipping validation: ${err.message}`
+      );
+      return;
+    }
+
+    const stored = this.db
+      .prepare('SELECT model_name, dimensions FROM model_metadata WHERE id = 1')
+      .get();
+
+    if (!stored) {
+      // First run — store metadata and proceed.
+      this.db.prepare(`
+        INSERT INTO model_metadata (id, model_name, dimensions, indexed_at)
+        VALUES (1, ?, ?, ?)
+      `).run(MODEL_NAME, realDimensions, new Date().toISOString());
+      logger.info('EmbeddingService',
+        `Model metadata initialised: model=${MODEL_NAME} dimensions=${realDimensions}`
+      );
+      return;
+    }
+
+    const dimensionMismatch = stored.dimensions !== realDimensions;
+    const modelMismatch     = stored.model_name  !== MODEL_NAME;
+
+    if (!dimensionMismatch && !modelMismatch) {
+      // Everything matches — index is safe to use.
+      logger.info('EmbeddingService',
+        `Model metadata validated: model=${MODEL_NAME} dimensions=${realDimensions} ✓`
+      );
+      return;
+    }
+
+    // ── MISMATCH DETECTED ────────────────────────────────────────────────────
+    logger.warn('EmbeddingService', [
+      `EMBEDDING MODEL CHANGE DETECTED — Full re-index required.`,
+      `  Previous: model=${stored.model_name} dimensions=${stored.dimensions}`,
+      `  Current:  model=${MODEL_NAME} dimensions=${realDimensions}`,
+      `  Action: wiping all stored embeddings and rebuilding HNSW index.`,
+      `  Skills will be unavailable for search until re-indexing completes.`
+    ].join('\n'));
+
+    // Wipe all stored embeddings — they were produced by the old model.
+    this.db.prepare('DELETE FROM skills').run();
+
+    // Reinitialise the in-memory HNSW index with the correct dimension.
+    // The write lock is not needed here because syncSkillsBackground runs
+    // before any concurrent search is possible at startup.
+    this._idToName.clear();
+    this._nameToId.clear();
+    this._skillData.clear();
+    this._nextId = 0;
+    this._hnsw = new (require('hnswlib-node').HierarchicalNSW)('cosine', realDimensions);
+    this._hnsw.initIndex(2000);
+
+    // Bump cache generation — every prior cached result is now invalid.
+    this._cacheGeneration++;
+
+    // Update stored metadata to the new model and dimensions.
+    this.db.prepare(`
+      INSERT OR REPLACE INTO model_metadata (id, model_name, dimensions, indexed_at)
+      VALUES (1, ?, ?, ?)
+    `).run(MODEL_NAME, realDimensions, new Date().toISOString());
+
+    logger.info('EmbeddingService',
+      `HNSW index reset for new model. Re-indexing all skills now ` +
+      `(new dimensions: ${realDimensions}).`
+    );
+  }
+
   get healthSnapshot() {
     const count = this.db.prepare('SELECT COUNT(*) as c FROM skills').get();
     return {
@@ -310,6 +434,11 @@ class EmbeddingService {
   }
 
   async syncSkillsBackground() {
+    // Fix 10: Validate that the current model's output dimension matches the
+    // dimension used to build the stored embeddings. Must run before any
+    // skill is read from or written to the index.
+    await this._validateModelMetadataAsync();
+
     let files;
     try {
       files = await fs.readdir(SKILLS_DIR);

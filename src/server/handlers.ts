@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import { Pipeline } from '../middleware/Pipeline';
+import { ConcurrencyMiddleware } from '../middleware/ConcurrencyMiddleware';
 import { AuthMiddleware } from '../middleware/AuthMiddleware';
 import { SpokeProxyMiddleware } from '../middleware/SpokeProxyMiddleware';
 import { CacheMiddleware } from '../middleware/CacheMiddleware';
@@ -8,7 +9,13 @@ import { MetricsMiddleware } from '../middleware/MetricsMiddleware';
 import type { Container } from '../core/Container';
 
 export function createToolCallHandler(container: Container) {
+  // Fix 11: ConcurrencyMiddleware is FIRST — it gates all tool calls.
+  // One shared instance per server process so the semaphore state is
+  // consistent across all requests.
+  const concurrencyMiddleware = new ConcurrencyMiddleware();
+
   const pipeline = new Pipeline()
+    .use(concurrencyMiddleware)   // Fix 11: semaphore — must be first
     .use(new MetricsMiddleware())
     .use(new AuthMiddleware())
     .use(new SpokeProxyMiddleware())

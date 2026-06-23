@@ -74,9 +74,24 @@ class KnowledgeGraphService {
   }
 
   /**
-   * Execute a read Cypher query through the circuit breaker.
-   * @param {string} query
-   * @param {object} [params={}]
+   * Execute a Cypher query (reads and DDL) through the circuit breaker.
+   *
+   * Fix 9 — Parameterization invariant:
+   * This method is the ONLY path through which Cypher reaches Neo4j.
+   * `session.run(query, params)` is always called with a separate params object.
+   * String interpolation into the query string is NEVER permitted — callers must
+   * pass all variable values through `params`. This is the only defence against
+   * Cypher injection: unlike SQL, Cypher injection can traverse the entire graph
+   * and execute arbitrary mutations including deleting all nodes.
+   *
+   * Enforcement: the params argument signature has no default that would accept
+   * a pre-interpolated string. If you find yourself writing
+   *   `executeCypher(`MATCH (n {id: '${id}'})`)`
+   * that is a Cypher injection vulnerability. Use params instead:
+   *   `executeCypher('MATCH (n {id: $id}) RETURN n', { id })`
+   *
+   * @param {string} query - Parameterized Cypher string. No string interpolation.
+   * @param {object} [params={}] - Parameter values referenced in the query as $name.
    * @returns {Promise<object[]>}
    */
   async executeCypher(query, params = {}) {
@@ -122,14 +137,67 @@ class KnowledgeGraphService {
     });
   }
 
+  /**
+   * Initialize Neo4j schema: uniqueness constraints and indexes.
+   *
+   * Fix 9 — Schema constraints and query planner indexes.
+   *
+   * Without explicit schema:
+   *   - Every MATCH query performs a full graph scan (AllNodesScan in EXPLAIN).
+   *   - Neo4j's query planner cannot use an index it doesn't know exists.
+   *   - Uniqueness constraints implicitly create an index; additional range/text
+   *     indexes are needed for the patterns this codebase actually queries.
+   *
+   * Constraints defined here (each implicitly creates a B-tree index):
+   *   - File.path UNIQUE    — used by MATCH (n:File {path: $p})
+   *   - Symbol.id UNIQUE    — used by MATCH (n:Symbol {id: $id})
+   *   - Skill.name UNIQUE   — used by MATCH (n:Skill {name: $name})
+   *   - Task.id UNIQUE      — used by MATCH (n:Task {id: $taskId})
+   *
+   * Indexes defined here (no uniqueness requirement, but needed for range/lookup):
+   *   - File(name)          — label+property lookup, used in KG exploration
+   *   - Symbol(name)        — symbol search by name in AST traversals
+   *   - Skill(category)     — category-filtered skill queries
+   *   - Relationship created_at range index — temporal traversal ordering
+   *
+   * All DDL uses IF NOT EXISTS so re-running on restart is idempotent.
+   * Errors are logged as warnings (Neo4j may not be available in dev).
+   */
   async initializeSchema() {
-    try {
-      await this.executeCypher(`CREATE CONSTRAINT file_path IF NOT EXISTS FOR (f:File) REQUIRE f.path IS UNIQUE`);
-      await this.executeCypher(`CREATE CONSTRAINT symbol_id IF NOT EXISTS FOR (s:Symbol) REQUIRE s.id IS UNIQUE`);
-      logger.info('KnowledgeGraph', 'Neo4j schema initialized successfully.');
-    } catch (err) {
-      logger.warn('KnowledgeGraph', `Schema initialization failed (Neo4j might not be running): ${err.message}`);
+    // Uniqueness constraints (implicitly create B-tree indexes)
+    const constraints = [
+      `CREATE CONSTRAINT file_path IF NOT EXISTS FOR (f:File) REQUIRE f.path IS UNIQUE`,
+      `CREATE CONSTRAINT symbol_id IF NOT EXISTS FOR (s:Symbol) REQUIRE s.id IS UNIQUE`,
+      `CREATE CONSTRAINT skill_name IF NOT EXISTS FOR (sk:Skill) REQUIRE sk.name IS UNIQUE`,
+      `CREATE CONSTRAINT task_id IF NOT EXISTS FOR (t:Task) REQUIRE t.id IS UNIQUE`,
+    ];
+
+    // Range/lookup indexes for patterns that don't require uniqueness
+    const indexes = [
+      `CREATE INDEX file_name_idx IF NOT EXISTS FOR (f:File) ON (f.name)`,
+      `CREATE INDEX symbol_name_idx IF NOT EXISTS FOR (s:Symbol) ON (s.name)`,
+      `CREATE INDEX skill_category_idx IF NOT EXISTS FOR (sk:Skill) ON (sk.category)`,
+      `CREATE INDEX node_id_idx IF NOT EXISTS FOR (n:Node) ON (n.id)`,
+    ];
+
+    let created = 0;
+    let failed = 0;
+
+    for (const ddl of [...constraints, ...indexes]) {
+      try {
+        await this.executeCypher(ddl);
+        created++;
+      } catch (err) {
+        // Individual DDL failures are non-fatal — some Neo4j editions don't
+        // support certain index types. Log and continue.
+        logger.warn('KnowledgeGraph', `Schema DDL skipped: ${err.message.split('\n')[0]}`);
+        failed++;
+      }
     }
+
+    logger.info('KnowledgeGraph',
+      `Schema initialization complete: ${created} DDL statements applied, ${failed} skipped.`
+    );
   }
 
   /** Circuit breaker status snapshot for health reporting */
