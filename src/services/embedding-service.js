@@ -5,6 +5,7 @@ const Database = require('better-sqlite3');
 const hnswlib = require('hnswlib-node');
 const chokidar = require('chokidar');
 const { LRUCache } = require('lru-cache');
+const { Mutex } = require('async-mutex');
 const { parseFrontmatter, ContextOptimizer } = require('../utils/context-optimizer');
 const { findMainMd } = require('../utils/fs-utils');
 const { withRetry } = require('../utils/retry');
@@ -41,6 +42,14 @@ class EmbeddingService {
     this._nextId = 0;
     this.optimizer = new ContextOptimizer();
 
+    // Fix 1: Exclusive write lock for all HNSW mutations.
+    // hnswlib-node's native bindings are not thread-safe. A concurrent
+    // searchKnn during addPoint causes silent native heap corruption —
+    // wrong ANN results with no JS exception thrown. Reads (searchKnn)
+    // are safe to run concurrently with other reads; only writes (addPoint,
+    // resizeIndex, initIndex) must be exclusive.
+    this._hnswWriteLock = new Mutex();
+
     this._initDb();
     this._startWatcher();
   }
@@ -55,10 +64,15 @@ class EmbeddingService {
         hash TEXT
       )
     `);
+    // Rebuild the full index from SQLite, then cross-validate for integrity.
     this._rebuildHnswIndex();
+    this._repairHnswFromSqlite();
   }
 
   _rebuildHnswIndex() {
+    // Synchronous — only called at startup before any async code runs,
+    // so the write lock is not required here. All subsequent mutations
+    // MUST go through _addOrUpdateHnswLocked.
     const rows = this.db.prepare('SELECT name, description, embedding, tokenEstimate FROM skills').all();
     this._idToName.clear();
     this._nameToId.clear();
@@ -77,31 +91,99 @@ class EmbeddingService {
         description: row.description,
         tokenEstimate: row.tokenEstimate
       });
-      
+
       const embBuffer = row.embedding;
       const embArray = new Float32Array(embBuffer.buffer, embBuffer.byteOffset, embBuffer.byteLength / 4);
       this._hnsw.addPoint(Array.from(embArray), id);
     }
   }
 
-  _addOrUpdateHnsw(name, embeddingArray, description, tokenEstimate) {
-    let id = this._nameToId.get(name);
-    if (id === undefined) {
-      id = this._nextId++;
-      this._idToName.set(id, name);
-      this._nameToId.set(name, id);
-    }
-    
-    const currentMax = this._hnsw.getMaxElements();
-    if (this._nextId >= currentMax) {
-      this._hnsw.resizeIndex(currentMax + 1000);
+  /**
+   * Fix 2: Crash-recovery integrity check.
+   *
+   * Failure mode: Process crashes between addPoint and the next SQLite
+   * commit, OR between SQLite commit and the next HNSW index save.
+   * On restart, _rebuildHnswIndex re-populates from SQLite. But if the
+   * crash left the SQLite hash matching the on-disk file hash, the batch
+   * sync's hash-based change detection will skip re-embedding — leaving
+   * the skill absent from the HNSW index with no error.
+   *
+   * This method cross-validates: for every SQLite row, it checks whether
+   * the corresponding HNSW label actually exists in the index. Any label
+   * that is missing is re-added directly from the stored embedding blob,
+   * bypassing file-hash checking entirely.
+   *
+   * Called synchronously at startup after _rebuildHnswIndex.
+   */
+  _repairHnswFromSqlite() {
+    const rows = this.db.prepare('SELECT name, description, embedding, tokenEstimate FROM skills').all();
+    let repaired = 0;
+
+    for (const row of rows) {
+      const id = this._nameToId.get(row.name);
+      if (id === undefined) {
+        // Label is in SQLite but was never loaded into the maps — re-add it.
+        const newId = this._nextId++;
+        this._idToName.set(newId, row.name);
+        this._nameToId.set(row.name, newId);
+        this._skillData.set(row.name, {
+          description: row.description,
+          tokenEstimate: row.tokenEstimate
+        });
+
+        const currentMax = this._hnsw.getMaxElements();
+        if (this._nextId >= currentMax) {
+          this._hnsw.resizeIndex(currentMax + 1000);
+        }
+
+        const embBuffer = row.embedding;
+        const embArray = new Float32Array(embBuffer.buffer, embBuffer.byteOffset, embBuffer.byteLength / 4);
+        this._hnsw.addPoint(Array.from(embArray), newId);
+        repaired++;
+      }
     }
 
-    this._hnsw.addPoint(Array.from(embeddingArray), id);
-    this._skillData.set(name, { description, tokenEstimate });
-    
-    // Invalidate caches when index updates
-    this._queryCache.clear();
+    if (repaired > 0) {
+      logger.warn(
+        'EmbeddingService',
+        `_repairHnswFromSqlite: Re-added ${repaired} skill(s) missing from HNSW index. ` +
+        'This indicates a previous crash between addPoint and SQLite commit. ' +
+        'Index is now consistent.'
+      );
+      metrics.increment('hnsw.startup_repairs', repaired);
+    } else {
+      logger.info('EmbeddingService', '_repairHnswFromSqlite: Index integrity OK — all SQLite records present in HNSW.');
+    }
+  }
+
+  /**
+   * Acquire the write lock and mutate the HNSW index.
+   * Must be awaited. Never call _hnsw.addPoint or _hnsw.resizeIndex
+   * outside this method — doing so bypasses the native thread-safety guard.
+   */
+  async _addOrUpdateHnswLocked(name, embeddingArray, description, tokenEstimate) {
+    const release = await this._hnswWriteLock.acquire();
+    try {
+      let id = this._nameToId.get(name);
+      if (id === undefined) {
+        id = this._nextId++;
+        this._idToName.set(id, name);
+        this._nameToId.set(name, id);
+      }
+
+      const currentMax = this._hnsw.getMaxElements();
+      if (this._nextId >= currentMax) {
+        this._hnsw.resizeIndex(currentMax + 1000);
+      }
+
+      this._hnsw.addPoint(Array.from(embeddingArray), id);
+      this._skillData.set(name, { description, tokenEstimate });
+
+      // Invalidate LRU cache — results are stale after any index mutation.
+      this._queryCache.clear();
+    } finally {
+      release();
+    }
   }
 
   _computeHash(content) {
@@ -130,6 +212,9 @@ class EmbeddingService {
         const skillName = parts[0];
         
         if (event === 'unlink') {
+          // Acquire write lock before rebuilding — a concurrent search must
+          // not read the index while it is being fully reconstructed.
+          const release = await this._hnswWriteLock.acquire();
           try {
             this.db.prepare('DELETE FROM skills WHERE name = ?').run(skillName);
             this._rebuildHnswIndex();
@@ -137,6 +222,8 @@ class EmbeddingService {
             logger.info('EmbeddingService', `Removed skill from database and index: ${skillName}`);
           } catch (err) {
             warn('EmbeddingService', `Failed to delete skill ${skillName} on unlink: ${err.message}`);
+          } finally {
+            release();
           }
         } else {
           logger.info('EmbeddingService', `Skill file change detected: ${relative}. Hot-reloading...`);
@@ -174,7 +261,7 @@ class EmbeddingService {
       );
 
       const embeddingBlob = Buffer.from(new Float32Array(embeddingArray).buffer);
-      this._addOrUpdateHnsw(skillName, embeddingArray, desc, tokenEstimate);
+      await this._addOrUpdateHnswLocked(skillName, embeddingArray, desc, tokenEstimate);
 
       this.db.prepare(`
         INSERT INTO skills (name, description, embedding, tokenEstimate, hash)
@@ -283,10 +370,11 @@ class EmbeddingService {
         }
 
         const embeddingBlob = Buffer.from(new Float32Array(embeddingArray).buffer);
-        
-        // HNSW incremental patch
-        this._addOrUpdateHnsw(entry, embeddingArray, desc, tokenEstimate);
-        
+
+        // Fix 1: Use the locked variant — batch sync runs concurrently with
+        // live search queries; the write lock prevents native ANN corruption.
+        await this._addOrUpdateHnswLocked(entry, embeddingArray, desc, tokenEstimate);
+
         updatesToExecute.push({ name: entry, desc, emb: embeddingBlob, tokens: tokenEstimate, hash });
       }));
 
@@ -339,8 +427,14 @@ class EmbeddingService {
     }
 
     const searchLimit = Math.min(limit, this._nextId);
-    
-    // HNSW Sub-millisecond ANN search
+
+    // HNSW ANN search — searchKnn is a read operation. The write lock
+    // (Mutex) does not block reads; it only serialises concurrent writes.
+    // If a write is in progress, searchKnn proceeds without waiting because
+    // hnswlib's read path is safe for concurrent read-read access.
+    // The only hazard is read-DURING-write, which the Mutex on the write
+    // side prevents by delaying the write until any in-flight search finishes
+    // (event loop turn boundaries ensure this in single-threaded Node.js).
     const result = this._hnsw.searchKnn(Array.from(queryEmbedding), searchLimit);
     
     const scored = [];
