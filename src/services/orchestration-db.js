@@ -479,10 +479,117 @@ class OrchestrationDB {
     return { released: false, file_path: filePath };
   }
 
-  async writeMemory(key, scope, value, agentId, taskId, ttlSeconds = null) {
+  /**
+   * Write a value to shared memory.
+   *
+   * Fix 7 — Compare-and-swap version enforcement.
+   *
+   * If `expectedVersion` is provided, the write is conditional:
+   *   - If the current stored version equals expectedVersion → write proceeds.
+   *   - If the current stored version does NOT equal expectedVersion →
+   *     the write is rejected and { conflict: true, current_version, current_value }
+   *     is returned so the agent can read the latest value, merge, and retry.
+   *
+   * The CAS check is made atomic via Redis WATCH/MULTI/EXEC:
+   *   WATCH the memory key → read current version → if match, MULTI/SET/EXEC.
+   *   If another writer updates the key between WATCH and EXEC, EXEC returns null
+   *   (transaction aborted) and we return a conflict rather than silently overwriting.
+   *
+   * Without `expectedVersion` the write is unconditional (backward compatible).
+   *
+   * @param {string}  key
+   * @param {string}  scope
+   * @param {*}       value
+   * @param {string}  agentId
+   * @param {string}  taskId
+   * @param {number}  [ttlSeconds]
+   * @param {number}  [expectedVersion]  — If set, enforce CAS. Omit for blind writes.
+   * @returns {object} Write result or { conflict: true, current_version, current_value }
+   */
+  async writeMemory(key, scope, value, agentId, taskId, ttlSeconds = null, expectedVersion = null) {
     const now = Math.floor(Date.now() / 1000);
     const memKey = `ase:memory:${scope}:${key}`;
 
+    // ─────────────────────────────────────────────────────────────
+    // Fix 7: CAS enforcement when expectedVersion is provided.
+    // Uses Redis WATCH to make the read-compare-write atomic.
+    // A concurrent write that changes the key between WATCH and EXEC
+    // causes EXEC to return null — we surface that as a conflict.
+    // ─────────────────────────────────────────────────────────────
+    if (expectedVersion !== null) {
+      // WATCH must be issued on a separate Redis client connection because
+      // WATCH state is connection-scoped and our shared this.redis client
+      // may have concurrent commands in flight. Duplicate the connection.
+      const casClient = this.redis.duplicate();
+      try {
+        await casClient.watch(memKey);
+
+        // Read current state while WATCHing.
+        const existingData = await casClient.get(memKey);
+        const currentVersion = existingData ? (JSON.parse(existingData).version || 1) : 0;
+        const currentValue   = existingData ? JSON.parse(existingData).value : null;
+
+        if (currentVersion !== expectedVersion) {
+          // Version mismatch — reject before touching the index.
+          await casClient.unwatch();
+          logger.warn('OrchestrationDB',
+            `writeMemory CAS conflict: key=${key} scope=${scope} ` +
+            `expected_version=${expectedVersion} current_version=${currentVersion} ` +
+            `writer=${agentId}`
+          );
+          return {
+            conflict: true,
+            current_version: currentVersion,
+            current_value: currentValue,
+            message:
+              `Write rejected: expected version ${expectedVersion} but current version is ${currentVersion}. ` +
+              `Read the current value, merge your changes, and retry with expected_version=${currentVersion}.`
+          };
+        }
+
+        // Versions match — build the new object and execute atomically.
+        const newVersion = currentVersion + 1;
+        const expiresAt = ttlSeconds ? now + ttlSeconds : null;
+        const newMemObj = { key, scope, value, written_by: agentId, task_id: taskId, version: newVersion, expires_at: expiresAt, created_at: now };
+        const oldValue = existingData ? JSON.stringify(JSON.parse(existingData).value) : null;
+
+        const multi = casClient.multi();
+        if (ttlSeconds) {
+          multi.set(memKey, JSON.stringify(newMemObj), 'EX', ttlSeconds);
+        } else {
+          multi.set(memKey, JSON.stringify(newMemObj));
+        }
+        const execResult = await multi.exec();
+
+        if (!execResult) {
+          // EXEC returned null — a concurrent writer modified the key between
+          // WATCH and EXEC. Surface this as a conflict; the caller should retry.
+          return {
+            conflict: true,
+            current_version: currentVersion,
+            current_value: currentValue,
+            message:
+              `Write rejected: concurrent modification detected (optimistic lock contention). ` +
+              `Read the current value and retry with the new expected_version.`
+          };
+        }
+
+        // EXEC succeeded. Persist to SQLite via write pool.
+        await this._writePool.run({
+          type: 'writeMemory',
+          payload: { key, scope, value, agentId, taskId, version: newVersion, expiresAt, oldValue, now }
+        });
+
+        return { key, scope, version: newVersion, written_by: agentId };
+      } finally {
+        casClient.disconnect();
+      }
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Unconditional write path (no expectedVersion provided).
+    // Backward-compatible with all existing callers.
+    // ─────────────────────────────────────────────────────────────
     const existingData = await this.redis.get(memKey);
     let version = 1;
     let oldValue = null;

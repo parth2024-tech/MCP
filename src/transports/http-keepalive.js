@@ -62,6 +62,31 @@ async function startHttpTransport(mcpServer, port = 3100) {
         return;
       }
 
+      // Fix 8: Replay-on-reconnect using the SSE Last-Event-ID header.
+      //
+      // WHY: Redis pub/sub is fire-and-forget. A subscriber that disconnects
+      // (network blip, process restart) misses all messages published during
+      // the gap. Events that drive orchestration (task_completed → next task
+      // starts) are silently lost. The SQLite events table is the durable log.
+      //
+      // HOW:
+      //   1. Read the Last-Event-ID header the browser/client sends automatically
+      //      on reconnect (SSE spec, RFC 7932). Parse it as a SQLite event row ID.
+      //   2. Before subscribing to pub/sub, drain every event since that ID from
+      //      SQLite that matches the agent's subscriptions. Send each as an SSE
+      //      frame with the correct id: field.
+      //   3. Subscribe to pub/sub. For live events, set id: to the SQLite row ID
+      //      included in the event envelope so the client tracks position.
+      //
+      // ORDERING: The backlog is sent before pub/sub subscriptions are active,
+      // so there is a tiny window where a new event could be emitted after the
+      // backlog query but before the pub/sub subscription is established. This
+      // is closed by querying SQLite again *after* subscribing and flushing any
+      // new events that arrived in that window (see "gap flush" below).
+
+      const lastEventIdHeader = req.headers['last-event-id'];
+      const resumeFromId = lastEventIdHeader ? parseInt(lastEventIdHeader, 10) : 0;
+
       res.writeHead(200, {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
@@ -70,22 +95,90 @@ async function startHttpTransport(mcpServer, port = 3100) {
       });
       res.write(': ok\n\n');
 
+      const orch = OrchestrationDB.getInstance();
+      const db   = orch.getDB();
+
+      // Helper: look up this agent's subscriptions and return matching events
+      // since a given SQLite row ID.
+      const getSubscriptions = () =>
+        db.prepare(`SELECT event_type FROM event_subscriptions WHERE agent_id = ?`)
+          .all(agentId)
+          .map(r => r.event_type);
+
+      const queryMissedEvents = (sinceId) => {
+        const subs = getSubscriptions();
+        if (subs.length === 0) return [];
+        const placeholders = subs.map(() => '?').join(',');
+        return db.prepare(
+          `SELECT id, type, payload, source_agent, task_id, created_at
+           FROM events
+           WHERE id > ? AND type IN (${placeholders})
+           ORDER BY id ASC
+           LIMIT 500`
+        ).all(sinceId, ...subs);
+      };
+
+      // Helper: write one SSE event frame with the id: field set.
+      // Setting id: enables automatic reconnection with Last-Event-ID.
+      const writeEvent = (event) => {
+        const data = JSON.stringify({
+          id:           event.id,
+          type:         event.type,
+          payload:      typeof event.payload === 'string' ? JSON.parse(event.payload) : event.payload,
+          source_agent: event.source_agent,
+          task_id:      event.task_id,
+          created_at:   event.created_at
+        });
+        res.write(`id: ${event.id}\ndata: ${data}\n\n`);
+      };
+
+      // Step 1: Drain the backlog from SQLite (events missed while disconnected).
+      let highWaterMark = resumeFromId;
+      if (resumeFromId > 0) {
+        const missed = queryMissedEvents(resumeFromId);
+        for (const event of missed) {
+          writeEvent(event);
+          highWaterMark = event.id;
+        }
+        if (missed.length > 0) {
+          logger.info('HTTP-SSE',
+            `Replayed ${missed.length} missed event(s) to agent ${agentId} (since id=${resumeFromId})`
+          );
+        }
+      }
+
+      // Step 2: Subscribe to Redis pub/sub for live events.
       const redisUrl = process.env.ASE_REDIS_URL || 'redis://127.0.0.1:6379';
       const subRedis = new Redis(redisUrl, { maxRetriesPerRequest: null });
-      
-      subRedis.subscribe('ase:events').catch((err) => {
+
+      // Await subscribe() so the subscription is registered before the gap flush.
+      // If this fails we log and fall through — live events will be missed but
+      // the backlog replay already ran successfully.
+      await subRedis.subscribe('ase:events').catch((err) => {
         logger.error('HTTP-SSE', `Redis subscribe failed: ${err.message}`);
       });
 
+      // Step 3: Gap flush — query SQLite for events emitted between the backlog
+      // query (Step 1) and the moment the subscription became active (Step 2).
+      // Without this, events in that window are missed even with replay enabled.
+      const gap = queryMissedEvents(highWaterMark);
+      for (const event of gap) {
+        writeEvent(event);
+        highWaterMark = event.id;
+      }
+
+      // Step 4: Handle live events from pub/sub.
       const onMessage = (channel, message) => {
         try {
           const event = JSON.parse(message);
-          const db = OrchestrationDB.getInstance().getDB();
-          const sub = db.prepare(
-            `SELECT 1 FROM event_subscriptions WHERE agent_id = ? AND event_type = ?`
-          ).get(agentId, event.type);
-          if (sub) {
-            res.write(`data: ${message}\n\n`);
+
+          // Skip events already sent in the backlog or gap flush.
+          if (event.id && event.id <= highWaterMark) return;
+
+          const subs = getSubscriptions();
+          if (subs.includes(event.type)) {
+            writeEvent(event);
+            if (event.id) highWaterMark = event.id;
           }
         } catch (err) {
           logger.error('HTTP-SSE', `SSE message error: ${err.message}`);
