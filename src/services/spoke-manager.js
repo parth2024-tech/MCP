@@ -7,6 +7,56 @@ const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
 const { StdioClientTransport } = require('@modelcontextprotocol/sdk/client/stdio.js');
 const { logger } = require('../utils/logger');
 
+// ─── Timeout configuration ─────────────────────────────────────────────────
+//
+// Why every spoke operation needs a timeout:
+//
+//   client.connect() — spawns the spoke process (e.g. `npx -y ...`) and waits
+//   for the MCP handshake. If npm is slow or the network is unreachable, this
+//   blocks indefinitely. The server startup call is fire-and-forget, so a hang
+//   here doesn't block the server — but it does leave a Promise that never
+//   settles, and the spoke slot is never populated, so all callTool() calls
+//   throw "not connected" immediately (good). However the spoke restart loop
+//   (onClose) keeps retrying indefinitely, each time spawning a new npx process.
+//
+//   client.listTools() / client.callTool() — the spoke process may have died
+//   without triggering onClose (e.g. zombie process, OS pipe buffering). The
+//   underlying stdio transport then blocks on read() indefinitely. Without a
+//   timeout, every listAggregatedTools() call during the server's ListTools
+//   handler hangs, which blocks Antigravity's own tool dispatch loop for as
+//   long as the hang lasts — which is why `invoke_tool { list_pages }` shows
+//   "Working." for 10+ minutes. The call isn't hanging in the tool handler
+//   itself; it's hanging in the ListTools response that runs before dispatch.
+//
+// Timeouts used:
+//   CONNECT_TIMEOUT_MS  — maximum time to wait for a spoke to handshake on startup
+//   CALL_TIMEOUT_MS     — maximum time for any listTools() or callTool() call
+//   RESTART_DELAY_MS    — delay before attempting a spoke restart after disconnect
+
+const CONNECT_TIMEOUT_MS = parseInt(process.env.ASE_SPOKE_CONNECT_TIMEOUT_MS || '15000', 10);
+const CALL_TIMEOUT_MS    = parseInt(process.env.ASE_SPOKE_CALL_TIMEOUT_MS    || '30000', 10);
+const RESTART_DELAY_MS   = parseInt(process.env.ASE_SPOKE_RESTART_DELAY_MS   || '5000',  10);
+
+/**
+ * Race a promise against a timeout.
+ * @template T
+ * @param {Promise<T>} promise
+ * @param {number} ms
+ * @param {string} label  — included in the error message for diagnostics
+ * @returns {Promise<T>}
+ */
+function withTimeout(promise, ms, label) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error(`Timed out after ${ms}ms: ${label}`));
+    }, ms);
+    promise.then(
+      (val) => { clearTimeout(timer); resolve(val); },
+      (err) => { clearTimeout(timer); reject(err); }
+    );
+  });
+}
+
 class SpokeManager {
   constructor(configPath, mockConfig = null) {
     this.spokes = new Map();
@@ -27,7 +77,7 @@ class SpokeManager {
   }
 
   async initialize() {
-    const promises = Object.entries(this.config).map(([name, config]) => 
+    const promises = Object.entries(this.config).map(([name, config]) =>
       this._startSpoke(name, config)
     );
     await Promise.allSettled(promises);
@@ -37,10 +87,18 @@ class SpokeManager {
   async _startSpoke(name, config) {
     try {
       const transport = this._createTransport(config);
-      const client = this._createClient();
+      const client    = this._createClient();
 
-      await client.connect(transport);
-      
+      // Fix: connect with a hard timeout.
+      // Without this, `npx -y <package>` hangs if npm is slow or offline,
+      // causing the spoke slot to remain empty forever and triggering
+      // infinite restart loops that each spawn a new orphaned npx process.
+      await withTimeout(
+        client.connect(transport),
+        CONNECT_TIMEOUT_MS,
+        `spoke '${name}' connect (${config.command} ${(config.args || []).join(' ')})`
+      );
+
       this.spokes.set(name, {
         client,
         transport,
@@ -50,34 +108,49 @@ class SpokeManager {
 
       logger.info('SpokeManager', `Spoke '${name}' connected successfully.`);
 
-      // Handle process exit to auto-restart
+      // Auto-restart on disconnect
       transport.onClose = () => {
-        logger.warn('SpokeManager', `Spoke '${name}' disconnected. Restarting...`);
+        logger.warn('SpokeManager', `Spoke '${name}' disconnected. Restarting in ${RESTART_DELAY_MS}ms...`);
         this.spokes.delete(name);
-        setTimeout(() => this._startSpoke(name, config), 5000);
+        setTimeout(() => this._startSpoke(name, config), RESTART_DELAY_MS);
       };
 
     } catch (err) {
       logger.error('SpokeManager', `Failed to start spoke '${name}': ${err.message}`);
+      // Spoke remains absent from this.spokes — callTool() will throw "not connected"
+      // which is a clean, immediate error rather than a silent hang.
     }
   }
 
   async listAggregatedTools() {
     const allTools = [];
     for (const [name, spoke] of this.spokes.entries()) {
-      if (spoke.status === 'connected') {
-        try {
-          const response = await spoke.client.listTools();
-          const tools = response.tools.map(tool => ({
-            ...tool,
-            name: `${name}__${tool.name}`, // Prefix to avoid collision
-            _originalName: tool.name,
-            _spoke: name
-          }));
-          allTools.push(...tools);
-        } catch (err) {
-          logger.error('SpokeManager', `Failed to list tools for spoke '${name}': ${err.message}`);
-        }
+      if (spoke.status !== 'connected') continue;
+      try {
+        // Fix: list tools with a hard timeout.
+        // A zombie spoke process (died but onClose not yet fired) leaves the
+        // stdio transport blocked on read(). Without a timeout, this call hangs
+        // indefinitely, which blocks the MCP ListTools handler, which blocks
+        // every subsequent tool dispatch in the host agent.
+        const response = await withTimeout(
+          spoke.client.listTools(),
+          CALL_TIMEOUT_MS,
+          `spoke '${name}' listTools`
+        );
+        const tools = response.tools.map(tool => ({
+          ...tool,
+          name: `${name}__${tool.name}`,
+          _originalName: tool.name,
+          _spoke: name
+        }));
+        allTools.push(...tools);
+      } catch (err) {
+        logger.error('SpokeManager',
+          `Failed to list tools for spoke '${name}': ${err.message}. ` +
+          `Marking spoke as degraded.`
+        );
+        // Mark the spoke degraded so subsequent calls fail fast until it recovers.
+        if (spoke) spoke.status = 'degraded';
       }
     }
     return allTools;
@@ -97,14 +170,25 @@ class SpokeManager {
       throw new Error(`Spoke '${spokeName}' is not connected or doesn't exist.`);
     }
 
-    // Proxy the request
+    // Fix: call tool with a hard timeout.
+    // Same zombie-spoke problem as listTools: without a timeout, a dead spoke
+    // process causes callTool() to block indefinitely on the stdio read.
     try {
-      const result = await spoke.client.callTool({
-        name: originalName,
-        arguments: args
-      });
+      const result = await withTimeout(
+        spoke.client.callTool({ name: originalName, arguments: args }),
+        CALL_TIMEOUT_MS,
+        `spoke '${spokeName}' callTool '${originalName}'`
+      );
       return result;
     } catch (err) {
+      // If the call timed out, mark the spoke degraded.
+      if (err.message.includes('Timed out')) {
+        logger.warn('SpokeManager',
+          `callTool timed out for spoke '${spokeName}' tool '${originalName}'. ` +
+          `Marking spoke as degraded.`
+        );
+        if (spoke) spoke.status = 'degraded';
+      }
       throw new Error(`Spoke '${spokeName}' tool execution failed: ${err.message}`);
     }
   }
