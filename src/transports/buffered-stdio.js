@@ -1,45 +1,33 @@
 /**
- * Buffered Stdio Transport
+ * Direct Stdio Transport
  *
- * Wraps the default StdioServerTransport to add write coalescing.
- * Instead of flushing every JSON-RPC message individually (one write
- * syscall per message), this transport buffers outgoing writes and
- * flushes them on the next microtask tick.
+ * Previously this class used queueMicrotask() to coalesce writes.
+ * That optimization caused a critical production bug:
  *
- * For high-throughput scenarios (e.g. progress notifications from
- * streaming validation), this reduces syscall overhead significantly.
+ * PROBLEM:
+ *   The MCP server loads a large ONNX embedding model (Xenova/all-MiniLM-L6-v2)
+ *   in a Piscina worker thread 2 seconds after startup. This model load saturates
+ *   the CPU for 5-15 seconds on first call. During that window, the Node.js event
+ *   loop is starved: microtasks queued via queueMicrotask() are never drained,
+ *   so the JSON-RPC response for any tool call that arrived during startup sits
+ *   in _writeBuffer forever. The IDE sees the tool as hanging at "Working..."
+ *   until its RPC timeout fires.
+ *
+ * FIX:
+ *   Remove all buffering. Call super.send() directly and immediately.
+ *   MCP is a request/response protocol — one tool call produces one response.
+ *   There is no high-throughput scenario that would benefit from write coalescing
+ *   on the response path. Correctness > micro-optimisation.
  */
 
 const { StdioServerTransport } = require("@modelcontextprotocol/sdk/server/stdio.js");
 
 class BufferedStdioTransport extends StdioServerTransport {
-  constructor() {
-    super();
-    this._writeBuffer = [];
-    this._flushScheduled = false;
-  }
-
-  /**
-   * Override send to buffer messages and flush on next microtask.
-   */
   async send(message, options) {
-    this._writeBuffer.push({ message, options });
-    if (!this._flushScheduled) {
-      this._flushScheduled = true;
-      queueMicrotask(() => this._flush());
-    }
-  }
-
-  async _flush() {
-    this._flushScheduled = false;
-    const batch = this._writeBuffer;
-    this._writeBuffer = [];
-    
-    // Process the entire batch
-    for (const item of batch) {
-      await super.send(item.message, item.options);
-    }
+    // Direct passthrough — no buffering, no microtask deferral.
+    return super.send(message, options);
   }
 }
 
 module.exports = { BufferedStdioTransport };
+

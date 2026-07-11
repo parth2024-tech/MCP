@@ -17,7 +17,7 @@ class WorkerPool {
     this.backgroundPool = new Piscina({
       filename: workerFile,
       maxThreads: 1,
-      minThreads: 1
+      minThreads: 0  // Don't pre-spawn — the ONNX model load will happen on first use
     });
   }
 

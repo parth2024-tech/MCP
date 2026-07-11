@@ -172,8 +172,12 @@ async function warmEmbeddingModel() {
     logger.warn({ err }, 'embedding_warmup_failed_circuit_breaker_will_handle');
   }
 }
-// Defer CPU-bound model warmup and skill sync to ensure instant startup
-// and prevent client initialization timeouts.
+// Defer CPU-bound model warmup and skill sync by 15s.
+// The IDE connects and makes its first tool calls within 0-5s of startup.
+// The ONNX model load (Xenova/all-MiniLM-L6-v2) saturates the CPU for
+// 5-15s on first call. Firing at 2s collides directly with those IDE
+// requests and starves the event loop, causing "Working..." hangs.
+// 15s gives the IDE time to fully initialize before heavy work begins.
 setTimeout(() => {
   warmEmbeddingModel();
 
@@ -184,7 +188,7 @@ setTimeout(() => {
   }).catch((err: any) => {
     logger.error('Server', `Background embedding sync failed: ${err.message}`);
   });
-}, 2000);
+}, 15000);
 
 knowledgeGraphService.initializeSchema().catch((err: any) => {
   logger.error('Server', `Failed to initialize Knowledge Graph schema: ${err.message}`);
@@ -255,3 +259,8 @@ if (process.env.NODE_ENV === 'development') {
 
   logger.info('Server', `Hot-reload active (chokidar) — watching: src/tools/`);
 }
+
+process.stdin.on('close', () => {
+  logger.info('Server', 'stdin closed by client, shutting down');
+  process.exit(0);
+});
