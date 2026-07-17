@@ -18,10 +18,10 @@ const readline = require('readline');
 // Path to the ASE tools directory
 const ASE_ROOT = '/home/thor/skiils/tools';
 
-const { generateProjectPrompt, getConfigTemplate } = require(`${ASE_ROOT}/server/project-prompt-generator`);
-const { validate, detectProjectType } = require(`${ASE_ROOT}/server/output-validator`);
-const { routeModel } = require(`${ASE_ROOT}/server/model-router`);
-const { selectTopSkills } = require(`${ASE_ROOT}/server/context-budget`);
+const { generateProjectPrompt, getConfigTemplate } = require(`${ASE_ROOT}/server/src/services/project-prompt-generator`);
+const { validate, detectProjectType } = require(`${ASE_ROOT}/server/src/services/output-validator`);
+const { routeModel } = require(`${ASE_ROOT}/server/src/services/model-router`);
+const { selectTopSkills } = require(`${ASE_ROOT}/server/src/services/context-budget`);
 
 const CONFIG_FILE = '.ase-project.json';
 const cwd = process.cwd();
@@ -66,17 +66,21 @@ if (args.includes('--check')) {
 // ──────────────────────────────────────────────────────────
 if (args.includes('--validate')) {
   log(c.cyan, '🔍', `Running output validation for: ${c.bold}${cwd}${c.reset}\n`);
-  const result = validate(cwd);
-  console.log(`Project type: ${c.bold}${result.project_type}${c.reset}\n`);
-  for (const step of result.results) {
-    const icon = step.passed ? `${c.green}✅${c.reset}` : `${c.red}❌${c.reset}`;
-    console.log(`${icon} ${step.step} (exit: ${step.exit_code})`);
-    if (!step.passed && step.output) {
-      console.log(`${c.gray}${step.output.slice(0, 500)}${c.reset}`);
+  validate(cwd).then(result => {
+    console.log(`Project type: ${c.bold}${result.project_type}${c.reset}\n`);
+    for (const step of result.results) {
+      const icon = step.passed ? `${c.green}✅${c.reset}` : `${c.red}❌${c.reset}`;
+      console.log(`${icon} ${step.step} (exit: ${step.exit_code})`);
+      if (!step.passed && step.output) {
+        console.log(`${c.gray}${step.output.slice(0, 500)}${c.reset}`);
+      }
     }
-  }
-  console.log(`\n${result.summary}`);
-  process.exit(result.passed ? 0 : 1);
+    console.log(`\n${result.summary}`);
+    process.exit(result.passed ? 0 : 1);
+  }).catch(err => {
+    console.error('Validation failed:', err.message);
+    process.exit(1);
+  });
 }
 
 // ──────────────────────────────────────────────────────────
@@ -120,22 +124,25 @@ if (budgetIdx !== -1) {
 // ──────────────────────────────────────────────────────────
 // DEFAULT — Initialize project (ase-init or ase-init --update)
 // ──────────────────────────────────────────────────────────
-const configPath = path.join(cwd, CONFIG_FILE);
-const isUpdate = args.includes('--update');
-const projectType = detectProjectType(cwd);
+const hasCommand = args.includes('--validate') || args.includes('--route') || args.includes('--budget') || args.includes('--check');
 
-if (fs.existsSync(configPath) && !isUpdate) {
-  log(c.green, '✅', `${CONFIG_FILE} already exists. Use ${c.bold}ase-init --update${c.reset} to regenerate.`);
-  const existing = generateProjectPrompt(cwd);
-  if (existing.prompt) {
-    console.log(`\n${c.gray}${existing.prompt.slice(0, 300)}...${c.reset}`);
+if (!hasCommand) {
+  const configPath = path.join(cwd, CONFIG_FILE);
+  const isUpdate = args.includes('--update');
+  const projectType = detectProjectType(cwd);
+
+  if (fs.existsSync(configPath) && !isUpdate) {
+    log(c.green, '✅', `${CONFIG_FILE} already exists. Use ${c.bold}ase-init --update${c.reset} to regenerate.`);
+    const existing = generateProjectPrompt(cwd);
+    if (existing.prompt) {
+      console.log(`\n${c.gray}${existing.prompt.slice(0, 300)}...${c.reset}`);
+    }
+    process.exit(0);
   }
-  process.exit(0);
-}
 
-console.log(`\n${c.bold}${c.cyan}🚀 ASE Project Initializer${c.reset}\n`);
-log(c.gray, '📁', `Directory: ${cwd}`);
-log(c.gray, '🔍', `Detected project type: ${c.bold}${projectType}${c.reset}`);
+  console.log(`\n${c.bold}${c.cyan}🚀 ASE Project Initializer${c.reset}\n`);
+  log(c.gray, '📁', `Directory: ${cwd}`);
+  log(c.gray, '🔍', `Detected project type: ${c.bold}${projectType}${c.reset}`);
 
 // Auto-detect project name from package.json or directory name
 let autoName = path.basename(cwd);
@@ -179,3 +186,4 @@ console.log(`\n${c.gray}Next steps:${c.reset}`);
 console.log(`  ${c.bold}1.${c.reset} Open ${c.cyan}${configPath}${c.reset} and fill in your tech stack, conventions, and never-do rules.`);
 console.log(`  ${c.bold}2.${c.reset} Run ${c.bold}ase-init --validate${c.reset} after generating code to check for issues.`);
 console.log(`  ${c.bold}3.${c.reset} Run ${c.bold}ase-init --route "your task"${c.reset} to get the optimal model config.\n`);
+}

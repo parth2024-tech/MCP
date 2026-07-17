@@ -29,7 +29,9 @@
     "Never set renderer.setPixelRatio above 2 — always cap with Math.min(devicePixelRatio, 2)",
     "Never ship a Three.js scene without calling .dispose() on all geometries, materials, and textures on unmount",
     "Never use separate meshes for repeated identical objects — always use THREE.InstancedMesh or THREE.Points",
-    "Never build a 3D scene without checking renderer.info.render.calls — must stay within draw call budget"
+    "Never build a 3D scene without checking renderer.info.render.calls — must stay within draw call budget",
+    "Never configure ioredis with maxRetriesPerRequest: null without also setting connectTimeout, lazyConnect: true, and retryStrategy: () => null. This causes every Redis command to hang indefinitely when Redis is unreachable, permanently freezing the MCP server.",
+    "Never call Redis commands (smembers, keys, get, etc.) without first checking isRedisAvailable(). All tools must degrade gracefully to SQLite-only mode when Redis is unreachable."
   ],
   "preferred_patterns": [
     "Use Zod for all schema validation",
