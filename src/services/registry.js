@@ -52,7 +52,8 @@ class ToolRegistry {
     const { z } = require('zod');
 
     // Inject agent_token to all tools except the bootstrap tool register_agent
-    if (tool.name !== 'register_agent') {
+    const authRequired = process.env.ASE_AUTH_REQUIRED !== 'false';
+    if (authRequired && tool.name !== 'register_agent') {
       // 1. Extend Zod schema for TypeScript tools
       if (tool.schema && typeof tool.schema.extend === 'function') {
         tool.schema = tool.schema.extend({

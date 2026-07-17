@@ -19,6 +19,10 @@ import {
 
 import { Container } from './src/core/Container';
 import { RedisService } from './src/services/redis-service';
+import { DeadLetterQueue } from './src/services/dead-letter-queue';
+import { startMemoryMonitoring, stopMemoryMonitoring } from './src/utils/memory-guard';
+import { startWatchdog, stopWatchdog } from './src/services/health-watchdog';
+import { ServiceRegistry } from './src/services/service-registry';
 
 // Legacy services that haven't been TS-migrated yet
 const ToolRegistry = require('./src/services/registry');
@@ -37,6 +41,48 @@ const ToolSearch = require('./src/services/tool-search');
 
 const { logger } = require('./src/utils/logger');
 const metrics = require('./src/utils/metrics');
+
+// ─── Process-Level Crash Guards ─────────────────────────────────────────────────
+//
+// Without these handlers, any uncaught error or unhandled promise rejection
+// terminates the process SILENTLY (or with a cryptic exit code) and the MCP
+// client sees a "connection closed" with no explanation.
+//
+// With these handlers:
+//   - The error is structurally logged to skills_audit.log (with full stack)
+//   - Metrics are updated so operators can detect the crash post-mortem
+//   - The process performs a clean exit (code 1) rather than an abrupt SIGKILL
+
+process.on('uncaughtException', (err: Error, origin: string) => {
+  try {
+    logger.error('Process', `UNCAUGHT EXCEPTION [${origin}]: ${err.message}`, {
+      stack: err.stack,
+      origin,
+      pid: process.pid,
+    });
+    metrics.increment('process.uncaught_exception');
+  } catch (_) { /* logger itself failed — nothing we can do */ }
+  // Give Pino 500ms to flush to disk, then exit cleanly.
+  setTimeout(() => process.exit(1), 500);
+});
+
+process.on('unhandledRejection', (reason: unknown, promise: Promise<unknown>) => {
+  try {
+    const msg = reason instanceof Error ? reason.message : String(reason);
+    const stack = reason instanceof Error ? reason.stack : undefined;
+    logger.error('Process', `UNHANDLED REJECTION: ${msg}`, {
+      stack,
+      pid: process.pid,
+    });
+    metrics.increment('process.unhandled_rejection');
+  } catch (_) { /* logger itself failed */ }
+  // Do NOT exit on unhandled rejections in MCP servers — the SDK may fire
+  // fire-and-forget notifications that occasionally fail. Just log and continue.
+});
+
+let metricsServer: http.Server | undefined;
+
+// ─────────────────────────────────────────────────────────────────────────
 
 import { createToolCallHandler } from './src/server/handlers';
 const { registerResourceHandlers } = require('./src/server/resources');
@@ -68,6 +114,8 @@ const virtualKeyManager = new VirtualKeyManager();
 const orchestrationDb = OrchestrationDB.getInstance();
 const spokeManager = new SpokeManager();
 const redisService = new RedisService();
+const dlq = new DeadLetterQueue();
+const serviceRegistry = new ServiceRegistry(container);
 
 spokeManager.initialize().catch((err: any) => {
   logger.error('Server', `Failed to initialize Spoke Manager: ${err.message}`);
@@ -89,6 +137,12 @@ container.register('Redis', redisService);
 container.register('ToolSearch', ToolSearch);
 container.register('Metrics', metrics);
 container.register('SessionToolCache', new (require('./src/core/Cache').SessionToolCache)());
+container.register('DeadLetterQueue', dlq);
+container.register('ServiceRegistry', serviceRegistry);
+
+// Start Watchdogs & Monitoring (OpenHands-inspired resilience)
+startMemoryMonitoring(container);
+startWatchdog(container);
 
 const deps = {
   workerPool,
@@ -119,6 +173,20 @@ const server = new Server(
 const serverRoot = __dirname.endsWith('dist') ? path.join(__dirname, '..') : __dirname;
 const toolsDir = path.join(serverRoot, 'src', 'tools');
 registry.loadToolsFromDirectory(toolsDir, deps);
+
+// ─── Startup Health Snapshot ─────────────────────────────────────────────────
+setTimeout(() => {
+  const redisUp = orchestrationDb?.isRedisAvailable?.() ?? false;
+  const toolCount = registry.list ? registry.list().length : '?';
+  logger.info('Server', 'ASE MCP Server started — health snapshot', {
+    version: '4.2.0-max-level',
+    redis: redisUp ? 'connected' : 'unavailable (SQLite-only mode)',
+    tools_loaded: toolCount,
+    node_version: process.version,
+    pid: process.pid,
+    env: process.env.NODE_ENV || 'production',
+  });
+}, 2000); // 2s delay gives Redis lazy-connect time to resolve
 
 const searchToolsSchema = {
   name: 'search_tools',
@@ -194,10 +262,18 @@ knowledgeGraphService.initializeSchema().catch((err: any) => {
   logger.error('Server', `Failed to initialize Knowledge Graph schema: ${err.message}`);
 });
 
-const metricsServer = http.createServer((req, res) => {
+metricsServer = http.createServer((req, res) => {
   if (req.url === '/metrics' && req.method === 'GET') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(metrics.snapshot(), null, 2));
+  } else if (req.url === '/health' && req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    try {
+      const registry = container.resolve<any>('ServiceRegistry');
+      res.end(JSON.stringify(registry.toJSON(), null, 2));
+    } catch (e: any) {
+      res.end(JSON.stringify({ status: 'degraded', error: e.message }, null, 2));
+    }
   } else {
     res.writeHead(404);
     res.end();
@@ -262,5 +338,116 @@ if (process.env.NODE_ENV === 'development') {
 
 process.stdin.on('close', () => {
   logger.info('Server', 'stdin closed by client, shutting down');
-  process.exit(0);
+  gracefulShutdown('stdin close').catch((err) => {
+    logger.error('Shutdown', `Error during stdin close shutdown: ${err.message}`);
+    process.exit(1);
+  });
+});
+
+async function gracefulShutdown(signal: string) {
+  logger.info('Shutdown', `Received ${signal} — starting graceful shutdown orchestrator`, { pid: process.pid });
+  
+  // 1. Stop watchdogs
+  try {
+    stopMemoryMonitoring();
+    stopWatchdog();
+  } catch (_) {}
+
+  // 2. Drain active concurrency requests
+  try {
+    const concurrency = container.resolve<any>('ConcurrencyMiddleware');
+    if (concurrency) {
+      logger.info('Shutdown', `Draining in-flight requests... Active: ${concurrency.snapshot.active}`);
+      let attempts = 0;
+      while (concurrency.snapshot.active > 0 && attempts < 20) {
+        await new Promise(r => setTimeout(r, 500));
+        attempts++;
+      }
+      logger.info('Shutdown', `Requests drained. Final active: ${concurrency.snapshot.active}`);
+    }
+  } catch (_) {}
+
+  // 3. Close Redis
+  try {
+    const redis = container.resolve<any>('Redis');
+    if (redis) {
+      logger.info('Shutdown', 'Closing Redis connection...');
+      await redis.close();
+    }
+  } catch (_) {}
+
+  // 4. Close SQLite databases
+  try {
+    const orch = container.resolve<any>('OrchestrationDB');
+    if (orch && typeof orch.close === 'function') {
+      logger.info('Shutdown', 'Closing Orchestration SQLite database...');
+      orch.close();
+    }
+  } catch (_) {}
+
+  try {
+    const state = container.resolve<any>('SessionState');
+    if (state && state.db && typeof state.db.close === 'function') {
+      logger.info('Shutdown', 'Closing Session State SQLite database...');
+      state.db.close();
+    }
+  } catch (_) {}
+
+  try {
+    const dlq = container.resolve<any>('DeadLetterQueue');
+    if (dlq && typeof dlq.close === 'function') {
+      logger.info('Shutdown', 'Closing Dead Letter Queue database...');
+      dlq.close();
+    }
+  } catch (_) {}
+
+  // 5. Destroy worker pools
+  try {
+    const pool = container.resolve<any>('WorkerPool');
+    if (pool) {
+      logger.info('Shutdown', 'Destroying worker pools...');
+      await Promise.all([
+        pool.foregroundPool?.destroy(),
+        pool.backgroundPool?.destroy()
+      ].filter(Boolean));
+    }
+  } catch (_) {}
+
+  // 6. Close Spokes
+  try {
+    const spokeManager = container.resolve<any>('SpokeManager');
+    if (spokeManager && typeof spokeManager.shutdown === 'function') {
+      logger.info('Shutdown', 'Stopping all spoke child processes...');
+      spokeManager.shutdown();
+    }
+  } catch (_) {}
+
+  // 7. Close metrics HTTP server
+  try {
+    if (metricsServer) {
+      logger.info('Shutdown', 'Closing metrics HTTP server...');
+      await new Promise<void>((resolve) => {
+        metricsServer!.close(() => resolve());
+      });
+    }
+  } catch (_) {}
+
+  logger.info('Shutdown', 'Graceful shutdown completed successfully. Exiting.');
+  
+  // Give Pino 500ms to flush to disk, then exit cleanly.
+  setTimeout(() => process.exit(0), 500);
+}
+
+process.on('SIGTERM', () => {
+  gracefulShutdown('SIGTERM').catch((err) => {
+    logger.error('Shutdown', `Fatal error during SIGTERM: ${err.message}`);
+    process.exit(1);
+  });
+});
+
+process.on('SIGINT', () => {
+  gracefulShutdown('SIGINT').catch((err) => {
+    logger.error('Shutdown', `Fatal error during SIGINT: ${err.message}`);
+    process.exit(1);
+  });
 });

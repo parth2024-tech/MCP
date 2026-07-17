@@ -1,4 +1,7 @@
 import type { Container } from '../core/Container';
+import { TimeoutError } from '../utils/errors';
+
+const PIPELINE_TIMEOUT_MS = parseInt(process.env.ASE_PIPELINE_TIMEOUT_MS || '45000', 10);
 
 export interface MiddlewareContext {
   container: Container;
@@ -37,7 +40,18 @@ export class Pipeline {
       await middleware.handle(context, () => dispatch(i + 1));
     };
 
-    await dispatch(0);
+    let timer: NodeJS.Timeout | undefined;
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timer = setTimeout(() => {
+        reject(new TimeoutError(context.name, PIPELINE_TIMEOUT_MS, { reqId: context.reqId }));
+      }, PIPELINE_TIMEOUT_MS);
+    });
+
+    try {
+      await Promise.race([dispatch(0), timeoutPromise]);
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
     
     if (!context.handled) {
       throw new Error(`Unhandled tool call: ${context.name}`);

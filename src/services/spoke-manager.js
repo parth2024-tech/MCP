@@ -6,6 +6,7 @@ const { spawn } = require('child_process');
 const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
 const { StdioClientTransport } = require('@modelcontextprotocol/sdk/client/stdio.js');
 const { logger } = require('../utils/logger');
+const metrics = require('../utils/metrics');
 
 // ─── Timeout configuration ─────────────────────────────────────────────────
 //
@@ -36,6 +37,7 @@ const { logger } = require('../utils/logger');
 const CONNECT_TIMEOUT_MS = parseInt(process.env.ASE_SPOKE_CONNECT_TIMEOUT_MS || '15000', 10);
 const CALL_TIMEOUT_MS    = parseInt(process.env.ASE_SPOKE_CALL_TIMEOUT_MS    || '30000', 10);
 const RESTART_DELAY_MS   = parseInt(process.env.ASE_SPOKE_RESTART_DELAY_MS   || '5000',  10);
+const MAX_RESTART_ATTEMPTS = parseInt(process.env.ASE_SPOKE_MAX_RESTART_ATTEMPTS || '5', 10);
 
 /**
  * Race a promise against a timeout.
@@ -60,6 +62,7 @@ function withTimeout(promise, ms, label) {
 class SpokeManager {
   constructor(configPath, mockConfig = null) {
     this.spokes = new Map();
+    this._restartCounts = new Map();
     this.configPath = configPath || path.join(process.cwd(), 'spokes.json');
     this.config = mockConfig || this._loadConfig();
   }
@@ -106,13 +109,27 @@ class SpokeManager {
         status: 'connected'
       });
 
+      this._restartCounts.set(name, 0); // Reset restart counter on success
       logger.info('SpokeManager', `Spoke '${name}' connected successfully.`);
 
       // Auto-restart on disconnect
       transport.onClose = () => {
-        logger.warn('SpokeManager', `Spoke '${name}' disconnected. Restarting in ${RESTART_DELAY_MS}ms...`);
+        const attempts = (this._restartCounts.get(name) || 0) + 1;
+        this._restartCounts.set(name, attempts);
+
         this.spokes.delete(name);
-        setTimeout(() => this._startSpoke(name, config), RESTART_DELAY_MS);
+
+        if (attempts > MAX_RESTART_ATTEMPTS) {
+          logger.error('SpokeManager', `Spoke '${name}' disconnected. Max restart attempts (${MAX_RESTART_ATTEMPTS}) reached. Marking as permanently failed.`);
+          this.spokes.set(name, { status: 'failed', config });
+          metrics.increment('spoke.restart_exhausted', { service: name });
+          return;
+        }
+
+        const delay = Math.min(RESTART_DELAY_MS * Math.pow(2, attempts - 1), 120000);
+        logger.warn('SpokeManager', `Spoke '${name}' disconnected. Restarting in ${delay}ms... (attempt ${attempts}/${MAX_RESTART_ATTEMPTS})`);
+        metrics.increment('spoke.restart_attempt', { service: name });
+        setTimeout(() => this._startSpoke(name, config), delay);
       };
 
     } catch (err) {
@@ -210,6 +227,17 @@ class SpokeManager {
       { name: 'ase-hub-client', version: '1.0.0' },
       { capabilities: {} }
     );
+  }
+
+  resetSpoke(name) {
+    this._restartCounts.set(name, 0);
+    const config = this.config[name];
+    if (config) {
+      logger.info('SpokeManager', `Manually resetting spoke '${name}'`);
+      this._startSpoke(name, config);
+    } else {
+      logger.warn('SpokeManager', `Cannot reset spoke '${name}': no configuration found`);
+    }
   }
 
   shutdown() {

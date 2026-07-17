@@ -5,6 +5,13 @@ export class AuthMiddleware implements Middleware {
   async handle(context: MiddlewareContext, next: () => Promise<void>): Promise<void> {
     const { name, args } = context;
 
+    // 0. Disable authentication entirely if configured via environment variable
+    const authRequired = process.env.ASE_AUTH_REQUIRED !== 'false';
+    if (!authRequired) {
+      await next();
+      return;
+    }
+
     // 1. Skip authentication for read-only / bootstrap tools that don't need a signed token.
     //    - register_agent: the bootstrap tool that ISSUES tokens — cannot require one
     //    - search_tools:   read-only semantic search over the tool list, no sensitive ops

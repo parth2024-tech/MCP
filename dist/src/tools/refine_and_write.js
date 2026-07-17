@@ -73,7 +73,68 @@ class RefineAndWriteTool extends BaseTool_1.BaseTool {
             current.includes("⚠️ ASE_TYPE") ||
             current.includes("⚠️ ASE_UNUSED_IMPORT");
         if (hasViolations) {
-            throw new Error(`Unresolved violations found after 5 loops. File not written. Refined code: ${current}`);
+            const rulesViolations = [];
+            const typesViolations = [];
+            const unusedImportsViolations = [];
+            const lines = current.split('\n');
+            for (const line of lines) {
+                if (line.includes('⚠️ ASE_VIOLATION')) {
+                    const match = line.match(/⚠️\s*ASE_VIOLATION\[(.*?)\]:\s*(.*?)(?:\s*\*\/)?\s*$/);
+                    if (match) {
+                        rulesViolations.push(`${match[1]}: ${match[2]}`);
+                    }
+                    else {
+                        rulesViolations.push(line.trim());
+                    }
+                }
+                if (line.includes('⚠️ ASE_TYPE')) {
+                    const match = line.match(/⚠️\s*ASE_TYPE\[(.*?)\]:\s*(.*?)(?:\s*\*\/)?\s*$/);
+                    if (match) {
+                        typesViolations.push(`${match[1]}: ${match[2]}`);
+                    }
+                    else {
+                        typesViolations.push(line.trim());
+                    }
+                }
+                if (line.includes('⚠️ ASE_UNUSED_IMPORT')) {
+                    const match = line.match(/⚠️\s*ASE_UNUSED_IMPORT:\s*(.*?)(?:\s*\*\/)?\s*$/);
+                    if (match) {
+                        unusedImportsViolations.push(match[1]);
+                    }
+                    else {
+                        unusedImportsViolations.push(line.trim());
+                    }
+                }
+            }
+            const totalCount = rulesViolations.length + typesViolations.length + unusedImportsViolations.length;
+            const violations_summary = {
+                total_count: totalCount,
+                categories: {
+                    rules: {
+                        count: rulesViolations.length,
+                        severity: 'error',
+                        fix_hint: 'Remove or modify expressions matching the violated never_do project rules.',
+                        violations: rulesViolations
+                    },
+                    types: {
+                        count: typesViolations.length,
+                        severity: 'error',
+                        fix_hint: 'Correct TypeScript type signatures, casts, or variable declarations.',
+                        violations: typesViolations
+                    },
+                    unused_imports: {
+                        count: unusedImportsViolations.length,
+                        severity: 'warning',
+                        fix_hint: 'Remove unused import statements from the file.',
+                        violations: unusedImportsViolations
+                    }
+                }
+            };
+            throw new Error(JSON.stringify({
+                error_code: 'VALIDATION_FAILED',
+                message: `Validation failed with ${totalCount} unresolved violations after 5 loops.`,
+                violations_summary
+            }));
         }
         if (dry_run) {
             return {

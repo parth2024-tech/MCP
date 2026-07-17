@@ -45,15 +45,19 @@
 const Database = require('better-sqlite3');
 const path = require('path');
 
-// One connection per worker thread — opened once, reused for all tasks.
-const DB_PATH = process.env.ASE_ORCHESTRATION_DB
-  || path.join(__dirname, 'orchestration.db');
-
 let db = null;
+let currentDbPath = null;
 
-function getDb() {
-  if (!db) {
-    db = new Database(DB_PATH);
+function getDb(providedDbPath) {
+  const dbPath = providedDbPath || process.env.ASE_ORCHESTRATION_DB
+    || path.join(__dirname, 'orchestration.db');
+
+  if (!db || currentDbPath !== dbPath) {
+    if (db) {
+      try { db.close(); } catch (e) {}
+    }
+    db = new Database(dbPath);
+    currentDbPath = dbPath;
     db.pragma('journal_mode = WAL');
     db.pragma('synchronous = NORMAL');
     db.pragma('foreign_keys = ON');
@@ -144,8 +148,7 @@ function checkForCycle(d, upstreamId, downstreamId) {
 // ─────────────────────────────────────────────────────────────
 // Task: createTask
 // ─────────────────────────────────────────────────────────────
-function handleCreateTask({ id, title, description, dependsOn, blocks, skillIds, priority, now }) {
-  const d = getDb();
+function handleCreateTask(d, { id, title, description, dependsOn, blocks, skillIds, priority, now }) {
 
   // All edges to validate and insert, collected before the transaction
   // so error messages are clear about which edge caused the cycle.
@@ -194,8 +197,7 @@ function handleCreateTask({ id, title, description, dependsOn, blocks, skillIds,
 // ─────────────────────────────────────────────────────────────
 // Task: writeMemory
 // ─────────────────────────────────────────────────────────────
-function handleWriteMemory({ key, scope, value, agentId, taskId, version, expiresAt, oldValue, now }) {
-  const d = getDb();
+function handleWriteMemory(d, { key, scope, value, agentId, taskId, version, expiresAt, oldValue, now }) {
   d.transaction(() => {
     d.prepare(`
       INSERT OR REPLACE INTO shared_memory (key, scope, value, written_by, task_id, version, expires_at, created_at)
@@ -213,8 +215,7 @@ function handleWriteMemory({ key, scope, value, agentId, taskId, version, expire
 // ─────────────────────────────────────────────────────────────
 // Task: completeTask
 // ─────────────────────────────────────────────────────────────
-function handleCompleteTask({ taskId, agentId, status, output, failureReason, now }) {
-  const d = getDb();
+function handleCompleteTask(d, { taskId, agentId, status, output, failureReason, now }) {
   d.prepare(`
     UPDATE tasks SET
       status = ?,
@@ -236,8 +237,7 @@ function handleCompleteTask({ taskId, agentId, status, output, failureReason, no
 // ─────────────────────────────────────────────────────────────
 // Task: runTaskLoop
 // ─────────────────────────────────────────────────────────────
-function handleRunTaskLoop({ taskId, agentId, loopNumber, loopName, loopLens, output, startedAt, completedAt }) {
-  const d = getDb();
+function handleRunTaskLoop(d, { taskId, agentId, loopNumber, loopName, loopLens, output, startedAt, completedAt }) {
   d.prepare(`
     INSERT OR REPLACE INTO task_loops (task_id, loop_number, loop_name, loop_lens, output, started_at, completed_at)
     VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -248,8 +248,7 @@ function handleRunTaskLoop({ taskId, agentId, loopNumber, loopName, loopLens, ou
 // ─────────────────────────────────────────────────────────────
 // Task: recordCodeLoop
 // ─────────────────────────────────────────────────────────────
-function handleRecordCodeLoop({ sessionId, taskId, loopNumber, loopName, inputCode, outputCode, changes, now }) {
-  const d = getDb();
+function handleRecordCodeLoop(d, { sessionId, taskId, loopNumber, loopName, inputCode, outputCode, changes, now }) {
   d.prepare(`
     INSERT OR REPLACE INTO code_loops (session_id, task_id, loop_number, loop_name, input_code, output_code, changes_made, completed_at)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -260,8 +259,7 @@ function handleRecordCodeLoop({ sessionId, taskId, loopNumber, loopName, inputCo
 // ─────────────────────────────────────────────────────────────
 // Task: claimTask (SQLite write-back only — Redis claim happens on main thread)
 // ─────────────────────────────────────────────────────────────
-function handleClaimTaskWriteback({ taskId, agentId, now, timeoutAt }) {
-  const d = getDb();
+function handleClaimTaskWriteback(d, { taskId, agentId, now, timeoutAt }) {
   d.prepare(`
     UPDATE tasks SET
       status = 'claimed',
@@ -277,16 +275,26 @@ function handleClaimTaskWriteback({ taskId, agentId, now, timeoutAt }) {
 // Piscina dispatch
 // ─────────────────────────────────────────────────────────────
 module.exports = (task) => {
-  const { type, payload } = task;
+  const { type, dbPath, payload } = task;
+  const d = getDb(dbPath);
 
-  switch (type) {
-    case 'createTask':         return handleCreateTask(payload);
-    case 'writeMemory':        return handleWriteMemory(payload);
-    case 'completeTask':       return handleCompleteTask(payload);
-    case 'runTaskLoop':        return handleRunTaskLoop(payload);
-    case 'recordCodeLoop':     return handleRecordCodeLoop(payload);
-    case 'claimTaskWriteback': return handleClaimTaskWriteback(payload);
-    default:
-      throw new Error(`orchestration-worker: unknown task type "${type}"`);
+  try {
+    switch (type) {
+      case 'createTask':         return handleCreateTask(d, payload);
+      case 'writeMemory':        return handleWriteMemory(d, payload);
+      case 'completeTask':       return handleCompleteTask(d, payload);
+      case 'runTaskLoop':        return handleRunTaskLoop(d, payload);
+      case 'recordCodeLoop':     return handleRecordCodeLoop(d, payload);
+      case 'claimTaskWriteback': return handleClaimTaskWriteback(d, payload);
+      default:
+        throw new Error(`orchestration-worker: unknown task type "${type}"`);
+    }
+  } catch (err) {
+    const errorObj = new Error(`${err.message} (dbPath: ${currentDbPath}, env: ${process.env.ASE_ORCHESTRATION_DB})`);
+    errorObj.stack = err.stack;
+    Object.assign(errorObj, {
+      code: err.code || 'WORKER_ERROR',
+    }, err);
+    throw errorObj;
   }
 };

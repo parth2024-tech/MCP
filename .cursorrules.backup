@@ -1,6 +1,0 @@
-# Project-specific Cursor rules
-# The global ASE rules at ~/.cursor/rules/ase-global.mdc are always active.
-# Add project-specific overrides here.
-
-## Project-Specific Overrides
-# (Customize based on your .ase-project.json conventions)

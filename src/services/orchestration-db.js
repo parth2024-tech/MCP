@@ -31,7 +31,7 @@ const path = require('path');
 const { logger } = require('../utils/logger');
 const metrics = require('../utils/metrics');
 
-let _instance = null;
+
 
 class OrchestrationDB {
   constructor() {
@@ -40,13 +40,27 @@ class OrchestrationDB {
     this.db = new Database(dbPath);
 
     const redisUrl = process.env.ASE_REDIS_URL || 'redis://127.0.0.1:6379';
+    this._redisAvailable = false;
     this.redis = new Redis(redisUrl, {
-      maxRetriesPerRequest: null,
-      enableReadyCheck: true
+      maxRetriesPerRequest: 1,
+      enableReadyCheck: false,
+      connectTimeout: 3000,
+      lazyConnect: true,
+      retryStrategy: () => null  // Never retry — fail fast and let tools degrade gracefully
+    });
+    this.redis.on('ready', () => {
+      this._redisAvailable = true;
+      logger.info('OrchestrationDB-Redis', 'Redis connection ready');
     });
     this.redis.on('error', (err) => {
-      logger.error('OrchestrationDB-Redis', `Redis error: ${err.message}`);
+      this._redisAvailable = false;
+      logger.warn('OrchestrationDB-Redis', `Redis unavailable: ${err.message} — tools will degrade to SQLite-only mode`);
     });
+    this.redis.on('close', () => {
+      this._redisAvailable = false;
+    });
+    // Attempt a non-blocking connection — do NOT await; we degrade gracefully if Redis is absent.
+    this.redis.connect().catch(() => {});
 
     // Performance pragmas (matches existing ASE pattern)
     this.db.pragma('journal_mode = WAL');
@@ -73,10 +87,10 @@ class OrchestrationDB {
    * Get the singleton instance. Creates DB lazily on first access.
    */
   static getInstance() {
-    if (!_instance) {
-      _instance = new OrchestrationDB();
+    if (!globalThis._aseOrchestrationDbInstance) {
+      globalThis._aseOrchestrationDbInstance = new OrchestrationDB();
     }
-    return _instance;
+    return globalThis._aseOrchestrationDbInstance;
   }
 
   /**
@@ -91,6 +105,14 @@ class OrchestrationDB {
    */
   getRedisClient() {
     return this.redis;
+  }
+
+  /**
+   * Returns true only if the Redis connection is currently established and ready.
+   * Tools should call this before any Redis operation to avoid hanging.
+   */
+  isRedisAvailable() {
+    return this._redisAvailable === true;
   }
 
   /**
@@ -373,7 +395,7 @@ class OrchestrationDB {
       this.redis.disconnect();
       this.redis = null;
     }
-    _instance = null;
+    globalThis._aseOrchestrationDbInstance = null;
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -577,6 +599,7 @@ class OrchestrationDB {
         // EXEC succeeded. Persist to SQLite via write pool.
         await this._writePool.run({
           type: 'writeMemory',
+          dbPath: this.db.name,
           payload: { key, scope, value, agentId, taskId, version: newVersion, expiresAt, oldValue, now }
         });
 
@@ -620,6 +643,7 @@ class OrchestrationDB {
     // Fix 3: Write transaction dispatched to worker thread.
     await this._writePool.run({
       type: 'writeMemory',
+      dbPath: this.db.name,
       payload: { key, scope, value, agentId, taskId, version, expiresAt, oldValue, now }
     });
 
@@ -671,6 +695,7 @@ class OrchestrationDB {
     // preventing MCP transport stalls under concurrent agent activity.
     await this._writePool.run({
       type: 'createTask',
+      dbPath: this.db.name,
       payload: { id, title, description, dependsOn, blocks, skillIds, priority, now }
     });
 
@@ -758,6 +783,7 @@ class OrchestrationDB {
           // Fix 3: Claim write-back goes to the worker thread.
           await this._writePool.run({
             type: 'claimTaskWriteback',
+            dbPath: this.db.name,
             payload: { taskId: task.id, agentId, now, timeoutAt }
           });
 
@@ -920,6 +946,7 @@ class OrchestrationDB {
     // Fix 3: Write to SQLite via worker thread.
     await this._writePool.run({
       type: 'recordCodeLoop',
+      dbPath: this.db.name,
       payload: { sessionId, taskId, loopNumber, loopName, inputCode, outputCode, changes: changesMade, now: completedAt }
     });
 

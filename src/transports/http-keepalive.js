@@ -19,6 +19,24 @@ const { AsyncLocalStorage } = require('async_hooks');
 
 const httpContextStorage = new AsyncLocalStorage();
 
+// Rate limiting map and parameters (OpenHands-inspired)
+const rateLimitMap = new Map();
+const RATE_LIMIT = parseInt(process.env.ASE_HTTP_RATE_LIMIT || '100', 10);
+const RATE_WINDOW_MS = parseInt(process.env.ASE_HTTP_RATE_WINDOW || '60', 10) * 1000;
+
+// Periodically clean up rate limit map
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, timestamps] of rateLimitMap.entries()) {
+    const active = timestamps.filter(ts => now - ts < RATE_WINDOW_MS);
+    if (active.length === 0) {
+      rateLimitMap.delete(ip);
+    } else {
+      rateLimitMap.set(ip, active);
+    }
+  }
+}, 60000).unref();
+
 /**
  * Creates an HTTP server with Keep-Alive and wires it to a StreamableHTTPServerTransport.
  *
@@ -33,6 +51,12 @@ async function startHttpTransport(mcpServer, port = 3100) {
 
   const httpServer = http.createServer(async (req, res) => {
     httpContextStorage.run({ req, res }, async () => {
+    // Generate request ID
+    const reqId = crypto.randomUUID();
+    res.setHeader('X-Request-Id', reqId);
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+
     // S-1: HTTP Bearer Token Authentication
     const requiredToken = process.env.ASE_HTTP_TOKEN;
     if (requiredToken) {
@@ -54,6 +78,52 @@ async function startHttpTransport(mcpServer, port = 3100) {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, mcp-session-id');
 
     const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+
+    // OPTIONS check bypasses rate limiting
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204);
+      res.end();
+      return;
+    }
+
+    // 1. Rate Limiting (sliding window per-IP)
+    const clientIp = req.socket.remoteAddress || 'unknown';
+    const now = Date.now();
+    if (parsedUrl.pathname !== '/events') {
+      let clientRequests = rateLimitMap.get(clientIp) || [];
+      clientRequests = clientRequests.filter(ts => now - ts < RATE_WINDOW_MS);
+      if (clientRequests.length >= RATE_LIMIT) {
+        const oldest = clientRequests[0];
+        const retryAfterSec = Math.ceil((oldest + RATE_WINDOW_MS - now) / 1000);
+        res.writeHead(429, { 
+          'Content-Type': 'application/json',
+          'Retry-After': String(retryAfterSec)
+        });
+        res.end(JSON.stringify({ error: 'Too Many Requests', retry_after: retryAfterSec }));
+        return;
+      }
+      clientRequests.push(now);
+      rateLimitMap.set(clientIp, clientRequests);
+    }
+
+    // 2. Request body size limits
+    const contentLength = req.headers['content-length'];
+    if (contentLength && parseInt(contentLength, 10) > 1048576) {
+      res.writeHead(413, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Payload Too Large', max_bytes: 1048576 }));
+      return;
+    }
+
+    let bytesRead = 0;
+    let limitExceeded = false;
+    req.on('data', (chunk) => {
+      bytesRead += chunk.length;
+      if (bytesRead > 1048576 && !limitExceeded) {
+        limitExceeded = true;
+        req.destroy(); // Abort request
+      }
+    });
+
     if (parsedUrl.pathname === '/events' && req.method === 'GET') {
       const agentId = parsedUrl.searchParams.get('agent_id');
       if (!agentId) {
@@ -63,27 +133,6 @@ async function startHttpTransport(mcpServer, port = 3100) {
       }
 
       // Fix 8: Replay-on-reconnect using the SSE Last-Event-ID header.
-      //
-      // WHY: Redis pub/sub is fire-and-forget. A subscriber that disconnects
-      // (network blip, process restart) misses all messages published during
-      // the gap. Events that drive orchestration (task_completed → next task
-      // starts) are silently lost. The SQLite events table is the durable log.
-      //
-      // HOW:
-      //   1. Read the Last-Event-ID header the browser/client sends automatically
-      //      on reconnect (SSE spec, RFC 7932). Parse it as a SQLite event row ID.
-      //   2. Before subscribing to pub/sub, drain every event since that ID from
-      //      SQLite that matches the agent's subscriptions. Send each as an SSE
-      //      frame with the correct id: field.
-      //   3. Subscribe to pub/sub. For live events, set id: to the SQLite row ID
-      //      included in the event envelope so the client tracks position.
-      //
-      // ORDERING: The backlog is sent before pub/sub subscriptions are active,
-      // so there is a tiny window where a new event could be emitted after the
-      // backlog query but before the pub/sub subscription is established. This
-      // is closed by querying SQLite again *after* subscribing and flushing any
-      // new events that arrived in that window (see "gap flush" below).
-
       const lastEventIdHeader = req.headers['last-event-id'];
       const resumeFromId = lastEventIdHeader ? parseInt(lastEventIdHeader, 10) : 0;
 
@@ -119,7 +168,6 @@ async function startHttpTransport(mcpServer, port = 3100) {
       };
 
       // Helper: write one SSE event frame with the id: field set.
-      // Setting id: enables automatic reconnection with Last-Event-ID.
       const writeEvent = (event) => {
         const data = JSON.stringify({
           id:           event.id,
@@ -149,18 +197,22 @@ async function startHttpTransport(mcpServer, port = 3100) {
 
       // Step 2: Subscribe to Redis pub/sub for live events.
       const redisUrl = process.env.ASE_REDIS_URL || 'redis://127.0.0.1:6379';
-      const subRedis = new Redis(redisUrl, { maxRetriesPerRequest: null });
+      const subRedis = new Redis(redisUrl, {
+        maxRetriesPerRequest: 1,
+        enableReadyCheck: false,
+        connectTimeout: 3000,
+        lazyConnect: true,
+        retryStrategy: () => null
+      });
+      await subRedis.connect().catch(() => {});
 
       // Await subscribe() so the subscription is registered before the gap flush.
-      // If this fails we log and fall through — live events will be missed but
-      // the backlog replay already ran successfully.
       await subRedis.subscribe('ase:events').catch((err) => {
         logger.error('HTTP-SSE', `Redis subscribe failed: ${err.message}`);
       });
 
       // Step 3: Gap flush — query SQLite for events emitted between the backlog
       // query (Step 1) and the moment the subscription became active (Step 2).
-      // Without this, events in that window are missed even with replay enabled.
       const gap = queryMissedEvents(highWaterMark);
       for (const event of gap) {
         writeEvent(event);
@@ -187,26 +239,46 @@ async function startHttpTransport(mcpServer, port = 3100) {
 
       subRedis.on('message', onMessage);
 
+      // SSE Heartbeat (keeps connection alive, prevents timeout disconnects)
+      const heartbeatInterval = setInterval(() => {
+        if (!res.writableEnded) {
+          res.write(': heartbeat\n\n');
+        }
+      }, 30000);
+
       req.on('close', () => {
+        clearInterval(heartbeatInterval);
         subRedis.disconnect().catch(() => {});
       });
       return;
     }
 
-    if (req.method === 'OPTIONS') {
-      res.writeHead(204);
-      res.end();
-      return;
-    }
-
-    // Route to MCP transport
+    // 3. Route to MCP transport with a 60-second aggregate timeout
     try {
-      await transport.handleRequest(req, res);
-    } catch (err) {
-      logger.error('HTTP', `Request handling error: ${err.message}`);
-      if (!res.headersSent) {
-        res.writeHead(500);
-        res.end(JSON.stringify({ error: err.message }));
+      let timer: NodeJS.Timeout | undefined;
+      const timeoutPromise = new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error('Gateway Timeout')), 60000);
+      });
+
+      await Promise.race([
+        transport.handleRequest(req, res),
+        timeoutPromise
+      ]);
+
+      if (timer) clearTimeout(timer);
+    } catch (err: any) {
+      if (err.message === 'Gateway Timeout') {
+        logger.error('HTTP', `Request to ${req.url} timed out after 60s`);
+        if (!res.headersSent) {
+          res.writeHead(504, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Gateway Timeout' }));
+        }
+      } else {
+        logger.error('HTTP', `Request handling error: ${err.message}`);
+        if (!res.headersSent) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: err.message }));
+        }
       }
     }
     });

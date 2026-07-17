@@ -6,13 +6,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createToolCallHandler = createToolCallHandler;
 const crypto_1 = __importDefault(require("crypto"));
 const Pipeline_1 = require("../middleware/Pipeline");
+const ConcurrencyMiddleware_1 = require("../middleware/ConcurrencyMiddleware");
 const AuthMiddleware_1 = require("../middleware/AuthMiddleware");
 const SpokeProxyMiddleware_1 = require("../middleware/SpokeProxyMiddleware");
 const CacheMiddleware_1 = require("../middleware/CacheMiddleware");
 const ToolExecutionMiddleware_1 = require("../middleware/ToolExecutionMiddleware");
 const MetricsMiddleware_1 = require("../middleware/MetricsMiddleware");
 function createToolCallHandler(container) {
+    // Fix 11: ConcurrencyMiddleware is FIRST — it gates all tool calls.
+    // One shared instance per server process so the semaphore state is
+    // consistent across all requests.
+    const concurrencyMiddleware = new ConcurrencyMiddleware_1.ConcurrencyMiddleware();
     const pipeline = new Pipeline_1.Pipeline()
+        .use(concurrencyMiddleware) // Fix 11: semaphore — must be first
         .use(new MetricsMiddleware_1.MetricsMiddleware())
         .use(new AuthMiddleware_1.AuthMiddleware())
         .use(new SpokeProxyMiddleware_1.SpokeProxyMiddleware())

@@ -1,51 +1,44 @@
 import { z } from 'zod';
-import { spawn } from 'child_process';
-import crypto from 'crypto';
-import fs from 'fs';
-import path from 'path';
 import { BaseTool, ToolContext } from '../core/BaseTool';
-const { logger } = require('../utils/logger');
+import * as fs from 'fs';
+import * as path from 'path';
+import * as crypto from 'crypto';
+import { spawn } from 'child_process';
+import * as os from 'os';
 
-// In-memory job store for background OpenHands runs
+declare var process: any;
+declare var fetch: any;
+declare var setTimeout: any;
+
+export const OPENHANDS_SETTINGS_PATH = path.join(os.homedir(), '.openhands', 'settings.json');
+
+// Global store for jobs (now tracking API-based jobs)
 const openhandsJobs = new Map<string, any>();
-
-// Path to the OpenHands settings file (where the LLM API key lives)
-const OPENHANDS_SETTINGS_PATH = path.join(process.env.HOME || '/root', '.openhands', 'settings.json');
-const OPENHANDS_DIR = path.join(process.env.HOME || '/root', '.skiils', 'OpenHands');
 
 export default class DelegateToOpenHandsTool extends BaseTool<any> {
   name = 'delegate_to_openhands';
-  description = 'Spawns an OpenHands agent in the background to complete a complex coding task for ANY software project. Returns a Job ID to track progress with check_openhands_status.';
+  description = 'Spawns an OpenHands agent headlessly to complete a complex coding task for ANY software project. Returns a Job ID to track progress with check_openhands_status.';
   
   schema = z.object({
     agent_token: z.string().optional(),
     task_description: z.string().describe('The detailed task you want OpenHands to accomplish'),
     workspace_dir: z.string().optional().describe('The project directory OpenHands should operate in. Defaults to current working directory.'),
-    llm_model: z.string().optional().describe('LLM model to use. Defaults to gemini/gemini-2.0-flash-exp. Examples: gemini/gemini-2.0-flash-exp, anthropic/claude-3-5-sonnet-20241022'),
+    llm_model: z.string().optional().describe('LLM model to use. Defaults to gemini/gemini-2.0-flash-exp.'),
   });
 
-  protected async execute(args: any, context: ToolContext): Promise<any> {
-    // ── Step 1: Verify settings.json exists with an API key ──────────────────
+  protected async execute(args: { task_description: string; workspace_dir?: string; llm_model?: string }, context: ToolContext): Promise<any> {
+    
+    // ── Step 1: Pre-flight checks ────────────────────────────────────────────
     if (!fs.existsSync(OPENHANDS_SETTINGS_PATH)) {
       return {
         success: false,
-        error: 'OpenHands is not configured. No settings.json found.',
-        fix: `Run the configure_openhands tool first, or manually create ${OPENHANDS_SETTINGS_PATH} with your Gemini API key.`,
-        hint: 'Call: configure_openhands({ gemini_api_key: "YOUR_KEY_HERE" })'
+        error: 'OpenHands settings.json not found.',
+        fix: 'Call configure_openhands with your gemini_api_key first.'
       };
     }
-
-    let settings: any;
-    try {
-      settings = JSON.parse(fs.readFileSync(OPENHANDS_SETTINGS_PATH, 'utf8'));
-    } catch (e: any) {
-      return { success: false, error: `Failed to parse ${OPENHANDS_SETTINGS_PATH}: ${e.message}` };
-    }
-
-    // Validate that a model and API key are present
-    const apiKey = settings?.agent_settings?.llm?.api_key ||
-                   settings?.llm_profiles?.profiles?.Default?.api_key;
-    if (!apiKey || apiKey === '' || apiKey === 'YOUR_GEMINI_API_KEY_HERE') {
+    
+    const settingsContent = fs.readFileSync(OPENHANDS_SETTINGS_PATH, 'utf-8');
+    if (!settingsContent.includes('"api_key"') || settingsContent.includes('"api_key": ""')) {
       return {
         success: false,
         error: 'OpenHands settings.json exists but no API key is configured.',
@@ -54,83 +47,89 @@ export default class DelegateToOpenHandsTool extends BaseTool<any> {
       };
     }
 
-    // ── Step 2: Create and register the job ──────────────────────────────────
-    const jobId = `OH-${crypto.randomBytes(4).toString('hex')}`;
-    const workspace = args.workspace_dir || process.cwd();
-
-    logger.info('OpenHands', `Starting job ${jobId} in ${workspace} for task: ${args.task_description.substring(0, 80)}...`);
-
-    openhandsJobs.set(jobId, {
-      status: 'starting',
-      task: args.task_description,
-      workspace,
-      startTime: Date.now(),
-      logs: []
-    });
-
-    // ── Step 3: Find and use the right start command ─────────────────────────
+    // ── Step 2: Start OpenHands Backend if not running ────────────────────────
     const ohRoot = path.join(process.env.HOME || '/root', 'skiils', 'OpenHands');
-    const startCmd = fs.existsSync(path.join(ohRoot, 'package.json')) ? 'npm' : null;
+    const hasMakefile = fs.existsSync(path.join(ohRoot, 'Makefile'));
 
-    if (!startCmd) {
-      openhandsJobs.get(jobId).status = 'failed';
+    if (!hasMakefile) {
       return { success: false, error: `OpenHands not found at ${ohRoot}. Please check the installation.` };
     }
 
-    const ohProcess = spawn(startCmd, ['run', 'dev'], {
-      cwd: ohRoot,
-      env: { 
-        ...process.env, 
-        PORT: '8000',
-        WORKSPACE_BASE: workspace,
-        PROJECTS_PATH: workspace,
-        // OpenHands reads settings from ~/.openhands/settings.json automatically
-        // Pass the model selection if specified
-        ...(args.llm_model ? { LLM_MODEL: args.llm_model } : {})
-      },
-      detached: false
-    });
+    const workspace = args.workspace_dir || process.cwd();
+    
+    // Try to hit the API first to see if it's already running
+    let isRunning = false;
+    try {
+      const ping = await fetch('http://127.0.0.1:3000/openapi.json');
+      if (ping.ok) isRunning = true;
+    } catch (e) {
+      isRunning = false;
+    }
 
-    ohProcess.stdout.on('data', (data: Buffer) => {
-      const text = data.toString();
-      const job = openhandsJobs.get(jobId);
-      if (!job) return;
-      job.logs.push(text);
-      if (text.includes('started') || text.includes('listening') || text.includes('ready')) {
-        job.status = 'running';
+    if (!isRunning) {
+      const ohProcess = spawn('make', ['start-backend'], {
+        cwd: ohRoot,
+        env: { 
+          ...process.env, 
+          PORT: '3000',
+          WORKSPACE_BASE: workspace,
+          PROJECTS_PATH: workspace,
+          ...(args.llm_model ? { LLM_MODEL: args.llm_model } : {})
+        },
+        detached: true,
+        stdio: 'ignore'
+      });
+      ohProcess.unref();
+
+      // Wait for it to boot (max 10 seconds to avoid MCP timeout)
+      for (let i = 0; i < 10; i++) {
+        await new Promise(r => setTimeout(r, 1000));
+        try {
+          const ping = await fetch('http://127.0.0.1:3000/openapi.json', { signal: AbortSignal.timeout(500) });
+          if (ping.ok) {
+            isRunning = true;
+            break;
+          }
+        } catch (e) {}
       }
-    });
-
-    ohProcess.stderr.on('data', (data: Buffer) => {
-      const text = data.toString();
-      const job = openhandsJobs.get(jobId);
-      if (!job) return;
-      job.logs.push(`[ERR] ${text}`);
-      // Detect common auth errors
-      if (text.includes('API key') || text.includes('authentication') || text.includes('401')) {
-        job.status = 'auth_error';
-        job.error = 'Invalid or missing API key in ~/.openhands/settings.json';
+      
+      if (!isRunning) {
+         return { success: false, error: 'OpenHands backend is starting but taking longer than expected. Please wait a few seconds and try delegating the task again.' };
       }
-    });
+    }
 
-    ohProcess.on('close', (code: number | null) => {
-      const job = openhandsJobs.get(jobId);
-      if (!job) return;
-      job.status = code === 0 ? 'completed' : (job.status === 'auth_error' ? 'auth_error' : 'failed');
-      job.exitCode = code;
-    });
-
-    openhandsJobs.get(jobId).process = ohProcess;
-
-    return {
-      success: true,
-      job_id: jobId,
-      workspace,
-      message: `OpenHands agent started. Job ID: ${jobId}. Use check_openhands_status({ job_id: "${jobId}" }) to monitor it.`,
-      ui_url: 'http://localhost:8000'
-    };
+    // ── Step 3: Create App Conversation Headlessly ────────────────────────────
+    
+    try {
+      const payload = {
+        initial_message: {
+          role: "user",
+          content: [{ type: "text", text: args.task_description }],
+          run: true
+        }
+      };
+      
+      const res = await fetch('http://127.0.0.1:3000/api/v1/app-conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      if (!res.ok) {
+         return { success: false, error: `API error: ${res.statusText}`, detail: await res.text() };
+      }
+      
+      const data = await res.json();
+      const jobId = data.id; // This is the task id
+      
+      return {
+        success: true,
+        job_id: jobId,
+        workspace,
+        message: `OpenHands agent task submitted headlessly. Job ID: ${jobId}. Use check_openhands_status({ job_id: "${jobId}" }) to monitor it. No UI is required.`
+      };
+    } catch (err: any) {
+      return { success: false, error: `Failed to submit task to OpenHands: ${err.message}` };
+    }
   }
 }
-
-// Expose the job store globally so check_openhands_status can access it
-(global as any).openhandsJobs = openhandsJobs;

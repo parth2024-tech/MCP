@@ -1,31 +1,43 @@
 import crypto from 'crypto';
 import { Pipeline } from '../middleware/Pipeline';
+import { ErrorMiddleware } from '../middleware/ErrorMiddleware';
 import { ConcurrencyMiddleware } from '../middleware/ConcurrencyMiddleware';
 import { AuthMiddleware } from '../middleware/AuthMiddleware';
 import { SpokeProxyMiddleware } from '../middleware/SpokeProxyMiddleware';
 import { CacheMiddleware } from '../middleware/CacheMiddleware';
 import { ToolExecutionMiddleware } from '../middleware/ToolExecutionMiddleware';
 import { MetricsMiddleware } from '../middleware/MetricsMiddleware';
+import { ASEError } from '../utils/errors';
 import type { Container } from '../core/Container';
 
 export function createToolCallHandler(container: Container) {
-  // Fix 11: ConcurrencyMiddleware is FIRST — it gates all tool calls.
-  // One shared instance per server process so the semaphore state is
-  // consistent across all requests.
+  // Pipeline order (outermost → innermost):
+  //
+  //   0. ErrorMiddleware        ← catches ANYTHING that escapes from below
+  //   1. ConcurrencyMiddleware  ← semaphore gate — must be before any async work
+  //   2. MetricsMiddleware      ← time everything (including queued wait time)
+  //   3. AuthMiddleware         ← validate agent_token before any tool logic
+  //   4. SpokeProxyMiddleware   ← forward spoke-namespaced tools (tool__spoke)
+  //   5. CacheMiddleware        ← serve from cache or populate after execution
+  //   6. ToolExecutionMiddleware← actually run the tool with timeout + retry
+  //
   const concurrencyMiddleware = new ConcurrencyMiddleware();
+  container.register('ConcurrencyMiddleware', concurrencyMiddleware);
 
   const pipeline = new Pipeline()
-    .use(concurrencyMiddleware)   // Fix 11: semaphore — must be first
-    .use(new MetricsMiddleware())
-    .use(new AuthMiddleware())
-    .use(new SpokeProxyMiddleware())
-    .use(new CacheMiddleware())
-    .use(new ToolExecutionMiddleware());
+    .use(new ErrorMiddleware())        // Layer 0: catch-all error boundary
+    .use(concurrencyMiddleware)        // Layer 1: backpressure semaphore
+    .use(new MetricsMiddleware())      // Layer 2: timing + observability
+    .use(new AuthMiddleware())         // Layer 3: token authentication
+    .use(new SpokeProxyMiddleware())   // Layer 4: spoke federation proxy
+    .use(new CacheMiddleware())        // Layer 5: response caching
+    .use(new ToolExecutionMiddleware()); // Layer 6: tool execution core
 
   return async (request: any, extra: any) => {
     let { name, arguments: toolArgs } = request.params;
     const reqId = crypto.randomUUID();
 
+    // Unwrap the outer invoke_tool envelope
     if (name === 'invoke_tool') {
       name = toolArgs?.tool_name;
       toolArgs = toolArgs?.tool_input;
@@ -36,17 +48,22 @@ export function createToolCallHandler(container: Container) {
       reqId,
       name,
       args: toolArgs,
-      extra
+      extra,
     };
 
     try {
-      const result = await pipeline.execute(context);
-      return result;
-    } catch (err: any) {
-      return {
-        content: [{ type: 'text', text: JSON.stringify({ error: err.message, req_id: reqId }) }],
-        isError: true
-      };
+      return await pipeline.execute(context);
+    } catch (rawErr: unknown) {
+      // This catch block is the absolute last resort — ErrorMiddleware should
+      // have caught everything inside the pipeline. If we reach here, something
+      // failed in the pipeline machinery itself (e.g. middleware constructor crash).
+      const err = ASEError.from(rawErr, {
+        toolName: name,
+        reqId,
+        code: 'INTERNAL_ERROR',
+      });
+
+      return err.toMCPResult(process.env.NODE_ENV !== 'production');
     }
   };
 }

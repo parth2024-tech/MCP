@@ -8,8 +8,12 @@ const crypto_1 = __importDefault(require("crypto"));
 class AuthMiddleware {
     async handle(context, next) {
         const { name, args } = context;
-        // 1. Skip authentication for the bootstrap tool 'register_agent'
-        if (name === 'register_agent') {
+        // 1. Skip authentication for read-only / bootstrap tools that don't need a signed token.
+        //    - register_agent: the bootstrap tool that ISSUES tokens — cannot require one
+        //    - search_tools:   read-only semantic search over the tool list, no sensitive ops
+        //    - check_openhands_status: read-only job status poll, no sensitive ops
+        const AUTH_BYPASS = new Set(['register_agent', 'search_tools', 'check_openhands_status']);
+        if (AUTH_BYPASS.has(name)) {
             await next();
             return;
         }
