@@ -103,6 +103,15 @@ It doesn't use WebGL. It was built specifically for environments where hardware 
 
 ---
 
+## Included Skills
+
+This repository includes several core agent skills:
+
+- [commit](file:///home/thor/skiils/commit/SKILL.md): Enforces Sentry-style conventional commits, branch safety, and issue referencing.
+- [git-pushing](file:///home/thor/skiils/git-pushing/SKILL.md): Automates staging, committing, and pushing code using a dedicated helper script.
+
+---
+
 ## How to Add Skills to ASE
 
 The ASE MCP server (`tools/server/`) auto-indexes any `SKILL.md` file in the workspace via its embedding service. To add a new skill:
