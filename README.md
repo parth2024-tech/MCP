@@ -119,6 +119,7 @@ The ASE MCP server (`tools/server/`) auto-indexes any `SKILL.md` file in the wor
 1. Create a folder: `your-skill-name/SKILL.md`
 2. Add a YAML frontmatter block with `name` and `description`
 3. Restart the ASE server — it will vectorize and index the new skill automatically
+4. Verify the skill is indexed by querying the server health endpoint: `curl http://127.0.0.1:9090/health`
 
 ---
 
