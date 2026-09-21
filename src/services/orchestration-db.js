@@ -295,6 +295,26 @@ class OrchestrationDB {
         timestamp    INTEGER NOT NULL,
         created_at   INTEGER DEFAULT (unixepoch())
       );
+
+      -- ═══════════════════════════════════════════════════════════
+      -- Idempotency / Dedupe Log (Activepieces DEDUPE_KEY_PROPERTY)
+      -- ═══════════════════════════════════════════════════════════
+      -- Stores a hash of (tool_name + dedupe_key) so that repeated tool
+      -- calls with the same dedupe_key are short-circuited and return the
+      -- previously cached result. Inspired by:
+      --   activepieces/packages/pieces/framework/src/lib/trigger/trigger.ts
+      --   export const DEDUPE_KEY_PROPERTY = '_dedupe_key'
+      -- Entries expire after 24 hours to prevent unbounded table growth.
+      CREATE TABLE IF NOT EXISTS dedupe_log (
+        hash        TEXT PRIMARY KEY,          -- SHA-256(tool_name + ':' + dedupe_key)
+        tool_name   TEXT NOT NULL,
+        dedupe_key  TEXT NOT NULL,
+        result      TEXT NOT NULL,             -- JSON-serialised MCP result payload
+        created_at  INTEGER DEFAULT (unixepoch()),
+        expires_at  INTEGER NOT NULL           -- unixepoch + 86400 (24 h TTL)
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_dedupe_expires ON dedupe_log(expires_at);
     `);
 
     // Migration for existing database files
@@ -340,6 +360,51 @@ class OrchestrationDB {
     this.db.prepare(
       `DELETE FROM shared_memory WHERE expires_at IS NOT NULL AND expires_at < unixepoch()`
     ).run();
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Idempotency / Dedupe Log helpers (Activepieces DEDUPE_KEY_PROPERTY)
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Expire stale dedupe log entries older than their 24-hour TTL.
+   */
+  expireDedupe() {
+    this.db.prepare(
+      `DELETE FROM dedupe_log WHERE expires_at < unixepoch()`
+    ).run();
+  }
+
+  /**
+   * Check if a dedupe_key has already been processed for a given tool.
+   * @param {string} toolName
+   * @param {string} dedupeKey
+   * @returns {{ result: string } | null} The cached MCP result payload, or null if not seen.
+   */
+  checkDedupe(toolName, dedupeKey) {
+    this.expireDedupe();
+    const crypto = require('crypto');
+    const hash = crypto.createHash('sha256').update(`${toolName}:${dedupeKey}`).digest('hex');
+    return this.db.prepare(
+      `SELECT result FROM dedupe_log WHERE hash = ? AND expires_at > unixepoch()`
+    ).get(hash) || null;
+  }
+
+  /**
+   * Record a processed dedupe_key and its result in the dedupe log.
+   * @param {string} toolName
+   * @param {string} dedupeKey
+   * @param {object} result  The MCP result object to cache
+   * @param {number} [ttlSeconds=86400]  TTL in seconds (default: 24 hours)
+   */
+  recordDedupe(toolName, dedupeKey, result, ttlSeconds = 86400) {
+    const crypto = require('crypto');
+    const hash = crypto.createHash('sha256').update(`${toolName}:${dedupeKey}`).digest('hex');
+    const expiresAt = Math.floor(Date.now() / 1000) + ttlSeconds;
+    this.db.prepare(`
+      INSERT OR REPLACE INTO dedupe_log (hash, tool_name, dedupe_key, result, expires_at)
+      VALUES (?, ?, ?, ?, ?)
+    `).run(hash, toolName, dedupeKey, JSON.stringify(result), expiresAt);
   }
 
   emitEvent(type, payload, sourceAgent = null, taskId = null) {
