@@ -21,6 +21,14 @@
  * Handles both single-line and multi-line description fields.
  * This is the authoritative implementation — do not duplicate.
  *
+ * Activepieces-inspired version compatibility fields (piece.ts pattern):
+ *   - min_ase_version: Minimum ASE server version this skill requires.
+ *     Equivalent to Piece.minimumSupportedRelease.
+ *   - max_ase_version: Optional upper bound. Skills above this version
+ *     will be rejected. Equivalent to Piece.maximumSupportedRelease.
+ *   - deprecated: When true, load_skill emits a warning and query_skills
+ *     excludes the skill from results. Equivalent to Piece.deprecated.
+ *
  * @param {string} content - Raw markdown content
  * @returns {object|null} Parsed frontmatter as a plain object, or null if absent/malformed
  */
@@ -55,6 +63,16 @@ function parseFrontmatter(content) {
 
   const versionMatch = fm.match(/^version:\s*["']?(.+?)["']?\s*$/m);
   if (versionMatch) result.version = versionMatch[1].trim();
+
+  // ── Activepieces-inspired version compatibility gating ─────────────────
+  const minAseMatch = fm.match(/^min_ase_version:\s*["']?(.+?)["']?\s*$/m);
+  if (minAseMatch) result.min_ase_version = minAseMatch[1].trim();
+
+  const maxAseMatch = fm.match(/^max_ase_version:\s*["']?(.+?)["']?\s*$/m);
+  if (maxAseMatch) result.max_ase_version = maxAseMatch[1].trim();
+
+  const deprecatedMatch = fm.match(/^deprecated:\s*(true|false)\s*$/m);
+  if (deprecatedMatch) result.deprecated = deprecatedMatch[1] === 'true';
 
   return result;
 }

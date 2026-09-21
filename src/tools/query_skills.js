@@ -2,12 +2,29 @@ const fs = require('fs');
 const path = require('path');
 const { logAccess, warn } = require('../utils/logger');
 const { selectTopSkills } = require('../services/context-budget');
+const { parseFrontmatter } = require('../utils/context-optimizer');
 
 const SKILLS_DIR = path.resolve(__dirname, '../../../../');
 
+/**
+ * Returns true if a skill is deprecated per its SKILL.md frontmatter.
+ * Activepieces pattern: Piece.deprecated = true (piece.ts).
+ */
+function isSkillDeprecated(skillName) {
+  try {
+    const mdPath = path.join(SKILLS_DIR, skillName, 'SKILL.md');
+    if (!fs.existsSync(mdPath)) return false;
+    const content = fs.readFileSync(mdPath, 'utf8');
+    const fm = parseFrontmatter(content);
+    return fm && fm.deprecated === true;
+  } catch (_) {
+    return false;
+  }
+}
+
 module.exports = (deps) => ({
   name: 'query_skills',
-  description: 'Scores ALL skills by relevance to the user request and returns the top-3 most relevant using semantic ranking. Use this to auto-select optimal skills.',
+  description: 'Scores ALL skills by relevance to the user request and returns the top-3 most relevant using semantic ranking. Deprecated skills are automatically excluded. Use this to auto-select optimal skills.',
   inputSchema: {
     type: 'object',
     properties: {
@@ -22,6 +39,10 @@ module.exports = (deps) => ({
       min_relevance: {
         type: 'number',
         description: 'Optional. Minimum relevance score (0.0–1.0) to include a skill. Skills below this threshold are excluded. Default: 0 (no filter).'
+      },
+      include_deprecated: {
+        type: 'boolean',
+        description: 'Optional. When true, deprecated skills are included in results. Default: false (deprecated skills are excluded).'
       }
     },
     required: ['request']
@@ -31,10 +52,11 @@ module.exports = (deps) => ({
     const minRelevance = (args.min_relevance !== undefined)
       ? Math.max(0, Math.min(1, args.min_relevance))
       : 0; // default: no filter
+    const includeDeprecated = args.include_deprecated === true;
 
     // --- Primary path: semantic cosine search ---
     try {
-      let results = await deps.embeddingService.search(args.request, maxSkills);
+      let results = await deps.embeddingService.search(args.request, maxSkills * 2); // fetch extra to account for filtering
 
       // Apply min_relevance filter if specified
       if (minRelevance > 0) {
@@ -47,12 +69,33 @@ module.exports = (deps) => ({
           );
         }
       }
+
+      // ── Activepieces Piece.deprecated filtering ───────────────────────────
+      // Exclude deprecated skills from results unless explicitly requested.
+      // Mirrors how Activepieces hides deprecated pieces from the builder UI.
+      let deprecatedDropped = 0;
+      if (!includeDeprecated) {
+        const before = results.length;
+        results = results.filter(r => !isSkillDeprecated(r.name));
+        deprecatedDropped = before - results.length;
+        if (deprecatedDropped > 0) {
+          (extra?.reqLogger || require('../utils/logger')).info(
+            'query_skills',
+            `Excluded ${deprecatedDropped} deprecated skill(s) from results.`
+          );
+        }
+      }
+
+      // Cap to maxSkills after filtering
+      results = results.slice(0, maxSkills);
+
       (extra?.reqLogger || require('../utils/logger')).logAccess('mcp-client', 'query_skills', 'authorized', 0, { selected: results.map(s => s.name), method: 'semantic' });
       return {
         selected: results,
         totalBudgetTokens: results.reduce((sum, r) => sum + r.tokenEstimate, 0),
         budget_status: 'ok',
-        dropped_count: 0,
+        dropped_count: deprecatedDropped,
+        deprecated_dropped: deprecatedDropped,
         hard_cap: maxSkills,
         extraction: { method: 'cosine-similarity' }
       };
@@ -72,6 +115,11 @@ module.exports = (deps) => ({
         return { error: 'Skill search unavailable — both semantic and text-based search failed.' };
       }
 
+      // Apply deprecated filter to fallback candidates too
+      if (!includeDeprecated) {
+        candidates = candidates.filter(name => !isSkillDeprecated(name));
+      }
+
       const budget = selectTopSkills(candidates, args.request, maxSkills);
       (extra?.reqLogger || require('../utils/logger')).logAccess('mcp-client', 'query_skills', 'authorized', 0, { selected: budget.selected.map(s => s.name), method: 'tfidf-fallback' });
       return { ...budget, service_degraded: true, degraded_reason: 'Embedding circuit open — used TF-IDF fallback' };
@@ -80,3 +128,4 @@ module.exports = (deps) => ({
     }
   }
 });
+

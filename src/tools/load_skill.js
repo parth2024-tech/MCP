@@ -153,6 +153,48 @@ module.exports = (deps) => ({
       const fm = parseFrontmatter(content);
       version = (fm && fm.version) ? fm.version : '1.0.0';
 
+      // ── Activepieces Piece version compatibility gating ──────────────────
+      // Inspired by Piece.minimumSupportedRelease / maximumSupportedRelease
+      // from: activepieces/packages/pieces/framework/src/lib/piece.ts
+      //
+      // If the skill SKILL.md declares min_ase_version or max_ase_version,
+      // we compare against the running ASE server version and reject the
+      // load if the server is out of the compatible range.
+      const ASE_VERSION = process.env.ASE_VERSION || '4.2.0';
+      const semverCompare = (a, b) => {
+        const pa = a.split('.').map(Number);
+        const pb = b.split('.').map(Number);
+        for (let i = 0; i < 3; i++) {
+          if ((pa[i] || 0) > (pb[i] || 0)) return 1;
+          if ((pa[i] || 0) < (pb[i] || 0)) return -1;
+        }
+        return 0;
+      };
+
+      if (fm && fm.min_ase_version && semverCompare(ASE_VERSION, fm.min_ase_version) < 0) {
+        if (deps.sessionState && typeof deps.sessionState.logToolCall === 'function') {
+          deps.sessionState.logToolCall('load_skill', Date.now() - startTime, true);
+        }
+        return toolError({
+          error_code: 'SKILL_VERSION_INCOMPATIBLE',
+          message: `Skill "${skill_name}" requires ASE >= ${fm.min_ase_version} (running ${ASE_VERSION}).`,
+          retryable: false,
+          fix_hint: `Upgrade your ASE server to v${fm.min_ase_version} or higher to use this skill.`
+        });
+      }
+
+      if (fm && fm.max_ase_version && semverCompare(ASE_VERSION, fm.max_ase_version) > 0) {
+        if (deps.sessionState && typeof deps.sessionState.logToolCall === 'function') {
+          deps.sessionState.logToolCall('load_skill', Date.now() - startTime, true);
+        }
+        return toolError({
+          error_code: 'SKILL_VERSION_INCOMPATIBLE',
+          message: `Skill "${skill_name}" is only compatible with ASE <= ${fm.max_ase_version} (running ${ASE_VERSION}).`,
+          retryable: false,
+          fix_hint: 'Use an older version of this skill or check for an updated skill compatible with your ASE version.'
+        });
+      }
+
       if (deps.sessionState) {
         deps.sessionState.pinSkill(skill_name, version, content);
       }
@@ -197,11 +239,22 @@ module.exports = (deps) => ({
       deps.sessionState.logToolCall('load_skill', Date.now() - startTime, false);
     }
 
+    // Check if the loaded skill is deprecated and warn the caller.
+    // Activepieces pattern: Piece.deprecated = true signals that a piece
+    // should no longer be used and will be removed in a future release.
+    const loadedFm = parseFrontmatter(content);
+    const isDeprecated = loadedFm && loadedFm.deprecated === true;
+
     return { 
       skill_name: skill_name, 
       path: mdFile,
       required_tier: requiredTier,
       version: version,
+      ...(isDeprecated ? {
+        deprecated: true,
+        deprecation_warning: `Skill "${skill_name}" is deprecated and may be removed in a future ASE release. ` +
+          'Prefer an alternative skill returned by query_skills.'
+      } : {}),
       content: content 
     };
   }
