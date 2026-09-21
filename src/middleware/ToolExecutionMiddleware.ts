@@ -95,7 +95,10 @@ export class ToolExecutionMiddleware implements Middleware {
     }
 
     // ── Execution with retry + timeout ────────────────────────────────────────
-    const MAX_RETRIES = 3;
+    // Activepieces pattern: retry_on_failure=false disables the retry loop
+    // for this specific call (equivalent to Activepieces retryOnFailure).
+    const retryOnFailure = context.args?.retry_on_failure !== false; // default true
+    const MAX_RETRIES = retryOnFailure ? 3 : 1;
     let lastErr: ASEError | null = null;
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
