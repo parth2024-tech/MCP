@@ -112,6 +112,24 @@ This repository includes several core agent skills:
 
 ---
 
+## Autonomous Agent Engine & DSPy Subsystem
+
+The ASE MCP server provides a native TypeScript implementation of Stanford DSPy optimization and DAG workflow execution:
+
+- **Declarative Signatures & Modules** (`src/core/dspy/`): Declarative inputs/outputs with `Predict`, `ChainOfThought`, and `ReAct` modules.
+- **Autonomous Teleprompter** (`src/services/teleprompter.ts`): Automatically harvests successful execution trajectories from `orchestration.db` and compiles few-shot prompts using Cobb-Douglas token budgeting and AST metric scoring.
+- **Workflow DAG Engine** (`src/services/workflow-engine.ts`): Activepieces-style multi-step DAG runner with dependency resolution, parallel execution, retries, and cross-step variable interpolation (`{{stepId.output}}`).
+
+### Included Subsystem Tools
+
+| Tool | Description |
+| :--- | :--- |
+| `compile_optimized_prompt` | Compiles optimized few-shot prompts using historical success demonstrations and AST scoring |
+| `execute_workflow_dag` | Executes resilient multi-step tool workflows with state persistence and deduplication |
+| `evaluate_prompt_metric` | Scores code and completions against AST syntax safety and `never_do` constraint rules |
+
+---
+
 ## How to Add Skills to ASE
 
 The ASE MCP server (`tools/server/`) auto-indexes any `SKILL.md` file in the workspace via its embedding service. To add a new skill:
