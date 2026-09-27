@@ -15,3 +15,5 @@ skills_session_state.archive.json
 coverage/
 # Temporary test directories
 /tmp/ase-*/
+# Obsidian knowledge vault output
+vault/

@@ -15,8 +15,17 @@ const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
 
+// Register tsx loader so TypeScript services can be loaded directly
+try {
+  require('tsx/cjs');
+} catch (_) {}
+
 // Path to the ASE tools directory
 const ASE_ROOT = '/home/thor/skiils/tools';
+
+function safeExit(code = 0) {
+  setTimeout(() => process.exit(code), 60);
+}
 
 const { generateProjectPrompt, getConfigTemplate } = require(`${ASE_ROOT}/server/src/services/project-prompt-generator`);
 const { validate, detectProjectType } = require(`${ASE_ROOT}/server/src/services/output-validator`);
@@ -58,7 +67,7 @@ if (args.includes('--check')) {
   } else {
     log(c.yellow, '⚠️ ', `No ${CONFIG_FILE} found. Run ${c.bold}ase-init${c.reset} to initialize.`);
   }
-  process.exit(0);
+  safeExit(0);
 }
 
 // ──────────────────────────────────────────────────────────
@@ -122,9 +131,51 @@ if (budgetIdx !== -1) {
 }
 
 // ──────────────────────────────────────────────────────────
+// --export-vault [dir]
+// ──────────────────────────────────────────────────────────
+if (args.includes('--export-vault')) {
+  const { VaultExporter } = require(`${ASE_ROOT}/server/src/services/vault-exporter`);
+  const vIdx = args.indexOf('--export-vault');
+  const targetDir = args[vIdx + 1] && !args[vIdx + 1].startsWith('-') ? args[vIdx + 1] : path.join(cwd, 'vault');
+  log(c.cyan, '🧠', `Exporting Second Brain knowledge vault to: ${c.bold}${targetDir}${c.reset}`);
+  try {
+    const exporter = new VaultExporter({ vaultDir: targetDir, projectDir: cwd });
+    const result = exporter.exportVault();
+    log(c.green, '✅', `Exported ${result.filesGenerated} connected notes with bidirectional [[wiki-links]]!`);
+    log(c.gray, '📁', `Index MoC: ${result.indexFile}`);
+  } catch (err) {
+    console.error('Vault export failed:', err.message);
+    safeExit(1);
+  }
+  safeExit(0);
+}
+
+// ──────────────────────────────────────────────────────────
+// --lessons [query]
+// ──────────────────────────────────────────────────────────
+if (args.includes('--lessons')) {
+  const { EpisodicLearningService } = require(`${ASE_ROOT}/server/src/services/episodic-learning`);
+  const service = new EpisodicLearningService();
+  const lIdx = args.indexOf('--lessons');
+  const query = args[lIdx + 1] && !args[lIdx + 1].startsWith('-') ? args[lIdx + 1] : '';
+  const lessons = query ? service.searchLessons(query, 10) : service.getAllLessons();
+
+  console.log(`\n${c.bold}🧠 Second Brain Learned Lessons (${lessons.length}):${c.reset}\n`);
+  if (lessons.length === 0) {
+    log(c.gray, 'ℹ️', 'No lessons recorded yet. Run tasks or use record_learned_lesson tool.');
+  } else {
+    lessons.forEach((l, i) => {
+      log(c.green, `${i+1}.`, `${c.bold}${l.problem}${c.reset} (${l.reinforcementCount}x verified)`);
+      console.log(`   ${c.cyan}Fix:${c.reset} ${l.solution.slice(0, 120)}...`);
+    });
+  }
+  safeExit(0);
+}
+
+// ──────────────────────────────────────────────────────────
 // DEFAULT — Initialize project (ase-init or ase-init --update)
 // ──────────────────────────────────────────────────────────
-const hasCommand = args.includes('--validate') || args.includes('--route') || args.includes('--budget') || args.includes('--check');
+const hasCommand = args.includes('--validate') || args.includes('--route') || args.includes('--budget') || args.includes('--check') || args.includes('--export-vault') || args.includes('--lessons');
 
 if (!hasCommand) {
   const configPath = path.join(cwd, CONFIG_FILE);
