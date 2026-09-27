@@ -109,21 +109,24 @@ This repository includes several core agent skills:
 
 - [commit](file:///home/thor/skiils/commit/SKILL.md): Enforces Sentry-style conventional commits, branch safety, and issue referencing.
 - [git-pushing](file:///home/thor/skiils/git-pushing/SKILL.md): Automates staging, committing, and pushing code using a dedicated helper script.
+- [loopy](file:///home/thor/skiils/loopy/SKILL.md): Implements the Loop Engineering framework (Doer + Independent Checker + Gate with iterative self-correction).
 
 ---
 
 ## Autonomous Agent Engine & DSPy Subsystem
 
-The ASE MCP server provides a native TypeScript implementation of Stanford DSPy optimization and DAG workflow execution:
+The ASE MCP server provides a native TypeScript implementation of Stanford DSPy optimization, DAG workflow execution, and Loop Engineering:
 
 - **Declarative Signatures & Modules** (`src/core/dspy/`): Declarative inputs/outputs with `Predict`, `ChainOfThought`, and `ReAct` modules.
 - **Autonomous Teleprompter** (`src/services/teleprompter.ts`): Automatically harvests successful execution trajectories from `orchestration.db` and compiles few-shot prompts using Cobb-Douglas token budgeting and AST metric scoring.
 - **Workflow DAG Engine** (`src/services/workflow-engine.ts`): Activepieces-style multi-step DAG runner with dependency resolution, parallel execution, retries, and cross-step variable interpolation (`{{stepId.output}}`).
+- **Loop Engineering Engine** (`src/services/goal-loop-engine.ts`): Autonomous Doer + Independent Checker + Gate cycle with automatic self-correction and a hard 8-try ceiling.
 
 ### Included Subsystem Tools
 
 | Tool | Description |
 | :--- | :--- |
+| `run_goal_loop` | Runs autonomous Loop Engineering cycles with Doer + Independent Checker + Gate verification |
 | `compile_optimized_prompt` | Compiles optimized few-shot prompts using historical success demonstrations and AST scoring |
 | `execute_workflow_dag` | Executes resilient multi-step tool workflows with state persistence and deduplication |
 | `evaluate_prompt_metric` | Scores code and completions against AST syntax safety and `never_do` constraint rules |
