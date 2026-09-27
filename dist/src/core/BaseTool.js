@@ -9,7 +9,7 @@ class BaseTool {
     async validateAndExecute(rawArgs, context) {
         const parseResult = this.schema.safeParse(rawArgs);
         if (!parseResult.success) {
-            throw new Error(`Validation Error for tool ${this.name}: ${parseResult.error.message}`);
+            throw parseResult.error;
         }
         return this.execute(parseResult.data, context);
     }

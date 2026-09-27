@@ -15,32 +15,39 @@ class MetricsMiddleware {
         catch (err) {
             isError = true;
             metrics.inc('tool_errors_total', context.name);
-            metrics.inc('tool_errors_total'); // Global counter
+            metrics.inc('tool_errors_total');
             throw err;
         }
         finally {
+            // Mark error if the result payload itself is an error
+            if (context.isError)
+                isError = true;
             const durationMs = Date.now() - startMs;
             metrics.record('tool_call_duration_ms', durationMs, context.name);
-            metrics.record('tool_call_duration_ms', durationMs); // Global latency histogram
+            metrics.record('tool_call_duration_ms', durationMs);
             if (sessionState && typeof sessionState.logToolCall === 'function') {
                 sessionState.logToolCall(context.name, durationMs, isError);
             }
-            // Evaluate alert thresholds
-            // NOTE: This is optional observability — Redis may not be running.
-            // Wrap in a hard 500ms timeout: the tool response MUST NOT be delayed
-            // by optional infrastructure. The try/catch below only handles thrown
-            // errors, not hung awaits (e.g. Redis connect timeout with no deadline).
-            try {
-                await Promise.race([
-                    (async () => {
-                        const orch = context.container.resolve('OrchestrationDB');
-                        if (!orch)
-                            return;
-                        const redis = orch.getRedisClient();
-                        if (!redis)
-                            return;
-                        const thresholdsRaw = await redis.get('ase:alert_thresholds');
-                        if (thresholdsRaw) {
+            // ── Optional alert threshold evaluation (Redis-gated) ─────────────────
+            // CRITICAL: Only runs if Redis is confirmed available via isRedisAvailable().
+            // Without this guard, the redis.get() call hangs indefinitely when Redis
+            // is down, causing every tool call to freeze at the metrics step.
+            // The 500ms Promise.race is a secondary defence — the primary defence is
+            // the isRedisAvailable() early-exit.
+            const orch = context.container.has
+                ? (context.container.has('OrchestrationDB') ? context.container.resolve('OrchestrationDB') : null)
+                : context.container.resolve('OrchestrationDB');
+            const redisUp = orch && typeof orch.isRedisAvailable === 'function' && orch.isRedisAvailable();
+            if (redisUp) {
+                try {
+                    await Promise.race([
+                        (async () => {
+                            const redis = orch.getRedisClient();
+                            if (!redis)
+                                return;
+                            const thresholdsRaw = await redis.get('ase:alert_thresholds');
+                            if (!thresholdsRaw)
+                                return;
                             const thresholds = JSON.parse(thresholdsRaw);
                             const summary = metrics.summarize('tool_call_duration_ms');
                             const p99 = (summary && typeof summary.p99 === 'number') ? summary.p99 : 0;
@@ -58,26 +65,23 @@ class MetricsMiddleware {
                                 breached = true;
                             if (thresholds.min_cache_hit_ratio !== undefined && cacheHitRatio < thresholds.min_cache_hit_ratio)
                                 breached = true;
-                            const prevDegraded = await redis.get('ase:system_degraded') === 'true';
-                            if (breached) {
-                                if (!prevDegraded) {
-                                    await redis.set('ase:system_degraded', 'true');
-                                    orch.emitEvent('system_degraded', { p99, errorRate, cacheHitRatio });
-                                }
+                            const prevDegradedRaw = await redis.get('ase:system_degraded');
+                            const prevDegraded = prevDegradedRaw === 'true';
+                            if (breached && !prevDegraded) {
+                                await redis.set('ase:system_degraded', 'true');
+                                orch.emitEvent('system_degraded', { p99, errorRate, cacheHitRatio });
                             }
-                            else {
-                                if (prevDegraded) {
-                                    await redis.set('ase:system_degraded', 'false');
-                                    orch.emitEvent('system_recovered', { p99, errorRate, cacheHitRatio });
-                                }
+                            else if (!breached && prevDegraded) {
+                                await redis.set('ase:system_degraded', 'false');
+                                orch.emitEvent('system_recovered', { p99, errorRate, cacheHitRatio });
                             }
-                        }
-                    })(),
-                    new Promise(resolve => setTimeout(resolve, 500)) // 500ms hard cap — Redis is optional
-                ]);
-            }
-            catch (e) {
-                // Ignore threshold evaluation errors to prevent breaking tool execution flow
+                        })(),
+                        new Promise(resolve => setTimeout(resolve, 500)) // 500ms hard cap
+                    ]);
+                }
+                catch (_e) {
+                    // Ignore threshold evaluation errors — they are entirely optional observability.
+                }
             }
         }
     }

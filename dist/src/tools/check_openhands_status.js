@@ -11,11 +11,11 @@ class CheckOpenHandsStatusTool extends BaseTool_1.BaseTool {
     async execute(args, context) {
         try {
             // First, get the task status
-            const res = await fetch(`http://127.0.0.1:3000/api/v1/app-conversations/start-tasks`);
+            const res = await fetch(`http://127.0.0.1:3000/api/v1/app-conversations/start-tasks`, { signal: AbortSignal.timeout(2000) });
             if (!res.ok) {
                 return { success: false, error: 'Failed to contact OpenHands API.' };
             }
-            const searchRes = await fetch(`http://127.0.0.1:3000/api/v1/app-conversations/start-tasks/search`);
+            const searchRes = await fetch(`http://127.0.0.1:3000/api/v1/app-conversations/start-tasks/search`, { signal: AbortSignal.timeout(2000) });
             const searchData = await searchRes.json();
             const task = (searchData.items || []).find((t) => t.id === args.job_id);
             if (!task) {
@@ -25,7 +25,7 @@ class CheckOpenHandsStatusTool extends BaseTool_1.BaseTool {
             // If there's an app_conversation_id, we can fetch messages
             if (task.app_conversation_id) {
                 try {
-                    const evRes = await fetch(`http://127.0.0.1:3000/api/v1/conversation/${task.app_conversation_id}/events`);
+                    const evRes = await fetch(`http://127.0.0.1:3000/api/v1/conversation/${task.app_conversation_id}/events`, { signal: AbortSignal.timeout(2000) });
                     if (evRes.ok) {
                         const evData = await evRes.json();
                         // Events may be wrapped or an array
