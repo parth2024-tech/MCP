@@ -121,12 +121,16 @@ The ASE MCP server provides a native TypeScript implementation of Stanford DSPy 
 - **Autonomous Teleprompter** (`src/services/teleprompter.ts`): Automatically harvests successful execution trajectories from `orchestration.db` and compiles few-shot prompts using Cobb-Douglas token budgeting and AST metric scoring.
 - **Workflow DAG Engine** (`src/services/workflow-engine.ts`): Activepieces-style multi-step DAG runner with dependency resolution, parallel execution, retries, and cross-step variable interpolation (`{{stepId.output}}`).
 - **Loop Engineering Engine** (`src/services/goal-loop-engine.ts`): Autonomous Doer + Independent Checker + Gate cycle with automatic self-correction and a hard 8-try ceiling.
+- **Second Brain Episodic Learning** (`src/services/episodic-learning.ts`): Self-evolving memory reinforcement that distills verified bug fixes and heuristics into SQLite memory ($Score = 0.7 \times \text{Relevance} + 0.3 \times \text{Reinforcement}$).
+- **Obsidian Vault Exporter** (`src/services/vault-exporter.ts`): Exports the entire second brain (skills, conventions, lessons) into an Obsidian-compatible markdown vault with bidirectional `[[wiki-links]]` for visual graph view.
 
 ### Included Subsystem Tools
 
 | Tool | Description |
 | :--- | :--- |
 | `run_goal_loop` | Runs autonomous Loop Engineering cycles with Doer + Independent Checker + Gate verification |
+| `record_learned_lesson` | Distills and records actionable solutions into episodic memory with reinforcement tracking |
+| `export_second_brain` | Exports skills, conventions, and learned lessons into an Obsidian markdown vault with `[[wiki-links]]` |
 | `compile_optimized_prompt` | Compiles optimized few-shot prompts using historical success demonstrations and AST scoring |
 | `execute_workflow_dag` | Executes resilient multi-step tool workflows with state persistence and deduplication |
 | `evaluate_prompt_metric` | Scores code and completions against AST syntax safety and `never_do` constraint rules |
