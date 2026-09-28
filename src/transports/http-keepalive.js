@@ -255,7 +255,7 @@ async function startHttpTransport(mcpServer, port = 3100) {
 
     // 3. Route to MCP transport with a 60-second aggregate timeout
     try {
-      let timer: NodeJS.Timeout | undefined;
+      let timer;
       const timeoutPromise = new Promise((_, reject) => {
         timer = setTimeout(() => reject(new Error('Gateway Timeout')), 60000);
       });
@@ -266,7 +266,7 @@ async function startHttpTransport(mcpServer, port = 3100) {
       ]);
 
       if (timer) clearTimeout(timer);
-    } catch (err: any) {
+    } catch (err) {
       if (err.message === 'Gateway Timeout') {
         logger.error('HTTP', `Request to ${req.url} timed out after 60s`);
         if (!res.headersSent) {

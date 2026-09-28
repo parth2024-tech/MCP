@@ -28,7 +28,7 @@ export default class UpgradeSkillPinTool extends BaseTool<any> {
       // 2. Fall back to current disk content if its version matches new_version
       const skillData = await skillCache.getSkillContent(skill_id);
       if (skillData) {
-        const fm = parseFrontmatter(skillData.content);
+        const fm = parseFrontmatter(skillData.content) as any;
         const diskVersion = (fm && fm.version) ? fm.version : '1.0.0';
         if (diskVersion === new_version) {
           content = skillData.content;

@@ -85,6 +85,7 @@ async function validate(projectDir, timeoutMs = 30000) {
       results.push({
         step: chunk.step.name,
         status: chunk.status,
+        passed: chunk.status === 'passed',
         exit_code: chunk.exit_code,
         output: chunk.output,
         elapsed_ms: chunk.elapsed_ms,

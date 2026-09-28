@@ -41,9 +41,10 @@ export default class ConfigureOpenHandsTool extends BaseTool<any> {
     }
 
     // Validate key looks real (basic sanity check)
-    if (apiKey.length < 10) {
+    if (!apiKey || apiKey.length < 10) {
       return { success: false, error: 'API key appears too short to be valid.' };
     }
+    const resolvedApiKey: string = apiKey;
 
     // Create ~/.openhands directory if needed
     if (!fs.existsSync(OPENHANDS_DIR)) {
@@ -57,7 +58,7 @@ export default class ConfigureOpenHandsTool extends BaseTool<any> {
         enable_cli_session: false,
         llm: {
           model,
-          api_key: apiKey,
+          api_key: resolvedApiKey,
           temperature: 0.0
         }
       },
@@ -66,7 +67,7 @@ export default class ConfigureOpenHandsTool extends BaseTool<any> {
         profiles: {
           Default: {
             model,
-            api_key: apiKey,
+            api_key: resolvedApiKey,
             temperature: 0.0
           }
         }
@@ -83,7 +84,7 @@ export default class ConfigureOpenHandsTool extends BaseTool<any> {
       message: `✅ OpenHands configured successfully!`,
       settings_path: SETTINGS_PATH,
       model,
-      api_key_preview: `${apiKey.substring(0, 6)}...${apiKey.substring(apiKey.length - 4)}`,
+      api_key_preview: `${resolvedApiKey.substring(0, 6)}...${resolvedApiKey.substring(resolvedApiKey.length - 4)}`,
       next_step: 'You can now use delegate_to_openhands to start the agent on any task.'
     };
   }

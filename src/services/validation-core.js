@@ -176,7 +176,9 @@ async function getSteps(projectType, cwd, pkg, aseConfig) {
       steps.push({
         name: 'Unit tests',
         cmd: hasScript('test') ? 'npm' : 'echo',
-        args: hasScript('test') ? ['test', '--', '--passWithNoTests', '--watchAll=false'] : ['No test script found.'],
+        args: hasScript('test')
+          ? (scripts.test && scripts.test.includes('vitest') ? ['test', '--', '--run', '--passWithNoTests'] : ['test', '--', '--passWithNoTests', '--watchAll=false'])
+          : ['No test script found.'],
         available: hasScript('test'),
         critical: false
       });
@@ -193,7 +195,9 @@ async function getSteps(projectType, cwd, pkg, aseConfig) {
       steps.push({
         name: 'Unit tests',
         cmd: hasScript('test') ? 'npm' : 'echo',
-        args: hasScript('test') ? ['test', '--', '--passWithNoTests', '--watchAll=false'] : ['No test script.'],
+        args: hasScript('test')
+          ? (scripts.test && scripts.test.includes('vitest') ? ['test', '--', '--run', '--passWithNoTests'] : ['test', '--', '--passWithNoTests', '--watchAll=false'])
+          : ['No test script.'],
         available: hasScript('test'),
         critical: false
       });

@@ -11,6 +11,7 @@ export interface MiddlewareContext {
   result?: any;
   isError?: boolean;
   handled?: boolean;
+  extra?: Record<string, any>;
 }
 
 export interface Middleware {

@@ -159,4 +159,21 @@ class ContextOptimizer {
   }
 }
 
-module.exports = { parseFrontmatter, ContextOptimizer };
+/**
+ * compactTranscript — decision-based context compaction using fast-jev-compaction.
+ * Prunes stale tool calls/results while preserving verbatim conversation text.
+ */
+async function compactTranscript(messages, options = {}) {
+  const { compact, collectToolCalls, reductionRatio, HybridJevClient } = require('../services/fast-jev/index');
+  const calls = collectToolCalls(messages, options.preserveRecentMessages || 6);
+  const asker = new HybridJevClient(calls, options.apiKey);
+  const result = await compact(messages, asker, options);
+  return {
+    messages: result.messages,
+    reductionRatio: reductionRatio(result),
+    stats: result.stats,
+    decisions: result.decisions
+  };
+}
+
+module.exports = { parseFrontmatter, ContextOptimizer, compactTranscript };
