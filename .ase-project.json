@@ -31,12 +31,15 @@
     "Never use separate meshes for repeated identical objects — always use THREE.InstancedMesh or THREE.Points",
     "Never build a 3D scene without checking renderer.info.render.calls — must stay within draw call budget",
     "Never configure ioredis with maxRetriesPerRequest: null without also setting connectTimeout, lazyConnect: true, and retryStrategy: () => null. This causes every Redis command to hang indefinitely when Redis is unreachable, permanently freezing the MCP server.",
-    "Never call Redis commands (smembers, keys, get, etc.) without first checking isRedisAvailable(). All tools must degrade gracefully to SQLite-only mode when Redis is unreachable."
+    "Never call Redis commands (smembers, keys, get, etc.) without first checking isRedisAvailable(). All tools must degrade gracefully to SQLite-only mode when Redis is unreachable.",
+    "Never pass --watchAll to vitest in automated validation; always use --run --passWithNoTests",
+    "Never throw unhandled errors when TYPESAFE_API_KEY is missing; always fall back gracefully to HeuristicJevAsker"
   ],
   "preferred_patterns": [
     "Use Zod for all schema validation",
     "Use Drizzle ORM for all database access",
     "Use server actions for mutations",
+    "Use fast-jev decision-based compaction (fast_jev_compact / compactTranscript) for conversation history compression rather than lossy LLM summarization",
     "For 3D: always use powerPreference: 'high-performance' in WebGLRenderer",
     "For 3D: always use ACESFilmicToneMapping + SRGBColorSpace on the renderer",
     "For 3D: use UnrealBloomPass or @react-three/postprocessing Bloom for all glowing effects",

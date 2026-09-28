@@ -8,6 +8,7 @@ export default defineConfig({
     include: ['tests/**/*.test.{js,ts}'],
     // Reporter
     reporter: 'verbose',
+    setupFiles: ['./tests/setup-redis-mock.js'],
     // Coverage (optional, run with: npx vitest run --coverage)
     coverage: {
       provider: 'v8',

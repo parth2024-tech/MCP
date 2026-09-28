@@ -9,6 +9,7 @@
  *   ase-init --validate → Run the output validator on the current project
  *   ase-init --route "your request text" → Get the recommended model+temperature
  *   ase-init --budget "your request text" → Get the top-3 relevant skills
+ *   ase-init --compact <transcript.json> → Compact a transcript with fast-jev-compaction
  */
 
 const fs = require('fs');
@@ -78,9 +79,10 @@ if (args.includes('--validate')) {
   validate(cwd).then(result => {
     console.log(`Project type: ${c.bold}${result.project_type}${c.reset}\n`);
     for (const step of result.results) {
-      const icon = step.passed ? `${c.green}✅${c.reset}` : `${c.red}❌${c.reset}`;
+      const isPassed = step.passed !== undefined ? step.passed : step.status === 'passed';
+      const icon = isPassed ? `${c.green}✅${c.reset}` : `${c.red}❌${c.reset}`;
       console.log(`${icon} ${step.step} (exit: ${step.exit_code})`);
-      if (!step.passed && step.output) {
+      if (!isPassed && step.output) {
         console.log(`${c.gray}${step.output.slice(0, 500)}${c.reset}`);
       }
     }
@@ -95,18 +97,25 @@ if (args.includes('--validate')) {
 // ──────────────────────────────────────────────────────────
 // --route "request text"
 // ──────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────
+// --route "request text"
+// ──────────────────────────────────────────────────────────
 const routeIdx = args.indexOf('--route');
 if (routeIdx !== -1) {
   const request = args[routeIdx + 1] || '';
   if (!request) { console.error('Usage: ase-init --route "your request text"'); process.exit(1); }
-  const config = routeModel(request);
-  console.log(`\n${c.bold}Model Recommendation:${c.reset}`);
-  log(c.blue,  '🤖', `Model:       ${c.bold}${config.model}${c.reset}`);
-  log(c.cyan,  '🌡 ', `Temperature: ${c.bold}${config.temperature}${c.reset}`);
-  log(c.green, '📏', `Max tokens:  ${c.bold}${config.max_tokens}${c.reset}`);
-  log(c.gray,  '🏷 ', `Task type:   ${config.task_type}`);
-  log(c.gray,  '💬', `Rationale:   ${config.rationale}`);
-  process.exit(0);
+  routeModel(request).then(config => {
+    console.log(`\n${c.bold}Model Recommendation:${c.reset}`);
+    log(c.blue,  '🤖', `Model:       ${c.bold}${config.model}${c.reset}`);
+    log(c.cyan,  '🌡 ', `Temperature: ${c.bold}${config.temperature}${c.reset}`);
+    log(c.green, '📏', `Max tokens:  ${c.bold}${config.max_tokens}${c.reset}`);
+    log(c.gray,  '🏷 ', `Task type:   ${config.task_type}`);
+    log(c.gray,  '💬', `Rationale:   ${config.rationale}`);
+    safeExit(0);
+  }).catch(err => {
+    console.error('Routing failed:', err.message);
+    safeExit(1);
+  });
 }
 
 // ──────────────────────────────────────────────────────────
@@ -126,8 +135,45 @@ if (budgetIdx !== -1) {
   budget.selected.forEach((s, i) => {
     log(c.green, `${i+1}.`, `${c.bold}${s.name}${c.reset} — score: ${s.score} (~${s.tokenEstimate} tokens)`);
   });
-  log(c.gray, '📊', `Total estimated: ${budget.totalBudgetTokens} tokens | Dropped: ${budget.dropped.length} skills`);
-  process.exit(0);
+  log(c.gray, '📊', `Total estimated: ${budget.totalBudgetTokens} tokens | Dropped: ${budget.dropped_count || 0} skills`);
+  safeExit(0);
+}
+
+// ──────────────────────────────────────────────────────────
+// --compact <transcript.json>
+// ──────────────────────────────────────────────────────────
+const compactIdx = args.indexOf('--compact');
+if (compactIdx !== -1) {
+  const targetFile = args[compactIdx + 1] && !args[compactIdx + 1].startsWith('-') ? args[compactIdx + 1] : null;
+  if (!targetFile) {
+    console.error('Usage: ase-init --compact <transcript.json>');
+    safeExit(1);
+  }
+  const fullPath = path.resolve(cwd, targetFile);
+  if (!fs.existsSync(fullPath)) {
+    console.error(`File not found: ${fullPath}`);
+    safeExit(1);
+  }
+  try {
+    const raw = fs.readFileSync(fullPath, 'utf8');
+    const messages = JSON.parse(raw);
+    const { compactTranscript } = require(`${ASE_ROOT}/server/src/utils/context-optimizer`);
+    log(c.cyan, '⚡', `Compacting conversation transcript with fast-jev-compaction: ${c.bold}${targetFile}${c.reset}`);
+    compactTranscript(messages).then(result => {
+      log(c.green, '✅', `Compaction completed! Reduction: ${c.bold}${Math.round(result.reductionRatio * 100)}%${c.reset}`);
+      log(c.gray, '📊', `Messages: ${result.stats.messagesBefore} → ${result.stats.messagesAfter} | Chars: ${result.stats.charsBefore} → ${result.stats.charsAfter} | Dropped calls: ${result.stats.callsDropped}`);
+      const outPath = fullPath.replace(/\.json$/, '.compacted.json');
+      fs.writeFileSync(outPath, JSON.stringify(result.messages, null, 2), 'utf8');
+      log(c.blue, '💾', `Saved compacted transcript to: ${c.bold}${outPath}${c.reset}`);
+      safeExit(0);
+    }).catch(err => {
+      console.error('Compaction failed:', err.message);
+      safeExit(1);
+    });
+  } catch (err) {
+    console.error('Failed to read or parse transcript JSON:', err.message);
+    safeExit(1);
+  }
 }
 
 // ──────────────────────────────────────────────────────────
@@ -175,7 +221,7 @@ if (args.includes('--lessons')) {
 // ──────────────────────────────────────────────────────────
 // DEFAULT — Initialize project (ase-init or ase-init --update)
 // ──────────────────────────────────────────────────────────
-const hasCommand = args.includes('--validate') || args.includes('--route') || args.includes('--budget') || args.includes('--check') || args.includes('--export-vault') || args.includes('--lessons');
+const hasCommand = args.includes('--validate') || args.includes('--route') || args.includes('--budget') || args.includes('--check') || args.includes('--export-vault') || args.includes('--lessons') || args.includes('--compact');
 
 if (!hasCommand) {
   const configPath = path.join(cwd, CONFIG_FILE);
@@ -188,7 +234,7 @@ if (!hasCommand) {
     if (existing.prompt) {
       console.log(`\n${c.gray}${existing.prompt.slice(0, 300)}...${c.reset}`);
     }
-    process.exit(0);
+    safeExit(0);
   }
 
   console.log(`\n${c.bold}${c.cyan}🚀 ASE Project Initializer${c.reset}\n`);

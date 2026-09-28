@@ -1,5 +1,5 @@
-import CheckOpenHandsStatusTool from './src/tools/check_openhands_status';
-import { Logger } from './src/utils/logger';
+import CheckOpenHandsStatusTool from '../src/tools/check_openhands_status';
+import { Logger } from '../src/utils/logger';
 
 async function run() {
   const tool = new CheckOpenHandsStatusTool();

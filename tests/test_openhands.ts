@@ -1,5 +1,5 @@
-import DelegateToOpenHandsTool from './src/tools/delegate_to_openhands';
-import { Logger } from './src/utils/logger';
+import DelegateToOpenHandsTool from '../src/tools/delegate_to_openhands';
+import { Logger } from '../src/utils/logger';
 
 async function run() {
   const tool = new DelegateToOpenHandsTool();

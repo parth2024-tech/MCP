@@ -43,6 +43,7 @@ describe('ASE MCP Server Phase 3 Upgrades', () => {
     // Reset OrchestrationDB singleton
     try { OrchestrationDB.getInstance().close(); } catch (e) {}
     dbInstance = OrchestrationDB.getInstance();
+    dbInstance._redisAvailable = true;
     redis = await dbInstance.getRedisClient();
 
     // Flush Redis database for clean tests
@@ -179,7 +180,8 @@ describe('ASE MCP Server Phase 3 Upgrades', () => {
       const token = dev.agent_token;
 
       // 1. Create a dummy skill folder on disk
-      const skillsDir = path.resolve(__dirname, '../../../');
+      const skillsDir = path.resolve(__dirname, '..');
+      process.env.ASE_ROOT = skillsDir;
       const tempSkillName = `test-skill-${Date.now()}`;
       const tempSkillPath = path.join(skillsDir, tempSkillName);
       await fs.mkdir(tempSkillPath, { recursive: true });
