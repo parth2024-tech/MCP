@@ -5,7 +5,7 @@ const { logAccess, logger } = require('../utils/logger');
 const { toolError } = require('../utils/errors');
 const { parseFrontmatter } = require('../utils/context-optimizer');
 
-const SKILLS_DIR = path.resolve(__dirname, '../../../../');
+const SKILLS_DIR = process.env.ASE_ROOT || path.resolve(__dirname, __dirname.includes('tools/server') ? '../../../../' : '../../');
 const AUTH_FILE = '/home/thor/.agents/auth.json';
 
 // Load authentication registry
@@ -130,7 +130,8 @@ module.exports = (deps) => ({
     if (pinned && pinned.content) {
       content = pinned.content;
       version = pinned.version;
-      mdFile = path.resolve(SKILLS_DIR, skill_name, 'SKILL.md');
+      const subpath = path.resolve(SKILLS_DIR, 'skills', skill_name, 'SKILL.md');
+      mdFile = fs.existsSync(subpath) ? subpath : path.resolve(SKILLS_DIR, skill_name, 'SKILL.md');
     } else {
       const skillData = await deps.skillCache.getSkillContent(skill_name);
 

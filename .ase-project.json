@@ -46,7 +46,7 @@
     "For 3D assets: always run optimize-3d-assets.sh before adding any .glb to /public"
   ],
   "agent_skills": {
-    "directory": "/home/thor/skiils",
+    "directory": "/home/thor/skiils/skills",
     "default_skills": [
       "lifecycle/using-agent-skills",
       "lifecycle/context-engineering"

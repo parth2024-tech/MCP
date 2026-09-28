@@ -8,7 +8,7 @@
     "dev": "NODE_ENV=development tsx ase-mcp-server.ts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "verify": "tsx verify-all.js && tsx verify-jit-mcp.js"
+    "verify": "tsx scripts/verify-all.js && tsx scripts/verify-jit-mcp.js"
   },
   "keywords": [],
   "author": "",

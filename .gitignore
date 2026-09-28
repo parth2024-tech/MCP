@@ -17,3 +17,5 @@ coverage/
 /tmp/ase-*/
 # Obsidian knowledge vault output
 vault/
+# Untracked nested clones
+OpenHands/
