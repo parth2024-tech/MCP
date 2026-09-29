@@ -357,19 +357,24 @@ function getConfigTemplate() {
       'Never store secrets in .env files committed to git',
       'Never use inline styles — always use Tailwind classes',
       'Never use `any` TypeScript type — always type explicitly',
-      'Never mix database queries into React components'
+      'Never mix database queries into React components',
+      'Never output verbose unsolicited recaps, exhaustive changelogs, or repetitive summaries that waste tokens — mention ONLY the most critical points unless explicitly asked',
+      'Never use purple gradients, pill buttons, fake reviews/metrics/counters, vague hero text, emoji icons, em dashes, crazy scroll/cursor animations, or AI slop photos/copy on websites'
     ],
     preferred_patterns: [
+      'Practice extreme token economy: keep responses concise, high-signal, and directly answer user requests without unprompted changelogs or filler',
       'Use Zod for all schema validation',
       'Use Drizzle ORM for all database access',
       'Use server actions for mutations',
-      'Use Next.js Image component for all images'
+      'Use Next.js Image component for all images',
+      'Always mandate production web essentials: custom domain, custom favicon suite, remove AI badges, /privacy page, and /terms page'
     ],
     agent_skills: {
       directory: '/home/thor/skiils',
       default_skills: [
         'lifecycle/using-agent-skills',
-        'lifecycle/context-engineering'
+        'lifecycle/context-engineering',
+        'anti-vibe-design'
       ],
       mandatory_skills: {
         api: 'lifecycle/api-and-interface-design',
