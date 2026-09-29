@@ -203,29 +203,38 @@ async function getSteps(projectType, cwd, pkg, aseConfig) {
       });
       break;
 
-    case 'python':
+    case 'python': {
+      const venvRuff = path.join(cwd, '.venv', 'bin', 'ruff');
+      const venvMypy = path.join(cwd, '.venv', 'bin', 'mypy');
+      const venvPytest = path.join(cwd, '.venv', 'bin', 'pytest');
+
+      const hasVenvRuff = await fileExists(venvRuff);
+      const hasVenvMypy = await fileExists(venvMypy);
+      const hasVenvPytest = await fileExists(venvPytest);
+
       steps.push({
         name: 'Ruff lint',
-        cmd: 'ruff',
+        cmd: hasVenvRuff ? venvRuff : 'ruff',
         args: ['check', '.'],
-        available: await commandExists('ruff', cwd, aseConfig),
+        available: hasVenvRuff || await commandExists('ruff', cwd, aseConfig),
         critical: false
       });
       steps.push({
         name: 'mypy type check',
-        cmd: 'mypy',
+        cmd: hasVenvMypy ? venvMypy : 'mypy',
         args: ['.', '--ignore-missing-imports'],
-        available: await commandExists('mypy', cwd, aseConfig),
+        available: hasVenvMypy || await commandExists('mypy', cwd, aseConfig),
         critical: false
       });
       steps.push({
         name: 'pytest',
-        cmd: 'pytest',
-        args: ['-x', '--timeout=30', '-q'],
-        available: await commandExists('pytest', cwd, aseConfig),
+        cmd: hasVenvPytest ? venvPytest : 'pytest',
+        args: ['-q'],
+        available: hasVenvPytest || await commandExists('pytest', cwd, aseConfig),
         critical: false
       });
       break;
+    }
 
     case 'golang':
       steps.push({
