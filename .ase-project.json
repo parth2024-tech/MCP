@@ -33,7 +33,18 @@
     "Never configure ioredis with maxRetriesPerRequest: null without also setting connectTimeout, lazyConnect: true, and retryStrategy: () => null. This causes every Redis command to hang indefinitely when Redis is unreachable, permanently freezing the MCP server.",
     "Never call Redis commands (smembers, keys, get, etc.) without first checking isRedisAvailable(). All tools must degrade gracefully to SQLite-only mode when Redis is unreachable.",
     "Never pass --watchAll to vitest in automated validation; always use --run --passWithNoTests",
-    "Never throw unhandled errors when TYPESAFE_API_KEY is missing; always fall back gracefully to HeuristicJevAsker"
+    "Never throw unhandled errors when TYPESAFE_API_KEY is missing; always fall back gracefully to HeuristicJevAsker",
+    "Never use purple-to-indigo gradients, purple glowing cards, or generic AI-slop color palettes on websites",
+    "Never use pill-shaped buttons (rounded-full) for primary landing page buttons or CTAs (use structured rounded-md or rounded-lg)",
+    "Never use fake reviews, fabricated testimonials, or AI-generated avatar photos",
+    "Never display fake metrics, unsubstantiated statistics, or fabricated customer counter tickers",
+    "Never write vague hero section titles (e.g. 'Empower your workflow with AI synergies') — always write concrete value propositions explaining the product in sentence one",
+    "Never use emojis as UI icons or bullet icons — always use vector SVG icons (Lucide, Heroicons, Radix)",
+    "Never use em dashes (—) repeatedly in marketing and website copy",
+    "Never use crazy scroll-jacking animations, tumbling card reveals, or custom laggy cursor follower animations",
+    "Never use generic 3D glossy clay figures or AI-generated stock photography",
+    "Never generate AI slop marketing filler — keep copy crisp, concise, and human-written",
+    "Never leave 'Made with AI', 'Built with v0', or default AI platform tags in production web applications"
   ],
   "preferred_patterns": [
     "Use Zod for all schema validation",
@@ -42,6 +53,11 @@
     "Use fast-jev decision-based compaction (fast_jev_compact / compactTranscript) for conversation history compression rather than lossy LLM summarization",
     "Use WorktreeManager (manage_worktree / ase-init --worktree) for isolated workspace branches during parallel tasks or experimental subagents without dirtying the working copy",
     "Use TranscriptReader (read_native_transcript / ase-init --transcript) for zero-overhead streaming log ingestion directly from disk without PTY scrapers or background daemons",
+    "Always mandate production web essentials: custom domain, custom favicon suite (SVG/ICO/Apple Touch), and complete OpenGraph metadata",
+    "Always remove all 'Made with AI' tags, badges, and builder watermarks before shipping",
+    "Always include dedicated, accessible Privacy Policy (/privacy) and Terms & Conditions (/terms) pages",
+    "Always use real product screenshots, live code samples, or honest zero-state displays rather than fake social proof",
+    "Always follow the anti-vibe-design skill guidelines for all frontend, web design, and UI/UX tasks",
     "For 3D: always use powerPreference: 'high-performance' in WebGLRenderer",
     "For 3D: always use ACESFilmicToneMapping + SRGBColorSpace on the renderer",
     "For 3D: use UnrealBloomPass or @react-three/postprocessing Bloom for all glowing effects",
@@ -54,11 +70,14 @@
     "directory": "/home/thor/skiils/skills",
     "default_skills": [
       "lifecycle/using-agent-skills",
-      "lifecycle/context-engineering"
+      "lifecycle/context-engineering",
+      "anti-vibe-design"
     ],
     "mandatory_skills": {
       "api": "lifecycle/api-and-interface-design",
-      "auth": "lifecycle/security-and-hardening"
+      "auth": "lifecycle/security-and-hardening",
+      "frontend": "anti-vibe-design",
+      "ui": "anti-vibe-design"
     },
     "session_reporting_preference": true
   },

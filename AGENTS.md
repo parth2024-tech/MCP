@@ -24,3 +24,25 @@ ASE MCP server: `node /home/thor/skiils/tools/server/ase-mcp-server.js`
 - Actively analyze the user's input and execution traces for new technical advice, code preferences, corrections, or constraints.
 - When detected, immediately call `record_learned_lesson` and `update_project_rules` with the appropriate `rule_type` to persist the new convention to `.ase-project.json` and episodic memory before completing.
 - Acknowledge to the user that the system has successfully "learned" this rule and upgraded itself.
+
+## Anti-Vibe-Coding & Anti-AI-Slop Law (Mandatory for all Web/UI/Frontend work)
+When generating or modifying frontend code, landing pages, or web apps, you MUST obey these rules:
+- **12 Anti-Patterns to NEVER use:**
+  1. ❌ No purple-to-indigo gradients, purple mesh overlays, or generic AI aesthetic palettes.
+  2. ❌ No pill-shaped buttons (rounded-full) for primary CTAs — use structured rounded-md or rounded-lg.
+  3. ❌ No fake reviews, fabricated testimonials, or AI avatar headshots.
+  4. ❌ No fake metrics, unsubstantiated statistics, or fabricated customer counter tickers.
+  5. ❌ No vague hero section copy ("Empower your workflow with AI synergy") — explain what the product does in sentence one.
+  6. ❌ No emoji icons for feature lists or navigation — use crisp SVG vector icons (Lucide, Heroicons).
+  7. ❌ No em dashes (—) overused in marketing or landing page copy.
+  8. ❌ No crazy scroll-jacking animations, tumbling cards, or disorienting view-transition spam.
+  9. ❌ No generic 3D glossy clay figures, floating laptops, or uncanny AI stock photos.
+  10. ❌ No AI slop marketing filler ("In today's fast-paced digital landscape...") — write direct human technical prose.
+  11. ❌ No custom cursor follower/sparkle/bubble animations — preserve the native OS cursor.
+  12. ❌ No fake customer counters or fake purchase popup toasts.
+- **5 Production Essentials to ALWAYS include:**
+  1. ✅ Custom domain configuration & clean metadata.
+  2. ✅ Full favicon suite (/favicon.ico, /icon.svg, /apple-touch-icon.png, OpenGraph tags).
+  3. ✅ Remove all "Made with AI", "Built with v0", or builder badges.
+  4. ✅ Dedicated, accessible Privacy Policy page (/privacy).
+  5. ✅ Dedicated, accessible Terms & Conditions page (/terms).
