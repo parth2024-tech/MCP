@@ -45,6 +45,10 @@ setInterval(() => {
  * @returns {Promise<{ httpServer: http.Server, transport: StreamableHTTPServerTransport }>}
  */
 async function startHttpTransport(mcpServer, port = 3100) {
+  if (!process.env.ASE_HTTP_TOKEN) {
+    throw new Error('Fatal Security Error: HTTP transport requires ASE_HTTP_TOKEN to be set. Refusing to run an unauthenticated HTTP server.');
+  }
+
   const transport = new StreamableHTTPServerTransport({
     sessionIdGenerator: () => crypto.randomUUID(),
   });

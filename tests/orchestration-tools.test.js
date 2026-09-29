@@ -179,9 +179,9 @@ describe('Orchestration Tools Integration', () => {
     const claimed = await tools.claim_task({ agent_id: 'dead-agent' });
     expect(claimed.id).toBe(task.id);
     
-    // Manually backdate the dead agent's heartbeat in SQLite and Redis to make it look dead
+    // Manually backdate the dead agent's heartbeat in SQLite and Redis to make it look dead (> 105s)
     const db = dbInstance.getDB();
-    const deadTime = Math.floor(Date.now() / 1000) - 100;
+    const deadTime = Math.floor(Date.now() / 1000) - 120;
     db.prepare(`
       UPDATE agents SET last_heartbeat = ? WHERE agent_id = 'dead-agent'
     `).run(deadTime);

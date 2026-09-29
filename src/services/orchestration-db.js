@@ -1036,40 +1036,50 @@ class OrchestrationDB {
   }
 
   async recoverDeadAgents() {
+    // Deterministic heartbeat timeout: 3 intervals (30s) + 15s grace buffer = 105s
+    const HEARTBEAT_INTERVAL_SEC = 30;
+    const DEAD_AGENT_TIMEOUT_SEC = 3 * HEARTBEAT_INTERVAL_SEC + 15; // 105s
     const now = Math.floor(Date.now() / 1000);
     const recovered = [];
 
     const deadAgents = this.db.prepare(`
       SELECT agent_id FROM agents
       WHERE status = 'active' AND last_heartbeat < ?
-    `).all(now - 30);
+    `).all(now - DEAD_AGENT_TIMEOUT_SEC);
 
     for (const agent of deadAgents) {
-      const claimedIds = await this.redis.smembers('ase:tasks:claimed');
-      for (const tId of claimedIds) {
-        const data = await this.redis.get(`ase:task:${tId}`);
-        if (data) {
-          const task = JSON.parse(data);
-          if (task.assigned_to === agent.agent_id) {
-            await this.redis.multi()
-               .srem('ase:tasks:claimed', tId)
-               .sadd('ase:tasks:pending', tId)
-               .set(`ase:task:${tId}`, JSON.stringify({
-                 ...task,
-                 status: 'pending',
-                 assigned_to: null,
-                 claimed_at: null,
-                 timeout_at: null
-               }))
-               .exec();
-
-            this.db.prepare(`
-              UPDATE tasks SET status = 'pending', assigned_to = NULL, claimed_at = NULL, timeout_at = NULL
-              WHERE id = ?
-            `).run(tId);
+      if (this.isRedisAvailable()) {
+        try {
+          const claimedIds = await this.redis.smembers('ase:tasks:claimed');
+          for (const tId of claimedIds) {
+            const data = await this.redis.get(`ase:task:${tId}`);
+            if (data) {
+              const task = JSON.parse(data);
+              if (task.assigned_to === agent.agent_id) {
+                await this.redis.multi()
+                   .srem('ase:tasks:claimed', tId)
+                   .sadd('ase:tasks:pending', tId)
+                   .set(`ase:task:${tId}`, JSON.stringify({
+                     ...task,
+                     status: 'pending',
+                     assigned_to: null,
+                     claimed_at: null,
+                     timeout_at: null
+                   }))
+                   .exec();
+              }
+            }
           }
+        } catch (redisErr) {
+          logger.warn('OrchestrationDB', `Redis error during dead agent task recovery: ${redisErr.message}`);
         }
       }
+
+      // SQLite authoritative recovery: unconditionally requeue all tasks claimed by this dead agent
+      this.db.prepare(`
+        UPDATE tasks SET status = 'pending', assigned_to = NULL, claimed_at = NULL, timeout_at = NULL
+        WHERE status = 'claimed' AND assigned_to = ?
+      `).run(agent.agent_id);
 
       this.db.prepare(`UPDATE agents SET status = 'dead' WHERE agent_id = ?`).run(agent.agent_id);
       recovered.push(agent.agent_id);

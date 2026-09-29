@@ -14,9 +14,9 @@ export function createToolCallHandler(container: Container) {
   // Pipeline order (outermost → innermost):
   //
   //   0. ErrorMiddleware        ← catches ANYTHING that escapes from below
-  //   1. ConcurrencyMiddleware  ← semaphore gate — must be before any async work
-  //   2. MetricsMiddleware      ← time everything (including queued wait time)
-  //   3. AuthMiddleware         ← validate agent_token before any tool logic
+  //   1. AuthMiddleware         ← validate agent_token before consuming semaphore permits
+  //   2. ConcurrencyMiddleware  ← semaphore gate — only authenticated calls acquire permits
+  //   3. MetricsMiddleware      ← time everything (including queued wait time)
   //   4. SpokeProxyMiddleware   ← forward spoke-namespaced tools (tool__spoke)
   //   5. CacheMiddleware        ← serve from cache or populate after execution
   //   6. ToolExecutionMiddleware← actually run the tool with timeout + retry
@@ -25,12 +25,12 @@ export function createToolCallHandler(container: Container) {
   container.register('ConcurrencyMiddleware', concurrencyMiddleware);
 
   const pipeline = new Pipeline()
-    .use(new ErrorMiddleware())        // Layer 0: catch-all error boundary
-    .use(concurrencyMiddleware)        // Layer 1: backpressure semaphore
-    .use(new MetricsMiddleware())      // Layer 2: timing + observability
-    .use(new AuthMiddleware())         // Layer 3: token authentication
-    .use(new SpokeProxyMiddleware())   // Layer 4: spoke federation proxy
-    .use(new CacheMiddleware())        // Layer 5: response caching
+    .use(new ErrorMiddleware())          // Layer 0: catch-all error boundary
+    .use(new AuthMiddleware())           // Layer 1: token authentication
+    .use(concurrencyMiddleware)          // Layer 2: backpressure semaphore
+    .use(new MetricsMiddleware())        // Layer 3: timing + observability
+    .use(new SpokeProxyMiddleware())     // Layer 4: spoke federation proxy
+    .use(new CacheMiddleware())          // Layer 5: response caching
     .use(new ToolExecutionMiddleware()); // Layer 6: tool execution core
 
   return async (request: any, extra: any) => {

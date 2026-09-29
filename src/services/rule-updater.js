@@ -28,6 +28,16 @@ async function updateProjectRules(ruleType, action, content, projectDir = null, 
     return { error: 'No .ase-project.json found in the directory tree.' };
   }
 
+  // Governance Lock: Agents cannot delete rules from 'never_do' or 'conventions'.
+  // Any deletion or direct alteration to never_do must be routed to human review via rule_proposals.jsonl.
+  const isProtectedRuleType = ['never_do', 'conventions'].includes(ruleType);
+  if (isProtectedRuleType && action === 'remove' && process.env.ASE_ALLOW_DIRECT_RULE_MUTATION !== 'true') {
+    draftMode = true;
+  }
+  if (ruleType === 'never_do' && !draftMode && !dryRun && process.env.ASE_ALLOW_DIRECT_RULE_MUTATION !== 'true') {
+    draftMode = true;
+  }
+
   if (draftMode) {
     const logPath = path.join(path.dirname(configPath), 'rule_proposals.jsonl');
     const proposal = {
