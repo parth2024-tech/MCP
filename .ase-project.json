@@ -45,7 +45,11 @@
     "Never use generic 3D glossy clay figures or AI-generated stock photography",
     "Never generate AI slop marketing filler — keep copy crisp, concise, and human-written",
     "Never leave 'Made with AI', 'Built with v0', or default AI platform tags in production web applications",
-    "Never output verbose unsolicited recaps, exhaustive changelogs, or repetitive summaries that waste tokens — mention ONLY the most critical points unless explicitly asked"
+    "Never output verbose unsolicited recaps, exhaustive changelogs, or repetitive summaries that waste tokens — mention ONLY the most critical points unless explicitly asked",
+    "Never allow AI agents to unilaterally weaken or remove rules from never_do or conventions without human review via draft_mode / review queue",
+    "Never execute arbitrary generated code or tests directly on the host environment without container isolation or throwaway sandbox boundaries",
+    "Never acquire or renew file locks without monotonically increasing fencing tokens to prevent expired-lease overwrites",
+    "Never execute long-running tools under fixed 30s timeouts without AbortController cancellation and async job status polling"
   ],
   "preferred_patterns": [
     "Practice extreme token economy: keep responses concise, high-signal, and directly answer user requests without unprompted changelogs or filler",
