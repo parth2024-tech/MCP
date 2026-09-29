@@ -10,6 +10,8 @@
  *   ase-init --route "your request text" → Get the recommended model+temperature
  *   ase-init --budget "your request text" → Get the top-3 relevant skills
  *   ase-init --compact <transcript.json> → Compact a transcript with fast-jev-compaction
+ *   ase-init --worktree <list|create|remove|prune> → Manage isolated Git worktrees
+ *   ase-init --transcript [path|latest] [--compact] → Inspect native agent transcript with zero PTY
  */
 
 const fs = require('fs');
@@ -143,11 +145,12 @@ if (budgetIdx !== -1) {
 // --compact <transcript.json>
 // ──────────────────────────────────────────────────────────
 const compactIdx = args.indexOf('--compact');
-if (compactIdx !== -1) {
+if (compactIdx !== -1 && !args.includes('--transcript')) {
   const targetFile = args[compactIdx + 1] && !args[compactIdx + 1].startsWith('-') ? args[compactIdx + 1] : null;
   if (!targetFile) {
     console.error('Usage: ase-init --compact <transcript.json>');
     safeExit(1);
+    return;
   }
   const fullPath = path.resolve(cwd, targetFile);
   if (!fs.existsSync(fullPath)) {
@@ -219,9 +222,112 @@ if (args.includes('--lessons')) {
 }
 
 // ──────────────────────────────────────────────────────────
+// --worktree <list|create|remove|prune> [args]
+// ──────────────────────────────────────────────────────────
+const wtIdx = args.indexOf('--worktree');
+if (wtIdx !== -1) {
+  const subAction = args[wtIdx + 1] || 'list';
+  const { WorktreeManager } = require(`${ASE_ROOT}/server/src/services/worktree-manager`);
+  (async () => {
+    try {
+      if (subAction === 'list') {
+        const list = await WorktreeManager.listWorktrees(cwd);
+        console.log(`\n${c.bold}🌳 Active Git Worktrees (${list.length}):${c.reset}\n`);
+        list.forEach((wt, i) => {
+          const tag = wt.isMain ? `${c.green}(main repo)${c.reset}` : `${c.cyan}(worktree)${c.reset}`;
+          console.log(`  ${c.bold}${i + 1}.${c.reset} [${c.yellow}${wt.branch || 'detached'}${c.reset}] ${tag}`);
+          console.log(`     ${c.gray}Path: ${wt.path}${c.reset}`);
+          console.log(`     ${c.gray}HEAD: ${wt.head}${c.reset}`);
+        });
+      } else if (subAction === 'create') {
+        const branchName = args[wtIdx + 2];
+        if (!branchName) {
+          console.error('Usage: ase-init --worktree create <branch-name>');
+          safeExit(1);
+          return;
+        }
+        log(c.cyan, '🌿', `Creating isolated git worktree for branch: ${c.bold}${branchName}${c.reset}`);
+        const res = await WorktreeManager.createWorktree({ repoPath: cwd, branch: branchName });
+        log(c.green, '✅', `Worktree ready at: ${c.bold}${res.worktreePath}${c.reset}`);
+        log(c.gray, '📌', `HEAD: ${res.head}`);
+      } else if (subAction === 'remove') {
+        const targetPath = args[wtIdx + 2];
+        if (!targetPath) {
+          console.error('Usage: ase-init --worktree remove <worktree-path> [--force] [--delete-branch]');
+          safeExit(1);
+          return;
+        }
+        const force = args.includes('--force');
+        const deleteBranch = args.includes('--delete-branch');
+        log(c.yellow, '🧹', `Removing worktree: ${c.bold}${targetPath}${c.reset}`);
+        const res = await WorktreeManager.removeWorktree({ repoPath: cwd, worktreePath: targetPath, force, deleteBranch });
+        log(c.green, '✅', `Removed worktree at: ${c.bold}${res.removedPath}${c.reset}${res.branchDeleted ? ' (branch deleted)' : ''}`);
+      } else if (subAction === 'prune') {
+        await WorktreeManager.pruneWorktrees(cwd);
+        log(c.green, '✅', 'Pruned stale worktrees cleanly.');
+      } else {
+        console.error(`Unknown worktree subaction: ${subAction}. Use list, create, remove, or prune.`);
+        safeExit(1);
+        return;
+      }
+      safeExit(0);
+    } catch (err) {
+      console.error('Worktree operation failed:', err.message);
+      safeExit(1);
+    }
+  })();
+}
+
+// ──────────────────────────────────────────────────────────
+// --transcript [path|latest] [--compact]
+// ──────────────────────────────────────────────────────────
+const transcriptIdx = args.indexOf('--transcript');
+if (transcriptIdx !== -1) {
+  const target = args[transcriptIdx + 1] && !args[transcriptIdx + 1].startsWith('-') ? args[transcriptIdx + 1] : 'latest';
+  const shouldCompact = args.includes('--compact');
+  const { TranscriptReader } = require(`${ASE_ROOT}/server/src/services/transcript-reader`);
+  const { compactTranscript } = require(`${ASE_ROOT}/server/src/utils/context-optimizer`);
+  (async () => {
+    try {
+      let resolved = target;
+      if (target === 'latest') {
+        const found = await TranscriptReader.discoverRecentTranscripts(cwd, 1);
+        if (found.length === 0) {
+          console.error('No recent transcripts discovered.');
+          safeExit(1);
+          return;
+        }
+        resolved = found[0];
+      }
+      log(c.cyan, '📜', `Reading native transcript: ${c.bold}${resolved}${c.reset}`);
+      const parsed = await TranscriptReader.readTranscript(resolved, { tail: 50 });
+      console.log(`\n${c.bold}Execution Metrics:${c.reset}`);
+      log(c.green, '📊', `Total Steps: ${parsed.metrics.totalSteps} (User: ${parsed.metrics.userTurns}, Assistant: ${parsed.metrics.assistantTurns})`);
+      log(c.blue, '🛠 ', `Total Tool Calls: ${parsed.metrics.totalToolCalls} (Failed: ${parsed.metrics.failedToolCalls})`);
+      if (Object.keys(parsed.metrics.toolInvocations).length > 0) {
+        console.log(`   ${c.gray}Tools used: ${Object.entries(parsed.metrics.toolInvocations).map(([k, v]) => `${k}(${v})`).join(', ')}${c.reset}`);
+      }
+      if (parsed.metrics.modifiedFiles.length > 0) {
+        log(c.yellow, '📝', `Modified Files: ${parsed.metrics.modifiedFiles.join(', ')}`);
+      }
+      if (shouldCompact) {
+        log(c.cyan, '⚡', 'Applying fast-jev compaction on native transcript...');
+        const comp = await compactTranscript(parsed.messages);
+        log(c.green, '✅', `Compaction completed! Reduction: ${c.bold}${Math.round(comp.reductionRatio * 100)}%${c.reset}`);
+        log(c.gray, '📊', `Messages: ${comp.stats.messagesBefore} → ${comp.stats.messagesAfter} | Chars: ${comp.stats.charsBefore} → ${comp.stats.charsAfter} | Dropped calls: ${comp.stats.callsDropped}`);
+      }
+      safeExit(0);
+    } catch (err) {
+      console.error('Transcript inspection failed:', err.message);
+      safeExit(1);
+    }
+  })();
+}
+
+// ──────────────────────────────────────────────────────────
 // DEFAULT — Initialize project (ase-init or ase-init --update)
 // ──────────────────────────────────────────────────────────
-const hasCommand = args.includes('--validate') || args.includes('--route') || args.includes('--budget') || args.includes('--check') || args.includes('--export-vault') || args.includes('--lessons') || args.includes('--compact');
+const hasCommand = args.includes('--validate') || args.includes('--route') || args.includes('--budget') || args.includes('--check') || args.includes('--export-vault') || args.includes('--lessons') || args.includes('--compact') || args.includes('--worktree') || args.includes('--transcript');
 
 if (!hasCommand) {
   const configPath = path.join(cwd, CONFIG_FILE);

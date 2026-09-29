@@ -40,6 +40,8 @@
     "Use Drizzle ORM for all database access",
     "Use server actions for mutations",
     "Use fast-jev decision-based compaction (fast_jev_compact / compactTranscript) for conversation history compression rather than lossy LLM summarization",
+    "Use WorktreeManager (manage_worktree / ase-init --worktree) for isolated workspace branches during parallel tasks or experimental subagents without dirtying the working copy",
+    "Use TranscriptReader (read_native_transcript / ase-init --transcript) for zero-overhead streaming log ingestion directly from disk without PTY scrapers or background daemons",
     "For 3D: always use powerPreference: 'high-performance' in WebGLRenderer",
     "For 3D: always use ACESFilmicToneMapping + SRGBColorSpace on the renderer",
     "For 3D: use UnrealBloomPass or @react-three/postprocessing Bloom for all glowing effects",
