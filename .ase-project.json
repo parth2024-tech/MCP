@@ -44,9 +44,11 @@
     "Never use crazy scroll-jacking animations, tumbling card reveals, or custom laggy cursor follower animations",
     "Never use generic 3D glossy clay figures or AI-generated stock photography",
     "Never generate AI slop marketing filler — keep copy crisp, concise, and human-written",
-    "Never leave 'Made with AI', 'Built with v0', or default AI platform tags in production web applications"
+    "Never leave 'Made with AI', 'Built with v0', or default AI platform tags in production web applications",
+    "Never output verbose unsolicited recaps, exhaustive changelogs, or repetitive summaries that waste tokens — mention ONLY the most critical points unless explicitly asked"
   ],
   "preferred_patterns": [
+    "Practice extreme token economy: keep responses concise, high-signal, and directly answer user requests without unprompted changelogs or filler",
     "Use Zod for all schema validation",
     "Use Drizzle ORM for all database access",
     "Use server actions for mutations",

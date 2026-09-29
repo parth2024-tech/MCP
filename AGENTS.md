@@ -19,6 +19,8 @@ ASE MCP server: `node /home/thor/skiils/tools/server/ase-mcp-server.js`
 - Never let an AI grade its own work without independent gate checks.
 - Your Second Brain MUST get sharper after every session.
 - ALWAYS push all changes to GitHub before concluding any turn or session.
+- NEVER waste tokens on unsolicited recaps, exhaustive changelogs, or repetitive code explanations. Only mention the most critical points, status, or answers requested.
+
 
 ## Self-Improvement & Continuous Learning
 - Actively analyze the user's input and execution traces for new technical advice, code preferences, corrections, or constraints.
