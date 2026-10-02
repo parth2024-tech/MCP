@@ -1,6 +1,6 @@
 ---
 name: web-games
-description: "Web browser game development principles. Framework selection, WebGPU, optimization, PWA."
+description: "Web browser game development principles. Framework selection, WebGPU, optimization, PWA. Use when building web games games or working on web-games-related game development."
 risk: unknown
 source: community
 date_added: "2026-02-27"

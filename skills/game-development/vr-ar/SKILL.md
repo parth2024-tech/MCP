@@ -1,6 +1,6 @@
 ---
 name: vr-ar
-description: "VR/AR development principles. Comfort, interaction, performance requirements."
+description: "VR/AR development principles. Comfort, interaction, performance requirements. Use when building vr ar games or working on vr-ar-related game development."
 risk: unknown
 source: community
 date_added: "2026-02-27"

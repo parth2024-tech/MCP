@@ -1,6 +1,6 @@
 ---
 name: multiplayer
-description: "Multiplayer game development principles. Architecture, networking, synchronization."
+description: "Multiplayer game development principles. Architecture, networking, synchronization. Use when building multiplayer games or working on multiplayer-related game development."
 risk: unknown
 source: community
 date_added: "2026-02-27"

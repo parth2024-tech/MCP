@@ -1,6 +1,6 @@
 ---
 name: 2d-games
-description: "2D game development principles. Sprites, tilemaps, physics, camera."
+description: "2D game development principles. Sprites, tilemaps, physics, camera. Use when building 2d games games or working on 2d-games-related game development."
 risk: none
 source: community
 date_added: "2026-02-27"

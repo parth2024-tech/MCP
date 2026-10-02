@@ -1,6 +1,6 @@
 ---
 name: mobile-games
-description: "Mobile game development principles. Touch input, battery, performance, app stores."
+description: "Mobile game development principles. Touch input, battery, performance, app stores. Use when building mobile games games or working on mobile-games-related game development."
 risk: safe
 source: community
 date_added: "2026-02-27"
