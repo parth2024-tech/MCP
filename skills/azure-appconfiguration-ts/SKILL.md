@@ -1,6 +1,6 @@
 ---
 name: azure-appconfiguration-ts
-description: "Centralized configuration management with feature flags and dynamic refresh."
+description: Centralized configuration management with feature flags and dynamic refresh. Use when the task involves azure appconfiguration ts.
 risk: unknown
 source: community
 date_added: "2026-02-27"
@@ -309,7 +309,7 @@ const prodSettings = client.listConfigurationSettings({
 
 // No label (null label)
 const noLabelSettings = client.listConfigurationSettings({
-  labelFilter: "\0",
+  labelFilter: "/0",
 });
 
 // List available labels

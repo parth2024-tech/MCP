@@ -1,6 +1,6 @@
 ---
 name: rag-implementation
-description: "RAG (Retrieval-Augmented Generation) implementation workflow covering embedding selection, vector database setup, chunking strategies, and retrieval optimization."
+description: RAG (Retrieval-Augmented Generation) implementation workflow covering embedding selection, vector database setup, chunking strategies, and retrieval optimization. Use when the task involves rag implementation.
 category: granular-workflow-bundle
 risk: safe
 source: personal

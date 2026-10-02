@@ -1,6 +1,6 @@
 ---
 name: axiom
-description: "First-principles assumption auditor. Classifies each hidden assumption (fact / convention / belief / interest-driven), ranks by fragility × impact, and rebuilds conclusions from verified premises. Bilingual: auto-detects Chinese or English."
+description: "First-principles assumption auditor. Classifies each hidden assumption (fact / convention / belief / interest-driven), ranks by fragility × impact, and rebuilds conclusions from verified premises. Bilingual: auto-detects Chinese or English. Use when the task involves axiom."
 risk: safe
 source: community
 date_added: "2026-04-13"

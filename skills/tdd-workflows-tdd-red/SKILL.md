@@ -1,6 +1,6 @@
 ---
 name: tdd-workflows-tdd-red
-description: "Generate failing tests for the TDD red phase to define expected behavior and edge cases."
+description: Generate failing tests for the TDD red phase to define expected behavior and edge cases. Use when the task involves tdd workflows tdd red.
 risk: unknown
 source: community
 date_added: "2026-02-27"

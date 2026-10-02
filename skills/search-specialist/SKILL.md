@@ -1,6 +1,6 @@
 ---
 name: search-specialist
-description: "Expert web researcher using advanced search techniques and"
+description: Expert web researcher using advanced search techniques and. Use when the task involves search specialist.
 risk: unknown
 source: community
 date_added: "2026-02-27"

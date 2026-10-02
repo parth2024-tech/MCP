@@ -1,6 +1,6 @@
 ---
 name: azure-storage-blob-ts
-description: Azure Blob Storage JavaScript/TypeScript SDK (@azure/storage-blob) for blob operations. Use for uploading, downloading, listing, and managing blobs and containers.
+description: Azure Blob Storage JavaScript/TypeScript SDK (@azure/storage-blob) for blob operations. Use for uploading, downloading, listing, and managing blobs and containers. Use when the task involves azure storage blob ts.
 risk: unknown
 source: community
 date_added: '2026-02-27'
@@ -375,8 +375,8 @@ const appendBlobClient = containerClient.getAppendBlobClient("app.log");
 await appendBlobClient.create();
 
 // Append data
-await appendBlobClient.appendBlock("Log entry 1\n", 12);
-await appendBlobClient.appendBlock("Log entry 2\n", 12);
+await appendBlobClient.appendBlock("Log entry 1/n", 12);
+await appendBlobClient.appendBlock("Log entry 2/n", 12);
 ```
 
 ### Page Blob

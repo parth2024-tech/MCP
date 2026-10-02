@@ -1,6 +1,6 @@
 ---
 name: family-health-analyzer
-description: 分析家族病史、评估遗传风险、识别家庭健康模式、提供个性化预防建议
+description: 分析家族病史、评估遗传风险、识别家庭健康模式、提供个性化预防建议. Use when the task involves family health analyzer.
 allowed-tools: Read, Write, Grep, Glob
 risk: unknown
 source: community

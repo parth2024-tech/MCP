@@ -1,6 +1,6 @@
 ---
 name: debugger
-description: 'Debugging specialist for errors, test failures, and unexpected
+description: Debugging specialist for errors, test failures, and unexpected. Use when the task involves debugger.
 
   behavior. Use proactively when encountering any issues.
 

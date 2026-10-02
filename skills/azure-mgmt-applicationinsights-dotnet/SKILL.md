@@ -1,6 +1,6 @@
 ---
 name: azure-mgmt-applicationinsights-dotnet
-description: Azure Application Insights SDK for .NET. Application performance monitoring and observability resource management.
+description: Azure Application Insights SDK for .NET. Application performance monitoring and observability resource management. Use when the task involves azure mgmt applicationinsights dotnet.
 risk: unknown
 source: community
 date_added: '2026-02-27'
@@ -257,7 +257,7 @@ WorkbookData workbookData = new WorkbookData(AzureLocation.EastUS)
             {
                 "type": 1,
                 "content": {
-                    "json": "# Application Performance\n\nThis workbook shows application performance metrics."
+                    "json": "# Application Performance/n/nThis workbook shows application performance metrics."
                 },
                 "name": "header"
             },
@@ -265,7 +265,7 @@ WorkbookData workbookData = new WorkbookData(AzureLocation.EastUS)
                 "type": 3,
                 "content": {
                     "version": "KqlItem/1.0",
-                    "query": "requests\n| summarize count() by bin(timestamp, 1h)\n| render timechart",
+                    "query": "requests/n| summarize count() by bin(timestamp, 1h)/n| render timechart",
                     "size": 0,
                     "title": "Requests per Hour",
                     "timeContext": {

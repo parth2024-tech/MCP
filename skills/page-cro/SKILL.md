@@ -1,6 +1,6 @@
 ---
 name: page-cro
-description: Analyze and optimize individual pages for conversion performance.
+description: Analyze and optimize individual pages for conversion performance. Use when the task involves page cro.
 risk: unknown
 source: community
 date_added: '2026-02-27'

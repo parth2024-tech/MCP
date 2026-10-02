@@ -1,6 +1,6 @@
 ---
 name: burp-suite-testing
-description: "Execute comprehensive web application security testing using Burp Suite's integrated toolset, including HTTP traffic interception and modification, request analysis and replay, automated vulnerability scanning, and manual testing workflows."
+description: Execute comprehensive web application security testing using Burp Suite's integrated toolset, including HTTP traffic interception and modification, request analysis and replay, automated vulnerability scanning, and manual testing workflows. Use when the task involves burp suite testing.
 risk: offensive
 source: community
 author: zebbern
@@ -286,7 +286,7 @@ javascript:alert(1)
 
 # Path Traversal
 ../../../etc/passwd
-..\..\..\..\windows\win.ini
+..\..\..\../windows/win.ini
 
 # Command Injection
 ; ls -la

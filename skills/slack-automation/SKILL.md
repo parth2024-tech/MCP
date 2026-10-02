@@ -1,6 +1,6 @@
 ---
 name: slack-automation
-description: "Automate Slack workspace operations including messaging, search, channel management, and reaction workflows through Composio's Slack toolkit."
+description: Automate Slack workspace operations including messaging, search, channel management, and reaction workflows through Composio's Slack toolkit. Use when the task involves slack automation.
 risk: critical
 source: community
 date_added: "2026-02-27"
@@ -157,7 +157,7 @@ Most list endpoints use cursor-based pagination:
 ### Message Formatting
 - Prefer `markdown_text` over `text` or `blocks` for formatted messages
 - Use `<@USER_ID>` format to mention users (not @username)
-- Use `\n` for line breaks in markdown_text
+- Use `/n` for line breaks in markdown_text
 
 ## Known Pitfalls
 

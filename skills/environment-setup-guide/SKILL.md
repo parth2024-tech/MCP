@@ -1,6 +1,6 @@
 ---
 name: environment-setup-guide
-description: "Guide developers through setting up development environments with proper tools, dependencies, and configurations"
+description: Guide developers through setting up development environments with proper tools, dependencies, and configurations. Use when the task involves environment setup guide.
 risk: unknown
 source: community
 date_added: "2026-02-27"
@@ -217,7 +217,7 @@ python3 -m venv venv
 source venv/bin/activate
 
 # Windows:
-venv\Scripts\activate
+venv/Scripts/activate
 \`\`\`
 
 ### Step 4: Install Dependencies

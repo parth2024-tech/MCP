@@ -1,6 +1,6 @@
 ---
 name: scarcity-urgency-psychologist
-description: "One sentence - what this skill does and when to invoke it"
+description: One sentence - what this skill does and when to invoke it. Use when the task involves scarcity urgency psychologist.
 risk: safe
 source: community
 date_added: "2026-04-04"

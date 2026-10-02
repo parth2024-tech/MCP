@@ -1,6 +1,6 @@
 ---
 name: monte-carlo-monitor-creation
-description: "Guides creation of Monte Carlo monitors via MCP tools, producing monitors-as-code YAML for CI/CD deployment."
+description: Guides creation of Monte Carlo monitors via MCP tools, producing monitors-as-code YAML for CI/CD deployment. Use when the task involves monte carlo monitor creation.
 category: data
 risk: safe
 source: community

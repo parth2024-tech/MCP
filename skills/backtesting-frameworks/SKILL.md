@@ -1,6 +1,6 @@
 ---
 name: backtesting-frameworks
-description: "Build robust, production-grade backtesting systems that avoid common pitfalls and produce reliable strategy performance estimates."
+description: Build robust, production-grade backtesting systems that avoid common pitfalls and produce reliable strategy performance estimates. Use when the task involves backtesting frameworks.
 risk: safe
 source: community
 date_added: "2026-02-27"

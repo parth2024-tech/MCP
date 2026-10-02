@@ -1,6 +1,6 @@
 ---
 name: webflow-automation
-description: "Automate Webflow CMS collections, site publishing, page management, asset uploads, and ecommerce orders via Rube MCP (Composio). Always search tools first for current schemas."
+description: Automate Webflow CMS collections, site publishing, page management, asset uploads, and ecommerce orders via Rube MCP (Composio). Always search tools first for current schemas. Use when the task involves webflow automation.
 risk: critical
 source: community
 date_added: "2026-02-27"

@@ -1,6 +1,6 @@
 ---
 name: api-documentation-generator
-description: "Generate comprehensive, developer-friendly API documentation from code, including endpoints, parameters, examples, and best practices"
+description: Generate comprehensive, developer-friendly API documentation from code, including endpoints, parameters, examples, and best practices. Use when the task involves api documentation generator.
 risk: unknown
 source: community
 date_added: "2026-02-27"

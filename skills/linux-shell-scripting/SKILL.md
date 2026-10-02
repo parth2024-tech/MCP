@@ -1,6 +1,6 @@
 ---
 name: linux-shell-scripting
-description: "Provide production-ready shell script templates for common Linux system administration tasks including backups, monitoring, user management, log analysis, and automation. These scripts serve as building blocks for security operations and penetration testing environments."
+description: Provide production-ready shell script templates for common Linux system administration tasks including backups, monitoring, user management, log analysis, and automation. These scripts serve as building blocks for security operations and penetration testing environments. Use when the task involves linux shell scripting.
 risk: unknown
 source: community
 author: zebbern
@@ -132,33 +132,7 @@ echo "CPU usage logged."
 ```
 
 **System Health Check**
-```bash
-#!/bin/bash
-output_file="system_health_check.txt"
-
-# Perform system health check and save results to a file
-{
-    echo "System Health Check - $(date)"
-    echo "================================"
-    echo ""
-    echo "Uptime:"
-    uptime
-    echo ""
-    echo "Load Average:"
-    cat /proc/loadavg
-    echo ""
-    echo "Memory Usage:"
-    free -h
-    echo ""
-    echo "Disk Usage:"
-    df -h
-    echo ""
-    echo "Top Processes:"
-    ps aux --sort=-%cpu | head -10
-} > "$output_file"
-
-echo "System health check saved to $output_file"
-```
+> See [references/details.md](references/details.md) for full code examples.
 
 ### Phase 3: User Management Scripts
 
@@ -188,7 +162,7 @@ output_file="password_expiry_report.txt"
 echo "Password Expiry Report - $(date)" > "$output_file"
 echo "=================================" >> "$output_file"
 
-IFS=$'\n'
+IFS=$'/n'
 for user in $(grep "/bin/bash" /etc/passwd | cut -d: -f1); do
     password_expires=$(chage -l "$user" 2>/dev/null | grep "Password expires" | awk -F: '{print $2}')
     echo "User: $user - Password Expires: $password_expires" >> "$output_file"
@@ -211,27 +185,7 @@ echo "Generated password: $password"
 ```
 
 **File Encryption Script**
-```bash
-#!/bin/bash
-file="$1"
-action="${2:-encrypt}"
-
-if [ -z "$file" ]; then
-    echo "Usage: $0 <file> [encrypt|decrypt]"
-    exit 1
-fi
-
-if [ "$action" == "encrypt" ]; then
-    # Encrypt file using AES-256-CBC
-    openssl enc -aes-256-cbc -salt -pbkdf2 -in "$file" -out "$file.enc"
-    echo "File encrypted: $file.enc"
-elif [ "$action" == "decrypt" ]; then
-    # Decrypt file
-    output_file="${file%.enc}"
-    openssl enc -aes-256-cbc -d -pbkdf2 -in "$file" -out "$output_file"
-    echo "File decrypted: $output_file"
-fi
-```
+> See [references/details.md](references/details.md) for full code examples.
 
 ### Phase 5: Log Analysis Scripts
 
@@ -407,36 +361,7 @@ du -sh "$folder_path"
 ### Phase 9: System Information
 
 **System Info Collector**
-```bash
-#!/bin/bash
-output_file="system_info_$(hostname)_$(date +%Y%m%d).txt"
-
-{
-    echo "System Information Report"
-    echo "Generated: $(date)"
-    echo "========================="
-    echo ""
-    echo "Hostname: $(hostname)"
-    echo "OS: $(uname -a)"
-    echo ""
-    echo "CPU Info:"
-    lscpu | grep -E "Model name|CPU\(s\)|Thread"
-    echo ""
-    echo "Memory:"
-    free -h
-    echo ""
-    echo "Disk Space:"
-    df -h
-    echo ""
-    echo "Network Interfaces:"
-    ip -br addr
-    echo ""
-    echo "Logged In Users:"
-    who
-} > "$output_file"
-
-echo "System info saved to $output_file"
-```
+> See [references/details.md](references/details.md) for full code examples.
 
 ### Phase 10: Git and Development
 
@@ -469,40 +394,4 @@ remote_script="${2:-/path/to/remote/script.sh}"
 # Execute a script on a remote server via SSH
 ssh "$remote_server" "bash -s" < "$remote_script"
 echo "Remote script executed on $remote_server"
-```
-
-## Quick Reference
-
-### Common Script Patterns
-
-| Pattern | Purpose |
-|---------|---------|
-| `#!/bin/bash` | Shebang for bash |
-| `$(date +%Y%m%d)` | Date formatting |
-| `$((expression))` | Arithmetic |
-| `${var:-default}` | Default value |
-| `"$@"` | All arguments |
-
-### Useful Commands
-
-| Command | Purpose |
-|---------|---------|
-| `chmod +x script.sh` | Make executable |
-| `./script.sh` | Run script |
-| `nohup ./script.sh &` | Run in background |
-| `crontab -e` | Edit cron jobs |
-| `source script.sh` | Run in current shell |
-
-### Cron Format
-Minute(0-59) Hour(0-23) Day(1-31) Month(1-12) Weekday(0-7, 0/7=Sun)
-
-## Constraints and Limitations
-
-- Always test scripts in non-production first
-- Use absolute paths to avoid errors
-- Quote variables to handle spaces properly
-- Many scripts require root/sudo privileges
-- Use `bash -x script.sh` for debugging
-
-## When to Use
-This skill is applicable to execute the workflow or actions described in the overview.
+> See [references/details.md](references/details.md) for full code examples.

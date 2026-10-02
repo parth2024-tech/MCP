@@ -1,6 +1,6 @@
 ---
 name: binary-analysis-patterns
-description: "Comprehensive patterns and techniques for analyzing compiled binaries, understanding assembly code, and reconstructing program logic."
+description: Comprehensive patterns and techniques for analyzing compiled binaries, understanding assembly code, and reconstructing program logic. Use when the task involves binary analysis patterns.
 risk: unknown
 source: community
 date_added: "2026-02-27"

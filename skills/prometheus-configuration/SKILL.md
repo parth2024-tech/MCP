@@ -1,6 +1,6 @@
 ---
 name: prometheus-configuration
-description: "Complete guide to Prometheus setup, metric collection, scrape configuration, and recording rules."
+description: Complete guide to Prometheus setup, metric collection, scrape configuration, and recording rules. Use when the task involves prometheus configuration.
 risk: unknown
 source: community
 date_added: "2026-02-27"
@@ -144,7 +144,7 @@ scrape_configs:
         regex: (.+)
       - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
         action: replace
-        regex: ([^:]+)(?::\d+)?;(\d+)
+        regex: ([^:]+)(?::/d+)?;(/d+)
         replacement: $1:$2
         target_label: __address__
       - source_labels: [__meta_kubernetes_namespace]

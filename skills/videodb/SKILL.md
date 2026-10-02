@@ -1,6 +1,6 @@
 ---
 name: videodb
-description: Video and audio perception, indexing, and editing. Ingest files/URLs/live streams, build visual/spoken indexes, search with timestamps, edit timelines, add overlays/subtitles, generate media, and create real-time alerts.
+description: Video and audio perception, indexing, and editing. Ingest files/URLs/live streams, build visual/spoken indexes, search with timestamps, edit timelines, add overlays/subtitles, generate media, and create real-time alerts. Use when the task involves videodb.
 category: media
 risk: safe
 source: community
@@ -190,7 +190,7 @@ try:
         prompt="Describe the visual content in this scene.",
     )
 except Exception as e:
-    match = re.search(r"id\s+([a-f0-9]+)", str(e))
+    match = re.search(r"id/s+([a-f0-9]+)", str(e))
     if match:
         scene_index_id = match.group(1)
     else:
@@ -300,7 +300,7 @@ except InvalidRequestError as e:
 | Scenario | Error message | Solution |
 |----------|--------------|----------|
 | Indexing an already-indexed video | `Spoken word index for video already exists` | Use `video.index_spoken_words(force=True)` to skip if already indexed |
-| Scene index already exists | `Scene index with id XXXX already exists` | Extract the existing `scene_index_id` from the error with `re.search(r"id\s+([a-f0-9]+)", str(e))` |
+| Scene index already exists | `Scene index with id XXXX already exists` | Extract the existing `scene_index_id` from the error with `re.search(r"id/s+([a-f0-9]+)", str(e))` |
 | Search finds no matches | `InvalidRequestError: No results found` | Catch the exception and treat as empty results (`shots = []`) |
 | Reframe times out | Blocks indefinitely on long videos | Use `start`/`end` to limit segment, or pass `callback_url` for async |
 | Negative timestamps on Timeline | Silently produces broken stream | Always validate `start >= 0` before creating `VideoAsset` |

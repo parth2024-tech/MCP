@@ -1,6 +1,6 @@
 ---
 name: django-access-review
-description: django-access-review
+description: django-access-review. Use when the task involves django access review.
 risk: unknown
 source: community
 ---

@@ -1,6 +1,6 @@
 ---
 name: prompt-caching
-description: Caching strategies for LLM prompts including Anthropic prompt
+description: Caching strategies for LLM prompts including Anthropic prompt. Use when the task involves prompt caching.
   caching, response caching, and CAG (Cache Augmented Generation)
 risk: none
 source: vibeship-spawner-skills (Apache 2.0)
@@ -158,8 +158,8 @@ class CAGSystem {
     async buildCachedContext(documents: Document[]): Promise<void> {
         // Pre-process and format documents
         const formatted = documents.map(d =>
-            `## ${d.title}\n${d.content}`
-        ).join('\n\n');
+            `## ${d.title}/n${d.content}`
+        ).join('/n/n');
 
         // Store with timestamp
         this.cachedContext = formatted;

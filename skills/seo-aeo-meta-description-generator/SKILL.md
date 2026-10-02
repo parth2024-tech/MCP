@@ -1,6 +1,6 @@
 ---
 name: seo-aeo-meta-description-generator
-description: "Writes 3 title tag variants and 3 meta description variants per page with SERP preview, OG tags, and Twitter Card tags. Activate when the user wants to write meta tags, title tags, or social sharing tags for any page."
+description: Writes 3 title tag variants and 3 meta description variants per page with SERP preview, OG tags, and Twitter Card tags. Activate when the user wants to write meta tags, title tags, or social sharing tags for any page. Use when the task involves seo aeo meta description generator.
 risk: safe
 source: community
 date_added: "2026-04-01"

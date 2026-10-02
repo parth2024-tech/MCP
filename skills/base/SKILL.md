@@ -1,6 +1,6 @@
 ---
 name: base
-description: "Database management, forms, reports, and data operations with LibreOffice Base."
+description: Database management, forms, reports, and data operations with LibreOffice Base. Use when the task involves base.
 category: database-processing
 risk: safe
 source: personal

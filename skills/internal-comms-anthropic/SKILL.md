@@ -1,6 +1,6 @@
 ---
-name: internal-comms-anthropic
-description: "To write internal communications, use this skill for:"
+name: internal-comms
+description: "To write internal communications, use this skill for:. Use when the task involves internal comms anthropic."
 risk: unknown
 source: community
 date_added: "2026-02-27"

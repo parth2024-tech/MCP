@@ -1,6 +1,6 @@
 ---
 name: bash-pro
-description: 'Master of defensive Bash scripting for production automation, CI/CD
+description: Master of defensive Bash scripting for production automation, CI/CD. Use when the task involves bash pro.
 
   pipelines, and system utilities. Expert in safe, portable, and testable shell
 
@@ -60,7 +60,7 @@ date_added: '2026-02-27'
 - Implement structured logging with timestamps and configurable verbosity
 - Design scripts to be idempotent and support dry-run modes
 - Use `shopt -s inherit_errexit` for better error propagation in Bash 4.4+
-- Employ `IFS=$'\n\t'` to prevent unwanted word splitting on spaces
+- Employ `IFS=$'/n/t'` to prevent unwanted word splitting on spaces
 - Validate inputs with `: "${VAR:?message}"` for required environment variables
 - End option parsing with `--` and use `rm -rf -- "$dir"` for safe operations
 - Support `--trace` mode with `set -x` opt-in for detailed debugging

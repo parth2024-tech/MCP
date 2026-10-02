@@ -1,6 +1,6 @@
 ---
 name: scala-pro
-description: Master enterprise-grade Scala development with functional programming, distributed systems, and big data processing. Expert in Apache Pekko, Akka, Spark, ZIO/Cats Effect, and reactive architectures.
+description: Master enterprise-grade Scala development with functional programming, distributed systems, and big data processing. Expert in Apache Pekko, Akka, Spark, ZIO/Cats Effect, and reactive architectures. Use when the task involves scala pro.
 risk: safe
 source: community
 date_added: '2026-02-27'

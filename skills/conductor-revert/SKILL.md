@@ -1,6 +1,6 @@
 ---
 name: conductor-revert
-description: "Git-aware undo by logical work unit (track, phase, or task)"
+description: Git-aware undo by logical work unit (track, phase, or task). Use when the task involves conductor revert.
 risk: critical
 source: community
 date_added: "2026-02-27"

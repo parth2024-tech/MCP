@@ -1,6 +1,6 @@
 ---
 name: leiloeiro-juridico
-description: 'Analise juridica de leiloes: nulidades, bem de familia, alienacao fiduciaria, CPC arts 829-903, Lei 9514/97, onus reais, embargos e jurisprudencia.'
+description: "Analise juridica de leiloes: nulidades, bem de familia, alienacao fiduciaria, CPC arts 829-903, Lei 9514/97, onus reais, embargos e jurisprudencia. Use when the task involves leiloeiro juridico."
 risk: safe
 source: community
 date_added: '2026-03-06'
@@ -399,7 +399,7 @@ Skill baseada em conhecimento (knowledge-only). Não requer instalação de depe
 
 ## Verificar Se A Skill Está Registrada:
 
-python C:\Users\renat\skills\agent-orchestrator\scripts\scan_registry.py
+python C:/Users/renat/skills/agent-orchestrator/scripts/scan_registry.py
 ```
 
 ---

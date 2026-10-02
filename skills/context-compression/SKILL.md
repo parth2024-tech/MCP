@@ -1,6 +1,6 @@
 ---
 name: context-compression
-description: "When agent sessions generate millions of tokens of conversation history, compression becomes mandatory. The naive approach is aggressive compression to minimize tokens per request."
+description: When agent sessions generate millions of tokens of conversation history, compression becomes mandatory. The naive approach is aggressive compression to minimize tokens per request. Use when the task involves context compression.
 risk: unknown
 source: community
 ---

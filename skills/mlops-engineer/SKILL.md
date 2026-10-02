@@ -1,6 +1,6 @@
 ---
 name: mlops-engineer
-description: Build comprehensive ML pipelines, experiment tracking, and model registries with MLflow, Kubeflow, and modern MLOps tools.
+description: Build comprehensive ML pipelines, experiment tracking, and model registries with MLflow, Kubeflow, and modern MLOps tools. Use when the task involves mlops engineer.
 risk: unknown
 source: community
 date_added: '2026-02-27'

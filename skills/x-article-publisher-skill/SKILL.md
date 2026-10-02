@@ -1,6 +1,6 @@
 ---
 name: x-article-publisher-skill
-description: "Publish articles to X/Twitter"
+description: Publish articles to X/Twitter. Use when the task involves x article publisher skill.
 risk: safe
 source: "https://github.com/wshuyi/x-article-publisher-skill"
 date_added: "2026-02-27"

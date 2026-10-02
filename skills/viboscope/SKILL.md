@@ -1,6 +1,6 @@
 ---
 name: viboscope
-description: "Psychological compatibility matching — find cofounders, collaborators, and friends through validated psychometrics"
+description: Psychological compatibility matching — find cofounders, collaborators, and friends through validated psychometrics. Use when the task involves viboscope.
 category: collaboration
 risk: safe
 source: community

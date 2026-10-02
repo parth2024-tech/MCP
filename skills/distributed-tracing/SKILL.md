@@ -1,6 +1,6 @@
 ---
 name: distributed-tracing
-description: "Implement distributed tracing with Jaeger and Tempo for request flow visibility across microservices."
+description: Implement distributed tracing with Jaeger and Tempo for request flow visibility across microservices. Use when the task involves distributed tracing.
 risk: critical
 source: community
 date_added: "2026-02-27"

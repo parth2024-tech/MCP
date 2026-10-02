@@ -1,6 +1,6 @@
 ---
 name: frontend-mobile-security-xss-scan
-description: "You are a frontend security specialist focusing on Cross-Site Scripting (XSS) vulnerability detection and prevention. Analyze React, Vue, Angular, and vanilla JavaScript code to identify injection poi"
+description: You are a frontend security specialist focusing on Cross-Site Scripting (XSS) vulnerability detection and prevention. Analyze React, Vue, Angular, and vanilla JavaScript code to identify injection poi. Use when the task involves frontend mobile security xss scan.
 risk: unknown
 source: community
 date_added: "2026-02-27"
@@ -77,7 +77,7 @@ class XSSScanner {
 
   detectHTMLManipulation(file: string, content: string): XSSFinding[] {
     const findings: XSSFinding[] = [];
-    const lines = content.split('\n');
+    const lines = content.split('/n');
 
     lines.forEach((line, index) => {
       if (line.includes('innerHTML') && this.hasUserInput(line)) {
@@ -99,7 +99,7 @@ class XSSScanner {
 
   detectReactVulnerabilities(file: string, content: string): XSSFinding[] {
     const findings: XSSFinding[] = [];
-    const lines = content.split('\n');
+    const lines = content.split('/n');
 
     lines.forEach((line, index) => {
       if (line.includes('dangerously') && !this.hasSanitization(content)) {
@@ -121,7 +121,7 @@ class XSSScanner {
 
   detectURLVulnerabilities(file: string, content: string): XSSFinding[] {
     const findings: XSSFinding[] = [];
-    const lines = content.split('\n');
+    const lines = content.split('/n');
 
     lines.forEach((line, index) => {
       if (line.includes('location.') && this.hasUserInput(line)) {
@@ -263,16 +263,16 @@ class XSSReportGenerator {
   generateReport(findings: XSSFinding[]): string {
     const grouped = this.groupBySeverity(findings);
 
-    let report = '# XSS Vulnerability Scan Report\n\n';
-    report += `Total Findings: ${findings.length}\n\n`;
+    let report = '# XSS Vulnerability Scan Report/n/n';
+    report += `Total Findings: ${findings.length}/n/n`;
 
     for (const [severity, issues] of Object.entries(grouped)) {
-      report += `## ${severity.toUpperCase()} (${issues.length})\n\n`;
+      report += `## ${severity.toUpperCase()} (${issues.length})/n/n`;
 
       for (const issue of issues) {
-        report += `- **${issue.type}**\n`;
-        report += `  File: ${issue.file}:${issue.line}\n`;
-        report += `  Fix: ${issue.fix}\n\n`;
+        report += `- **${issue.type}**/n`;
+        report += `  File: ${issue.file}:${issue.line}/n`;
+        report += `  Fix: ${issue.fix}/n/n`;
       }
     }
 

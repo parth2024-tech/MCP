@@ -1,6 +1,6 @@
 ---
 name: conductor-new-track
-description: "Create a new track with specification and phased implementation plan"
+description: Create a new track with specification and phased implementation plan. Use when the task involves conductor new track.
 risk: unknown
 source: community
 date_added: "2026-02-27"

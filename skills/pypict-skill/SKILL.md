@@ -1,6 +1,6 @@
 ---
 name: pypict-skill
-description: "Pairwise test generation"
+description: Pairwise test generation. Use when the task involves pypict skill.
 risk: safe
 source: "https://github.com/omkamal/pypict-claude-skill/blob/main/SKILL.md"
 date_added: "2026-02-27"

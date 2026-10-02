@@ -1,6 +1,6 @@
 ---
 name: azd-deployment
-description: "Deploy containerized frontend + backend applications to Azure Container Apps with remote builds, managed identity, and idempotent infrastructure."
+description: Deploy containerized frontend + backend applications to Azure Container Apps with remote builds, managed identity, and idempotent infrastructure. Use when the task involves azd deployment.
 risk: critical
 source: community
 date_added: "2026-02-27"

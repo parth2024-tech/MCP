@@ -1,6 +1,6 @@
 ---
 name: skyvern-browser-automation
-description: "AI-powered browser automation — navigate sites, fill forms, extract structured data, log in with stored credentials, and build reusable workflows."
+description: AI-powered browser automation — navigate sites, fill forms, extract structured data, log in with stored credentials, and build reusable workflows. Use when the task involves skyvern browser automation.
 category: browser-automation
 risk: safe
 source: community

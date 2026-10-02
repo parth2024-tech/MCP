@@ -1,6 +1,6 @@
 ---
 name: seo-sitemap
-description: >
+description: >. Use when the task involves seo sitemap.
   Analyze existing XML sitemaps or generate new ones with industry templates.
   Validates format, URLs, and structure. Use when user says "sitemap",
   "generate sitemap", "sitemap issues", or "XML sitemap".

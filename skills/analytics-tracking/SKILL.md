@@ -1,6 +1,6 @@
 ---
 name: analytics-tracking
-description: Design, audit, and improve analytics tracking systems that produce reliable, decision-ready data.
+description: Design, audit, and improve analytics tracking systems that produce reliable, decision-ready data. Use when the task involves analytics tracking.
 risk: unknown
 source: community
 date_added: '2026-02-27'

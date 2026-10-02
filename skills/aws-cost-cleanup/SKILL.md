@@ -1,6 +1,6 @@
 ---
 name: aws-cost-cleanup
-description: "Automated cleanup of unused AWS resources to reduce costs"
+description: Automated cleanup of unused AWS resources to reduce costs. Use when the task involves aws cost cleanup.
 risk: safe
 source: community
 date_added: "2026-02-27"
@@ -147,10 +147,10 @@ addresses = ec2.describe_addresses()
 unused = [a for a in addresses['Addresses'] if 'AssociationId' not in a]
 
 eip_cost = len(unused) * 3.65  # $0.005/hour * 730 hours
-print(f"\nUnused Elastic IPs: {len(unused)}")
+print(f"/nUnused Elastic IPs: {len(unused)}")
 print(f"Monthly Savings: ${eip_cost:.2f}")
 
-print(f"\nTotal Monthly Savings: ${monthly_cost + eip_cost:.2f}")
+print(f"/nTotal Monthly Savings: ${monthly_cost + eip_cost:.2f}")
 print(f"Annual Savings: ${(monthly_cost + eip_cost) * 12:.2f}")
 ```
 

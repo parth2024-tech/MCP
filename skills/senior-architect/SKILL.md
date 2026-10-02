@@ -1,6 +1,6 @@
 ---
 name: senior-architect
-description: "Complete toolkit for senior architect with modern tools and best practices."
+description: Complete toolkit for senior architect with modern tools and best practices. Use when the task involves senior architect.
 risk: critical
 source: community
 date_added: "2026-02-27"

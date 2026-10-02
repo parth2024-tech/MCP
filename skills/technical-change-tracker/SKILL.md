@@ -1,6 +1,6 @@
 ---
 name: technical-change-tracker
-description: "Track code changes with structured JSON records, state machine enforcement, and AI session handoff for bot continuity"
+description: Track code changes with structured JSON records, state machine enforcement, and AI session handoff for bot continuity. Use when the task involves technical change tracker.
 category: development
 risk: safe
 source: community

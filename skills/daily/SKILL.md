@@ -1,6 +1,6 @@
 ---
 name: daily
-description: Documentation and capabilities reference for Daily
+description: Documentation and capabilities reference for Daily. Use when the task involves daily.
 metadata:
   mintlify-proj: daily
   version: "1.0"

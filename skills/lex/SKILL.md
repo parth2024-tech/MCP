@@ -1,6 +1,6 @@
 ---
 name: lex
-description: "Centralized 'Truth Engine' for cross-jurisdictional legal context (US, EU, CA) and contract scaffolding."
+description: Centralized 'Truth Engine' for cross-jurisdictional legal context (US, EU, CA) and contract scaffolding. Use when the task involves lex.
 category: business
 risk: safe
 source: community

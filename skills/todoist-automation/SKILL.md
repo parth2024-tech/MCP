@@ -1,6 +1,6 @@
 ---
 name: todoist-automation
-description: "Automate Todoist task management, projects, sections, filtering, and bulk operations via Rube MCP (Composio). Always search tools first for current schemas."
+description: Automate Todoist task management, projects, sections, filtering, and bulk operations via Rube MCP (Composio). Always search tools first for current schemas. Use when the task involves todoist automation.
 risk: critical
 source: community
 date_added: "2026-02-27"

@@ -1,6 +1,6 @@
 ---
 name: angular-migration
-description: "Master AngularJS to Angular migration, including hybrid apps, component conversion, dependency injection changes, and routing migration."
+description: Master AngularJS to Angular migration, including hybrid apps, component conversion, dependency injection changes, and routing migration. Use when the task involves angular migration.
 risk: unknown
 source: community
 date_added: "2026-02-27"

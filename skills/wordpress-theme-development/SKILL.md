@@ -1,6 +1,6 @@
 ---
 name: wordpress-theme-development
-description: "WordPress theme development workflow covering theme architecture, template hierarchy, custom post types, block editor support, responsive design, and WordPress 7.0 features: DataViews, Pattern Editing, Navigation Overlays, and admin refresh."
+description: "WordPress theme development workflow covering theme architecture, template hierarchy, custom post types, block editor support, responsive design, and WordPress 7.0 features: DataViews, Pattern Editing, Navigation Overlays, and admin refresh. Use when the task involves wordpress theme development."
 category: granular-workflow-bundle
 risk: safe
 source: personal
@@ -496,11 +496,5 @@ theme-name/
 
 ## Related Workflow Bundles
 
-- `wordpress` - WordPress development
-- `wordpress-plugin-development` - Plugin development
-- `wordpress-woocommerce` - WooCommerce
 
-## Limitations
-- Use this skill only when the task clearly matches the scope described above.
-- Do not treat the output as a substitute for environment-specific validation, testing, or expert review.
-- Stop and ask for clarification if required inputs, permissions, safety boundaries, or success criteria are missing.
+> Extended reference material: [references/details.md](references/details.md)

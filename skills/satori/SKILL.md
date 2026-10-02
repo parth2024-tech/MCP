@@ -1,6 +1,6 @@
 ---
 name: satori
-description: "Clinically informed wisdom companion blending psychology and philosophy into a structured thinking partner"
+description: Clinically informed wisdom companion blending psychology and philosophy into a structured thinking partner. Use when the task involves satori.
 category: personal-development
 risk: safe
 source: community

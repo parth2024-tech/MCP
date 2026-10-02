@@ -1,6 +1,6 @@
 ---
 name: azure-ai-agents-persistent-dotnet
-description: Azure AI Agents Persistent SDK for .NET. Low-level SDK for creating and managing AI agents with threads, messages, runs, and tools.
+description: Azure AI Agents Persistent SDK for .NET. Low-level SDK for creating and managing AI agents with threads, messages, runs, and tools. Use when the task involves azure ai agents persistent dotnet.
 risk: unknown
 source: community
 date_added: '2026-02-27'
@@ -131,7 +131,7 @@ await foreach (StreamingUpdate update in stream)
     }
     else if (update.UpdateKind == StreamingUpdateReason.RunCompleted)
     {
-        Console.WriteLine("\n--- Run completed! ---");
+        Console.WriteLine("/n--- Run completed! ---");
     }
 }
 ```

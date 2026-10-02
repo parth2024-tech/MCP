@@ -1,5 +1,5 @@
 ---
-name: lifecycle/debugging-and-error-recovery
+name: debugging-and-error-recovery
 description: Guides systematic root-cause debugging. Use when tests fail, builds break, behavior doesn't match expectations, or you encounter any unexpected error. Use when you need a systematic approach to finding and fixing the root cause rather than guessing.
 token_estimate: 2140
 activation_keywords:

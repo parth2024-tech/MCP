@@ -1,6 +1,6 @@
 ---
 name: embedding-strategies
-description: "Guide to selecting and optimizing embedding models for vector search applications."
+description: Guide to selecting and optimizing embedding models for vector search applications. Use when the task involves embedding strategies.
 risk: unknown
 source: community
 date_added: "2026-02-27"
@@ -220,10 +220,10 @@ def chunk_by_sentences(
 
 def chunk_by_semantic_sections(
     text: str,
-    headers_pattern: str = r'^#{1,3}\s+.+$'
+    headers_pattern: str = r'^#{1,3}/s+.+$'
 ) -> List[Tuple[str, str]]:
     """Chunk markdown by headers, preserving hierarchy."""
-    lines = text.split('\n')
+    lines = text.split('/n')
     chunks = []
     current_header = ""
     current_content = []
@@ -231,14 +231,14 @@ def chunk_by_semantic_sections(
     for line in lines:
         if re.match(headers_pattern, line, re.MULTILINE):
             if current_content:
-                chunks.append((current_header, '\n'.join(current_content)))
+                chunks.append((current_header, '/n'.join(current_content)))
             current_header = line
             current_content = []
         else:
             current_content.append(line)
 
     if current_content:
-        chunks.append((current_header, '\n'.join(current_content)))
+        chunks.append((current_header, '/n'.join(current_content)))
 
     return chunks
 
@@ -250,7 +250,7 @@ def recursive_character_splitter(
     separators: List[str] = None
 ) -> List[str]:
     """LangChain-style recursive splitter."""
-    separators = separators or ["\n\n", "\n", ". ", " ", ""]
+    separators = separators or ["/n/n", "/n", ". ", " ", ""]
 
     def split_text(text: str, separators: List[str]) -> List[str]:
         if not text:
@@ -324,9 +324,9 @@ class DomainEmbeddingPipeline:
     def _default_preprocess(self, text: str) -> str:
         """Default preprocessing."""
         # Remove excessive whitespace
-        text = re.sub(r'\s+', ' ', text)
+        text = re.sub(r'/s+', ' ', text)
         # Remove special characters
-        text = re.sub(r'[^\w\s.,!?-]', '', text)
+        text = re.sub(r'[^/w/s.,!?-]', '', text)
         return text.strip()
 
     async def process_documents(
@@ -395,7 +395,7 @@ class CodeEmbeddingPipeline:
 
     def embed_with_context(self, chunk: str, context: str) -> List[float]:
         """Embed code with surrounding context."""
-        combined = f"Context: {context}\n\nCode:\n{chunk}"
+        combined = f"Context: {context}/n/nCode:/n{chunk}"
         return get_embedding(combined, model=self.model)
 ```
 

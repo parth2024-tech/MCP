@@ -1,6 +1,6 @@
 ---
 name: shopify-automation
-description: "Automate Shopify tasks via Rube MCP (Composio): products, orders, customers, inventory, collections. Always search tools first for current schemas."
+description: "Automate Shopify tasks via Rube MCP (Composio): products, orders, customers, inventory, collections. Always search tools first for current schemas. Use when the task involves shopify automation."
 risk: unknown
 source: community
 date_added: "2026-02-27"

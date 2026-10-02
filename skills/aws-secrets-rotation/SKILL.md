@@ -1,6 +1,6 @@
 ---
 name: aws-secrets-rotation
-description: "Automate AWS secrets rotation for RDS, API keys, and credentials"
+description: Automate AWS secrets rotation for RDS, API keys, and credentials. Use when the task involves aws secrets rotation.
 category: security
 risk: safe
 source: community
@@ -435,7 +435,7 @@ def generate_compliance_report():
     
     print(f"Compliant Secrets: {len(compliant)}")
     print(f"Non-Compliant Secrets: {len(non_compliant)}")
-    print("\nNon-Compliant Details:")
+    print("/nNon-Compliant Details:")
     for item in non_compliant:
         print(f"  - {item['name']}: {item['issue']}")
 

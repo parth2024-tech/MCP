@@ -1,6 +1,6 @@
 ---
 name: speed
-description: Launch RSVP speed reader for text
+description: Launch RSVP speed reader for text. Use when the task involves speed.
 trigger: command
 risk: unknown
 source: community

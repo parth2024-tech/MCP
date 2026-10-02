@@ -1,6 +1,6 @@
 ---
-name: claude-scientific-skills
-description: "Scientific research and analysis skills"
+name: scientific-skills
+description: Scientific research and analysis skills. Use when the task involves claude scientific skills.
 risk: safe
 source: "https://github.com/K-Dense-AI/claude-scientific-skills"
 date_added: "2026-02-27"

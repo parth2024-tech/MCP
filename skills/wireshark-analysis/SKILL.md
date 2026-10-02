@@ -1,6 +1,6 @@
 ---
 name: wireshark-analysis
-description: "Execute comprehensive network traffic analysis using Wireshark to capture, filter, and examine network packets for security investigations, performance optimization, and troubleshooting."
+description: Execute comprehensive network traffic analysis using Wireshark to capture, filter, and examine network packets for security investigations, performance optimization, and troubleshooting. Use when the task involves wireshark analysis.
 risk: unknown
 source: community
 author: zebbern
@@ -495,7 +495,6 @@ File > Export Packet Dissections   # Export as text/CSV
 - Obtain server private key
 - Configure at Edit > Preferences > Protocols > TLS
 - For ephemeral keys, capture pre-master secret from browser
-- Some modern ciphers cannot be decrypted passively
 
-## When to Use
-This skill is applicable to execute the workflow or actions described in the overview.
+
+> Extended reference material: [references/details.md](references/details.md)

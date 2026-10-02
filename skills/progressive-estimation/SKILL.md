@@ -1,6 +1,6 @@
 ---
 name: progressive-estimation
-description: "Estimate AI-assisted and hybrid human+agent development work with research-backed PERT statistics and calibration feedback loops"
+description: Estimate AI-assisted and hybrid human+agent development work with research-backed PERT statistics and calibration feedback loops. Use when the task involves progressive estimation.
 category: project-management
 risk: safe
 source: community

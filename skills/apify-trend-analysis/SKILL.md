@@ -1,6 +1,6 @@
 ---
 name: apify-trend-analysis
-description: Discover and track emerging trends across Google Trends, Instagram, Facebook, YouTube, and TikTok to inform content strategy.
+description: Discover and track emerging trends across Google Trends, Instagram, Facebook, YouTube, and TikTok to inform content strategy. Use when the task involves apify trend analysis.
 risk: unknown
 source: community
 ---

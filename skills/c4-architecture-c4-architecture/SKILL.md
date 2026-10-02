@@ -1,6 +1,6 @@
 ---
 name: c4-architecture-c4-architecture
-description: "Generate comprehensive C4 architecture documentation for an existing repository/codebase using a bottom-up analysis approach."
+description: Generate comprehensive C4 architecture documentation for an existing repository/codebase using a bottom-up analysis approach. Use when the task involves c4 architecture c4 architecture.
 risk: unknown
 source: community
 date_added: "2026-02-27"

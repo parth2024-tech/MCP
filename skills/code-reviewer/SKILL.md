@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: "Elite code review expert specializing in modern AI-powered code"
+description: Elite code review expert specializing in modern AI-powered code. Use when the task involves code reviewer.
 risk: unknown
 source: community
 date_added: "2026-02-27"

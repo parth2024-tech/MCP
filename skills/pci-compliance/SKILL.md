@@ -1,6 +1,6 @@
 ---
 name: pci-compliance
-description: "Master PCI DSS (Payment Card Industry Data Security Standard) compliance for secure payment processing and handling of cardholder data."
+description: Master PCI DSS (Payment Card Industry Data Security Standard) compliance for secure payment processing and handling of cardholder data. Use when the task involves pci compliance.
 risk: unknown
 source: community
 date_added: "2026-02-27"
@@ -360,7 +360,7 @@ import re
 def validate_card_number(card_number):
     """Validate card number format (Luhn algorithm)."""
     # Remove spaces and dashes
-    card_number = re.sub(r'[\s-]', '', card_number)
+    card_number = re.sub(r'[/s-]', '', card_number)
 
     # Check if all digits
     if not card_number.isdigit():

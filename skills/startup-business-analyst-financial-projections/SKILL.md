@@ -1,6 +1,6 @@
 ---
 name: startup-business-analyst-financial-projections
-description: 'Create detailed 3-5 year financial model with revenue, costs, cash
+description: Create detailed 3-5 year financial model with revenue, costs, cash. Use when the task involves startup business analyst financial projections.
 
   flow, and scenarios
 

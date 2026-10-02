@@ -1,6 +1,6 @@
 ---
 name: m365-agents-py
-description: Microsoft 365 Agents SDK for Python. Build multichannel agents for Teams/M365/Copilot Studio with aiohttp hosting, AgentApplication routing, streaming responses, and MSAL-based auth.
+description: Microsoft 365 Agents SDK for Python. Build multichannel agents for Teams/M365/Copilot Studio with aiohttp hosting, AgentApplication routing, streaming responses, and MSAL-based auth. Use when the task involves m365 agents py.
 risk: unknown
 source: community
 date_added: '2026-02-27'
@@ -203,7 +203,7 @@ async def on_poem_message(context: TurnContext, _state: TurnState):
             name="Internal",
         )
     )
-    context.streaming_response.queue_informative_update("Starting a poem...\n")
+    context.streaming_response.queue_informative_update("Starting a poem.../n")
 
     # Stream from Azure OpenAI
     streamed_response = await CLIENT.chat.completions.create(

@@ -1,6 +1,6 @@
 ---
 name: aws-security-audit
-description: "Comprehensive AWS security posture assessment using AWS CLI and security best practices"
+description: Comprehensive AWS security posture assessment using AWS CLI and security best practices. Use when the task involves aws security audit.
 category: security
 risk: safe
 source: community
@@ -288,7 +288,7 @@ def calculate_security_score():
         issues.append(f"{unencrypted} unencrypted EBS volumes")
     
     print(f"Security Score: {score}/100")
-    print("\nIssues Found:")
+    print("/nIssues Found:")
     for issue in issues:
         print(f"  - {issue}")
     

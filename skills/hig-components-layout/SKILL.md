@@ -1,6 +1,6 @@
 ---
 name: hig-components-layout
-description: Apple Human Interface Guidelines for layout and navigation components.
+description: Apple Human Interface Guidelines for layout and navigation components. Use when the task involves hig components layout.
 risk: unknown
 source: community
 date_added: '2026-02-27'

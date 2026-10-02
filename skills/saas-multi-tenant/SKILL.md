@@ -1,6 +1,6 @@
 ---
 name: saas-multi-tenant
-description: "Design and implement multi-tenant SaaS architectures with row-level security, tenant-scoped queries, shared-schema isolation, and safe cross-tenant admin patterns in PostgreSQL and TypeScript."
+description: Design and implement multi-tenant SaaS architectures with row-level security, tenant-scoped queries, shared-schema isolation, and safe cross-tenant admin patterns in PostgreSQL and TypeScript. Use when the task involves saas multi tenant.
 risk: safe
 source: community
 date_added: "2026-03-28"

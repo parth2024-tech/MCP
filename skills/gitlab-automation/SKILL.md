@@ -1,6 +1,6 @@
 ---
 name: gitlab-automation
-description: "Automate GitLab project management, issues, merge requests, pipelines, branches, and user operations via Rube MCP (Composio). Always search tools first for current schemas."
+description: Automate GitLab project management, issues, merge requests, pipelines, branches, and user operations via Rube MCP (Composio). Always search tools first for current schemas. Use when the task involves gitlab automation.
 risk: critical
 source: community
 date_added: "2026-02-27"

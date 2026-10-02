@@ -1,6 +1,6 @@
 ---
 name: grafana-dashboards
-description: "Create and manage production-ready Grafana dashboards for comprehensive system observability."
+description: Create and manage production-ready Grafana dashboards for comprehensive system observability. Use when the task involves grafana dashboards.
 risk: unknown
 source: community
 date_added: "2026-02-27"

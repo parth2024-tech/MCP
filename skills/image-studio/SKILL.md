@@ -1,6 +1,6 @@
 ---
 name: image-studio
-description: "Studio de geracao de imagens inteligente — roteamento automatico entre ai-studio-image (fotos humanizadas/influencer) e stability-ai (arte/ ilustracao/edicao). Detecta o tipo de imagem solicitada e escolhe o modelo ideal automaticamente."
+description: Studio de geracao de imagens inteligente — roteamento automatico entre ai-studio-image (fotos humanizadas/influencer) e stability-ai (arte/ ilustracao/edicao). Detecta o tipo de imagem solicitada e escolhe o modelo ideal automaticamente. Use when the task involves image studio.
 risk: safe
 source: community
 date_added: '2026-03-06'
@@ -300,11 +300,11 @@ Se ambos falham:
 
 ```
 ai-studio-image:
-  Scripts: C:\Users\renat\skills\ai-studio-image\
+  Scripts: C:/Users/renat/skills/ai-studio-image\
   Gerar: python generate.py [--template T] [--prompt P]
 
 stability-ai:
-  Scripts: C:\Users\renat\skills\stability-ai\
+  Scripts: C:/Users/renat/skills/stability-ai\
   Gerar: python generate.py [MODE] --prompt P --style S
 ```
 

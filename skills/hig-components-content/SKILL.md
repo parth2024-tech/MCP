@@ -1,6 +1,6 @@
 ---
 name: hig-components-content
-description: Apple Human Interface Guidelines for content display components.
+description: Apple Human Interface Guidelines for content display components. Use when the task involves hig components content.
 risk: unknown
 source: community
 date_added: '2026-02-27'

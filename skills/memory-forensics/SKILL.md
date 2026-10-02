@@ -1,6 +1,6 @@
 ---
 name: memory-forensics
-description: "Comprehensive techniques for acquiring, analyzing, and extracting artifacts from memory dumps for incident response and malware analysis."
+description: Comprehensive techniques for acquiring, analyzing, and extracting artifacts from memory dumps for incident response and malware analysis. Use when the task involves memory forensics.
 risk: unknown
 source: community
 date_added: "2026-02-27"
@@ -165,7 +165,7 @@ vol -f memory.raw windows.vadyarascan --yara-rules rules.yar
 vol -f memory.raw windows.registry.hivelist
 
 # Print registry key
-vol -f memory.raw windows.registry.printkey --key "Software\Microsoft\Windows\CurrentVersion\Run"
+vol -f memory.raw windows.registry.printkey --key "Software/Microsoft/Windows/CurrentVersion/Run"
 
 # Dump registry hive
 vol -f memory.raw windows.registry.hivescan --dump
@@ -265,7 +265,7 @@ vol -f memory.raw windows.consoles
 
 # 3. Persistence mechanisms
 vol -f memory.raw windows.registry.printkey \
-    --key "Software\Microsoft\Windows\CurrentVersion\Run"
+    --key "Software/Microsoft/Windows/CurrentVersion/Run"
 
 # 4. Services
 vol -f memory.raw windows.svcscan

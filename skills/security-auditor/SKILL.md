@@ -1,6 +1,6 @@
 ---
 name: security-auditor
-description: Expert security auditor specializing in DevSecOps, comprehensive cybersecurity, and compliance frameworks.
+description: Expert security auditor specializing in DevSecOps, comprehensive cybersecurity, and compliance frameworks. Use when the task involves security auditor.
 risk: unknown
 source: community
 date_added: '2026-02-27'

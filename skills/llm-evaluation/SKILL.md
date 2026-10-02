@@ -1,6 +1,6 @@
 ---
 name: llm-evaluation
-description: "Master comprehensive evaluation strategies for LLM applications, from automated metrics to human evaluation and A/B testing."
+description: Master comprehensive evaluation strategies for LLM applications, from automated metrics to human evaluation and A/B testing. Use when the task involves llm evaluation.
 risk: unknown
 source: community
 date_added: "2026-02-27"

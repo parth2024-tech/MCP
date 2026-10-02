@@ -1,6 +1,6 @@
 ---
-name: ffuf-claude-skill
-description: "Web fuzzing with ffuf"
+name: ffuf--skill
+description: Web fuzzing with ffuf. Use when the task involves ffuf claude skill.
 risk: safe
 source: "https://github.com/jthack/ffuf_claude_skill"
 date_added: "2026-02-27"

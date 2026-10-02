@@ -1,6 +1,6 @@
 ---
 name: ui-review
-description: "Review UI code for StyleSeed design-system compliance, accessibility, mobile ergonomics, spacing discipline, and implementation quality."
+description: Review UI code for StyleSeed design-system compliance, accessibility, mobile ergonomics, spacing discipline, and implementation quality. Use when the task involves ui review.
 category: design
 risk: safe
 source: community

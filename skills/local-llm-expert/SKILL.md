@@ -1,6 +1,6 @@
 ---
 name: local-llm-expert
-description: Master local LLM inference, model selection, VRAM optimization, and local deployment using Ollama, llama.cpp, vLLM, and LM Studio. Expert in quantization formats (GGUF, EXL2) and local AI privacy.
+description: Master local LLM inference, model selection, VRAM optimization, and local deployment using Ollama, llama.cpp, vLLM, and LM Studio. Expert in quantization formats (GGUF, EXL2) and local AI privacy. Use when the task involves local llm expert.
 category: data-ai
 risk: safe
 source: community
@@ -80,7 +80,7 @@ Expert AI systems engineer mastering local LLM deployment, hardware optimization
 - "How do I serve an open-source model like OpenAI's API?"
   -> (Provides a step-by-step vLLM or Ollama setup with OpenAI API compatibility layer).
 - "Can you build a ChatML prompt wrapper for Qwen2?"
-  -> (Provides the exact string formatting: `<|im_start|>system\n...<|im_end|>\n<|im_start|>user\n...`).
+  -> (Provides the exact string formatting: `<|im_start|>system/n...<|im_end|>/n<|im_start|>user/n...`).
 
 ## Limitations
 - Use this skill only when the task clearly matches the scope described above.

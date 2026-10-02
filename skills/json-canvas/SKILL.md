@@ -94,11 +94,11 @@ Nodes are objects placed on the canvas. Array order determines z-index: first no
   "y": 0,
   "width": 400,
   "height": 200,
-  "text": "# Hello World\n\nThis is **Markdown** content."
+  "text": "# Hello World/n/nThis is **Markdown** content."
 }
 ```
 
-**Newline pitfall**: Use `\n` for line breaks in JSON strings. Do **not** use the literal `\\n` -- Obsidian renders that as the characters `\` and `n`.
+**Newline pitfall**: Use `/n` for line breaks in JSON strings. Do **not** use the literal `\\n` -- Obsidian renders that as the characters `\` and `n`.
 
 ### File Nodes
 

@@ -1,6 +1,6 @@
 ---
 name: architecture-decision-records
-description: "Comprehensive patterns for creating, maintaining, and managing Architecture Decision Records (ADRs) that capture the context and rationale behind significant technical decisions."
+description: Comprehensive patterns for creating, maintaining, and managing Architecture Decision Records (ADRs) that capture the context and rationale behind significant technical decisions. Use when the task involves architecture decision records.
 risk: unknown
 source: community
 date_added: "2026-02-27"

@@ -1,6 +1,6 @@
 ---
 name: vexor
-description: "Vector-powered CLI for semantic file search with a Claude/Codex skill"
+description: Vector-powered CLI for semantic file search with a Claude/Codex skill. Use when the task involves vexor.
 risk: safe
 source: "https://github.com/scarletkc/vexor"
 date_added: "2026-02-27"

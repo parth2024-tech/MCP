@@ -1,6 +1,6 @@
 ---
 name: gdpr-data-handling
-description: "Practical implementation guide for GDPR-compliant data processing, consent management, and privacy controls."
+description: Practical implementation guide for GDPR-compliant data processing, consent management, and privacy controls. Use when the task involves gdpr data handling.
 risk: safe
 source: community
 date_added: "2026-02-27"

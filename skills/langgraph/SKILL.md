@@ -1,6 +1,6 @@
 ---
 name: langgraph
-description: Expert in LangGraph - the production-grade framework for building
+description: Expert in LangGraph - the production-grade framework for building. Use when the task involves langgraph.
   stateful, multi-actor AI applications. Covers graph construction, state
   management, cycles and branches, persistence with checkpointers,
   human-in-the-loop patterns, and the ReAct agent pattern.
@@ -493,13 +493,5 @@ Works well with: `crewai`, `autonomous-agents`, `langfuse`, `structured-output`
 ## When to Use
 - User mentions or implies: langgraph
 - User mentions or implies: langchain agent
-- User mentions or implies: stateful agent
-- User mentions or implies: agent graph
-- User mentions or implies: react agent
-- User mentions or implies: agent workflow
-- User mentions or implies: multi-step agent
 
-## Limitations
-- Use this skill only when the task clearly matches the scope described above.
-- Do not treat the output as a substitute for environment-specific validation, testing, or expert review.
-- Stop and ask for clarification if required inputs, permissions, safety boundaries, or success criteria are missing.
+> See [references/details.md](references/details.md) for additional content.

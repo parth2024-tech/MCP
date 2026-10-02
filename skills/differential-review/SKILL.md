@@ -1,6 +1,6 @@
 ---
 name: differential-review
-description: "Security-focused code review for PRs, commits, and diffs."
+description: Security-focused code review for PRs, commits, and diffs. Use when the task involves differential review.
 risk: unknown
 source: community
 ---

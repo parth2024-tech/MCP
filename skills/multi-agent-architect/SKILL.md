@@ -1,6 +1,6 @@
 ---
 name: multi-agent-architect
-description: "Design and optimize production-grade multi-agent systems with LangGraph, LangChain, and DeepAgents for complex AI workflows."
+description: Design and optimize production-grade multi-agent systems with LangGraph, LangChain, and DeepAgents for complex AI workflows. Use when the task involves multi agent architect.
 risk: safe
 source: community
 metadata:
@@ -225,7 +225,7 @@ multi_agent_system/
 async def research_node(state: AgentState) -> AgentState:
     llm = ChatOpenAI(model="gpt-4o").bind_tools([web_search, rag_search])
     response = await llm.ainvoke(
-        f"Research the following and return structured findings:\n{state['user_goal']}"
+        f"Research the following and return structured findings:/n{state['user_goal']}"
     )
     state["context"]["research"] = response.content
     state["next_agent"] = "coder"
@@ -235,7 +235,7 @@ async def research_node(state: AgentState) -> AgentState:
 async def coding_node(state: AgentState) -> AgentState:
     llm = ChatOpenAI(model="gpt-4o").bind_tools([python_repl, github_tool])
     response = await llm.ainvoke(
-        f"Given this research:\n{state['context']['research']}\n\nWrite production Python code."
+        f"Given this research:/n{state['context']['research']}/n/nWrite production Python code."
     )
     state["context"]["code"] = response.content
     state["next_agent"] = "validator"
@@ -279,7 +279,7 @@ async def supervisor_node(state: AgentState) -> AgentState:
 async def reflection_node(state: AgentState) -> AgentState:
     llm = ChatOpenAI(model="gpt-4o")
     critique = await llm.ainvoke(
-        f"Evaluate this output critically:\n{state['context'].get('code', '')}\n"
+        f"Evaluate this output critically:/n{state['context'].get('code', '')}/n"
         "List any bugs, gaps, or improvements. Be concise."
     )
     state["context"]["critique"] = critique.content

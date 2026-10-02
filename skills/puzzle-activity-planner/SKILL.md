@@ -1,6 +1,6 @@
 ---
 name: puzzle-activity-planner
-description: "Plan puzzle-based activities for classrooms, parties, and events with pre-configured generator links"
+description: Plan puzzle-based activities for classrooms, parties, and events with pre-configured generator links. Use when the task involves puzzle activity planner.
 category: education
 risk: safe
 source: community

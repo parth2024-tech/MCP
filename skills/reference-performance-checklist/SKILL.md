@@ -1,6 +1,6 @@
 ---
-name: reference/performance-checklist
-description: Performance optimization checklist and anti-pattern reference. Load as a companion to performance-optimization for detailed verification steps covering Core Web Vitals, bundle size, caching, and database query performance.
+name: performance-checklist
+description: Performance optimization checklist and anti-pattern reference. Load as a companion to performance-optimization for detailed verification steps covering Core Web Vitals, bundle size, caching, and database query performance. Use when the task involves reference performance checklist.
 token_estimate: 1484
 activation_keywords:
   - "performance"

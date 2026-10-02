@@ -1,6 +1,6 @@
 ---
 name: tanstack-query-expert
-description: "Expert in TanStack Query (React Query) — asynchronous state management. Covers data fetching, stale time configuration, mutations, optimistic updates, and Next.js App Router (SSR) integration."
+description: Expert in TanStack Query (React Query) — asynchronous state management. Covers data fetching, stale time configuration, mutations, optimistic updates, and Next.js App Router (SSR) integration. Use when the task involves tanstack query expert.
 risk: safe
 source: community
 date_added: "2026-03-07"

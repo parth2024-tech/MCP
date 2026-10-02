@@ -1,6 +1,6 @@
 ---
 name: professional-proofreader
-description: >
+description: >. Use when the task involves professional proofreader.
     Use when a user asks to "proofread", "review and correct", "fix grammar", "improve readability while keeping my voice", and to proofread a document file and save an updated version.
 risk: safe
 source: original

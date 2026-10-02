@@ -1,6 +1,6 @@
 ---
 name: langchain-architecture
-description: "Master the LangChain framework for building sophisticated LLM applications with agents, chains, memory, and tool integration."
+description: Master the LangChain framework for building sophisticated LLM applications with agents, chains, memory, and tool integration. Use when the task involves langchain architecture.
 risk: unknown
 source: community
 date_added: "2026-02-27"
@@ -182,21 +182,21 @@ from langchain.prompts import PromptTemplate
 # Step 1: Extract key information
 extract_prompt = PromptTemplate(
     input_variables=["text"],
-    template="Extract key entities from: {text}\n\nEntities:"
+    template="Extract key entities from: {text}/n/nEntities:"
 )
 extract_chain = LLMChain(llm=llm, prompt=extract_prompt, output_key="entities")
 
 # Step 2: Analyze entities
 analyze_prompt = PromptTemplate(
     input_variables=["entities"],
-    template="Analyze these entities: {entities}\n\nAnalysis:"
+    template="Analyze these entities: {entities}/n/nAnalysis:"
 )
 analyze_chain = LLMChain(llm=llm, prompt=analyze_prompt, output_key="analysis")
 
 # Step 3: Generate summary
 summary_prompt = PromptTemplate(
     input_variables=["entities", "analysis"],
-    template="Summarize:\nEntities: {entities}\nAnalysis: {analysis}\n\nSummary:"
+    template="Summarize:/nEntities: {entities}/nAnalysis: {analysis}/n/nSummary:"
 )
 summary_chain = LLMChain(llm=llm, prompt=summary_prompt, output_key="summary")
 
@@ -269,7 +269,7 @@ from unittest.mock import Mock
 def test_agent_tool_selection():
     # Mock LLM to return specific tool selection
     mock_llm = Mock()
-    mock_llm.predict.return_value = "Action: search_database\nAction Input: test query"
+    mock_llm.predict.return_value = "Action: search_database/nAction Input: test query"
 
     agent = initialize_agent(tools, mock_llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION)
 

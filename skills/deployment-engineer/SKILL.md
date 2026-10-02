@@ -1,6 +1,6 @@
 ---
 name: deployment-engineer
-description: Expert deployment engineer specializing in modern CI/CD pipelines, GitOps workflows, and advanced deployment automation.
+description: Expert deployment engineer specializing in modern CI/CD pipelines, GitOps workflows, and advanced deployment automation. Use when the task involves deployment engineer.
 risk: critical
 source: community
 date_added: '2026-02-27'

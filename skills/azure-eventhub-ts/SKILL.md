@@ -1,6 +1,6 @@
 ---
 name: azure-eventhub-ts
-description: "High-throughput event streaming and real-time data ingestion."
+description: High-throughput event streaming and real-time data ingestion. Use when the task involves azure eventhub ts.
 risk: unknown
 source: community
 date_added: "2026-02-27"

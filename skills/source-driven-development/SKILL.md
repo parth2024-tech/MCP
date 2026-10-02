@@ -1,5 +1,5 @@
 ---
-name: lifecycle/source-driven-development
+name: source-driven-development
 description: Grounds every implementation decision in official documentation. Use when you want authoritative, source-cited code free from outdated patterns. Use when building with any framework or library where correctness matters.
 token_estimate: 1553
 activation_keywords:

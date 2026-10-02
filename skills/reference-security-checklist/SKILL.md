@@ -1,6 +1,6 @@
 ---
-name: reference/security-checklist
-description: Pre-commit and pre-deploy security checklist. Load as a companion to security-and-hardening for verification steps covering authentication, authorization, input validation, data protection, and infrastructure security.
+name: security-checklist
+description: Pre-commit and pre-deploy security checklist. Load as a companion to security-and-hardening for verification steps covering authentication, authorization, input validation, data protection, and infrastructure security. Use when the task involves reference security checklist.
 token_estimate: 818
 activation_keywords:
   - "security"

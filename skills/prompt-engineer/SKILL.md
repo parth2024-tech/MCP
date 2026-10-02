@@ -1,6 +1,6 @@
 ---
 name: prompt-engineer
-description: "Transforms user prompts into optimized prompts using frameworks (RTF, RISEN, Chain of Thought, RODES, Chain of Density, RACE, RISE, STAR, SOAP, CLEAR, GROW)"
+description: Transforms user prompts into optimized prompts using frameworks (RTF, RISEN, Chain of Thought, RODES, Chain of Density, RACE, RISE, STAR, SOAP, CLEAR, GROW). Use when the task involves prompt engineer.
 category: automation
 risk: safe
 source: community

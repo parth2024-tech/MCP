@@ -1,6 +1,6 @@
 ---
 name: constant-time-analysis
-description: "Analyze cryptographic code to detect operations that leak secret data through execution timing variations."
+description: Analyze cryptographic code to detect operations that leak secret data through execution timing variations. Use when the task involves constant time analysis.
 risk: unknown
 source: community
 ---

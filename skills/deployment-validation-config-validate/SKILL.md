@@ -1,6 +1,6 @@
 ---
 name: deployment-validation-config-validate
-description: "You are a configuration management expert specializing in validating, testing, and ensuring the correctness of application configurations. Create comprehensive validation schemas, implement configurat"
+description: You are a configuration management expert specializing in validating, testing, and ensuring the correctness of application configurations. Create comprehensive validation schemas, implement configurat. Use when the task involves deployment validation config validate.
 risk: critical
 source: community
 date_added: "2026-02-27"
@@ -136,7 +136,7 @@ export class ConfigValidator {
 
     this.ajv.addFormat('duration', {
       type: 'string',
-      validate: /^\d+[smhd]$/
+      validate: /^/d+[smhd]$/
     });
   }
 
@@ -456,32 +456,32 @@ import yaml
 
 class ConfigDocGenerator:
     def generate_docs(self, schema: Dict, examples: Dict) -> str:
-        docs = ["# Configuration Reference\n"]
+        docs = ["# Configuration Reference/n"]
 
-        docs.append("## Configuration Options\n")
+        docs.append("## Configuration Options/n")
         sections = self._generate_sections(schema.get('properties', {}), examples)
         docs.extend(sections)
 
-        return '\n'.join(docs)
+        return '/n'.join(docs)
 
     def _generate_sections(self, properties: Dict, examples: Dict, level: int = 3) -> List[str]:
         sections = []
 
         for prop_name, prop_schema in properties.items():
-            sections.append(f"{'#' * level} {prop_name}\n")
+            sections.append(f"{'#' * level} {prop_name}/n")
 
             if 'description' in prop_schema:
-                sections.append(f"{prop_schema['description']}\n")
+                sections.append(f"{prop_schema['description']}/n")
 
-            sections.append(f"**Type:** `{prop_schema.get('type', 'any')}`\n")
+            sections.append(f"**Type:** `{prop_schema.get('type', 'any')}`/n")
 
             if 'default' in prop_schema:
-                sections.append(f"**Default:** `{prop_schema['default']}`\n")
+                sections.append(f"**Default:** `{prop_schema['default']}`/n")
 
             if prop_name in examples:
-                sections.append("**Example:**\n```yaml")
+                sections.append("**Example:**/n```yaml")
                 sections.append(yaml.dump({prop_name: examples[prop_name]}))
-                sections.append("```\n")
+                sections.append("```/n")
 
         return sections
 ```
@@ -494,11 +494,6 @@ class ConfigDocGenerator:
 4. **Test Suite**: Configuration tests
 5. **Migration Scripts**: Version migrations
 6. **Security Report**: Issues and recommendations
-7. **Documentation**: Auto-generated reference
 
-Focus on preventing configuration errors, ensuring consistency, and maintaining security best practices.
 
-## Limitations
-- Use this skill only when the task clearly matches the scope described above.
-- Do not treat the output as a substitute for environment-specific validation, testing, or expert review.
-- Stop and ask for clarification if required inputs, permissions, safety boundaries, or success criteria are missing.
+> Extended reference material: [references/details.md](references/details.md)

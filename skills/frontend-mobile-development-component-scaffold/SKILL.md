@@ -1,6 +1,6 @@
 ---
 name: frontend-mobile-development-component-scaffold
-description: "You are a React component architecture expert specializing in scaffolding production-ready, accessible, and performant components. Generate complete component implementations with TypeScript, tests, s"
+description: You are a React component architecture expert specializing in scaffolding production-ready, accessible, and performant components. Generate complete component implementations with TypeScript, tests, s. Use when the task involves frontend mobile development component scaffold.
 risk: unknown
 source: community
 date_added: "2026-02-27"
@@ -95,7 +95,7 @@ class ReactComponentGenerator {
     const component = this.generateComponentBody(spec, options);
     const exports = this.generateExports(spec);
 
-    return `${imports}\n\n${types}\n\n${component}\n\n${exports}`;
+    return `${imports}/n/n${types}/n/n${component}/n/n${exports}`;
   }
 
   generateImports(spec: ComponentSpec, options: GeneratorOptions): string {
@@ -111,52 +111,52 @@ class ReactComponentGenerator {
       imports.push("import { useA11y } from '@/hooks/useA11y';");
     }
 
-    return imports.join('\n');
+    return imports.join('/n');
   }
 
   generatePropTypes(spec: ComponentSpec): string {
     const props = spec.props.map(p => {
       const optional = p.required ? '' : '?';
-      const comment = p.description ? `  /** ${p.description} */\n` : '';
+      const comment = p.description ? `  /** ${p.description} *//n` : '';
       return `${comment}  ${p.name}${optional}: ${p.type};`;
-    }).join('\n');
+    }).join('/n');
 
-    return `export interface ${spec.name}Props {\n${props}\n}`;
+    return `export interface ${spec.name}Props {/n${props}/n}`;
   }
 
   generateComponentBody(spec: ComponentSpec, options: GeneratorOptions): string {
     const propsType = options.typescript ? `: React.FC<${spec.name}Props>` : '';
     const destructuredProps = spec.props.map(p => p.name).join(', ');
 
-    let body = `export const ${spec.name}${propsType} = ({ ${destructuredProps} }) => {\n`;
+    let body = `export const ${spec.name}${propsType} = ({ ${destructuredProps} }) => {/n`;
 
     // Add state hooks
     if (spec.state) {
       body += spec.state.map(s =>
-        `  const [${s.name}, set${this.capitalize(s.name)}] = useState${options.typescript ? `<${s.type}>` : ''}(${s.initial});\n`
+        `  const [${s.name}, set${this.capitalize(s.name)}] = useState${options.typescript ? `<${s.type}>` : ''}(${s.initial});/n`
       ).join('');
-      body += '\n';
+      body += '/n';
     }
 
     // Add effects
     if (spec.hooks?.includes('useEffect')) {
-      body += `  useEffect(() => {\n`;
-      body += `    // TODO: Add effect logic\n`;
-      body += `  }, [${destructuredProps}]);\n\n`;
+      body += `  useEffect(() => {/n`;
+      body += `    // TODO: Add effect logic/n`;
+      body += `  }, [${destructuredProps}]);/n/n`;
     }
 
     // Add accessibility
     if (options.accessibility) {
-      body += `  const a11yProps = useA11y({\n`;
-      body += `    role: '${this.inferAriaRole(spec.type)}',\n`;
-      body += `    label: ${spec.props.find(p => p.name === 'label')?.name || `'${spec.name}'`}\n`;
-      body += `  });\n\n`;
+      body += `  const a11yProps = useA11y({/n`;
+      body += `    role: '${this.inferAriaRole(spec.type)}',/n`;
+      body += `    label: ${spec.props.find(p => p.name === 'label')?.name || `'${spec.name}'`}/n`;
+      body += `  });/n/n`;
     }
 
     // JSX return
-    body += `  return (\n`;
+    body += `  return (/n`;
     body += this.generateJSX(spec, options);
-    body += `  );\n`;
+    body += `  );/n`;
     body += `};`;
 
     return body;
@@ -166,9 +166,9 @@ class ReactComponentGenerator {
     const className = spec.styling === 'css-modules' ? `className={styles.${this.camelCase(spec.name)}}` : '';
     const a11y = options.accessibility ? '{...a11yProps}' : '';
 
-    return `    <div ${className} ${a11y}>\n` +
-           `      {/* TODO: Add component content */}\n` +
-           `    </div>\n`;
+    return `    <div ${className} ${a11y}>/n` +
+           `      {/* TODO: Add component content */}/n` +
+           `    </div>/n`;
   }
 }
 ```
@@ -189,11 +189,11 @@ import {
 } from 'react-native';
 
 interface ${spec.name}Props {
-${spec.props.map(p => `  ${p.name}${p.required ? '' : '?'}: ${this.mapNativeType(p.type)};`).join('\n')}
+${spec.props.map(p => `  ${p.name}${p.required ? '' : '?'}: ${this.mapNativeType(p.type)};`).join('/n')}
 }
 
 export const ${spec.name}: React.FC<${spec.name}Props> = ({
-  ${spec.props.map(p => p.name).join(',\n  ')}
+  ${spec.props.map(p => p.name).join(',/n  ')}
 }) => {
   return (
     <View
@@ -246,7 +246,7 @@ import { ${spec.name} } from './${spec.name}';
 
 describe('${spec.name}', () => {
   const defaultProps = {
-${spec.props.filter(p => p.required).map(p => `    ${p.name}: ${this.getMockValue(p.type)},`).join('\n')}
+${spec.props.filter(p => p.required).map(p => `    ${p.name}: ${this.getMockValue(p.type)},`).join('/n')}
   };
 
   it('renders without crashing', () => {
@@ -268,7 +268,7 @@ ${spec.props.filter(p => p.type.includes('()') || p.name.startsWith('on')).map(p
     fireEvent.click(trigger);
 
     expect(mock${this.capitalize(p.name)}).toHaveBeenCalledTimes(1);
-  });`).join('\n')}
+  });`).join('/n')}
 
   it('meets accessibility standards', async () => {
     const { container } = render(<${spec.name} {...defaultProps} />);
@@ -363,7 +363,7 @@ const meta: Meta<typeof ${spec.name}> = {
   component: ${spec.name},
   tags: ['autodocs'],
   argTypes: {
-${spec.props.map(p => `    ${p.name}: { control: '${this.inferControl(p.type)}', description: '${p.description}' },`).join('\n')}
+${spec.props.map(p => `    ${p.name}: { control: '${this.inferControl(p.type)}', description: '${p.description}' },`).join('/n')}
   },
 };
 
@@ -372,7 +372,7 @@ type Story = StoryObj<typeof ${spec.name}>;
 
 export const Default: Story = {
   args: {
-${spec.props.map(p => `    ${p.name}: ${p.defaultValue || this.getMockValue(p.type)},`).join('\n')}
+${spec.props.map(p => `    ${p.name}: ${p.defaultValue || this.getMockValue(p.type)},`).join('/n')}
   },
 };
 

@@ -1,6 +1,6 @@
 ---
 name: rayden-use
-description: Build and maintain Rayden UI components and screens in Figma via Figma MCP with full design token enforcement
+description: Build and maintain Rayden UI components and screens in Figma via Figma MCP with full design token enforcement. Use when the task involves rayden use.
 category: design
 risk: safe
 source: https://github.com/playbookTV/rayden-ui-design-skill

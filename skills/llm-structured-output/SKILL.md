@@ -1,6 +1,6 @@
 ---
 name: llm-structured-output
-description: >
+description: >. Use when the task involves llm structured output.
   Get reliable JSON, enums, and typed objects from LLMs using response_format, tool_use, and schema-constrained decoding across OpenAI, Anthropic, and Google APIs.
 risk: safe
 source: community

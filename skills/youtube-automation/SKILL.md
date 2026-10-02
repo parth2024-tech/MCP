@@ -1,6 +1,6 @@
 ---
 name: youtube-automation
-description: "Automate YouTube tasks via Rube MCP (Composio): upload videos, manage playlists, search content, get analytics, and handle comments. Always search tools first for current schemas."
+description: "Automate YouTube tasks via Rube MCP (Composio): upload videos, manage playlists, search content, get analytics, and handle comments. Always search tools first for current schemas. Use when the task involves youtube automation."
 risk: critical
 source: community
 date_added: "2026-02-27"

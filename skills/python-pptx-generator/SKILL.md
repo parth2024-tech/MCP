@@ -1,6 +1,6 @@
 ---
 name: python-pptx-generator
-description: "Generate complete Python scripts that build polished PowerPoint decks with python-pptx and real slide content."
+description: Generate complete Python scripts that build polished PowerPoint decks with python-pptx and real slide content. Use when the task involves python pptx generator.
 category: development
 risk: safe
 source: self

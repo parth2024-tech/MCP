@@ -1,6 +1,6 @@
 ---
 name: cc-skill-project-guidelines-example
-description: "Project Guidelines Skill (Example)"
+description: Project Guidelines Skill (Example). Use when the task involves cc skill project guidelines example.
 risk: unknown
 source: community
 date_added: "2026-02-27"

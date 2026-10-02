@@ -1,6 +1,6 @@
 ---
 name: zod-validation-expert
-description: "Expert in Zod — TypeScript-first schema validation. Covers parsing, custom errors, refinements, type inference, and integration with React Hook Form, Next.js, and tRPC."
+description: Expert in Zod — TypeScript-first schema validation. Covers parsing, custom errors, refinements, type inference, and integration with React Hook Form, Next.js, and tRPC. Use when the task involves zod validation expert.
 risk: safe
 source: community
 date_added: "2026-03-05"

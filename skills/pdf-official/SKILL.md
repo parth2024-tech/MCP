@@ -1,6 +1,6 @@
 ---
 name: pdf-official
-description: "This guide covers essential PDF processing operations using Python libraries and command-line tools. For advanced features, JavaScript libraries, and detailed examples, see reference.md. If you need to fill out a PDF form, read forms.md and follow its instructions."
+description: This guide covers essential PDF processing operations using Python libraries and command-line tools. For advanced features, JavaScript libraries, and detailed examples, see reference.md. If you need to fill out a PDF form, read forms.md and follow its instructions. Use when the task involves pdf official.
 risk: unknown
 source: community
 date_added: "2026-02-27"
@@ -224,9 +224,9 @@ images = convert_from_path('scanned.pdf')
 # OCR each page
 text = ""
 for i, image in enumerate(images):
-    text += f"Page {i+1}:\n"
+    text += f"Page {i+1}:/n"
     text += pytesseract.image_to_string(image)
-    text += "\n\n"
+    text += "/n/n"
 
 print(text)
 ```

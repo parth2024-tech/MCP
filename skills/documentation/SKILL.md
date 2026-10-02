@@ -1,6 +1,6 @@
 ---
 name: documentation
-description: "Documentation generation workflow covering API docs, architecture docs, README files, code comments, and technical writing."
+description: Documentation generation workflow covering API docs, architecture docs, README files, code comments, and technical writing. Use when the task involves documentation.
 category: workflow-bundle
 risk: safe
 source: personal

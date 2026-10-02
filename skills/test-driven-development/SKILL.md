@@ -1,5 +1,5 @@
 ---
-name: lifecycle/test-driven-development
+name: test-driven-development
 description: Drives development with tests. Use when implementing any logic, fixing any bug, or changing any behavior. Use when you need to prove that code works, when a bug report arrives, or when you're about to modify existing functionality.
 token_estimate: 2915
 activation_keywords:

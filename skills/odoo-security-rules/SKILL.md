@@ -1,6 +1,6 @@
 ---
 name: odoo-security-rules
-description: "Expert in Odoo access control: ir.model.access.csv, record rules (ir.rule), groups, and multi-company security patterns."
+description: "Expert in Odoo access control: ir.model.access.csv, record rules (ir.rule), groups, and multi-company security patterns. Use when the task involves odoo security rules."
 risk: safe
 source: "self"
 ---

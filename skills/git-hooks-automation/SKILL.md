@@ -1,6 +1,6 @@
 ---
 name: git-hooks-automation
-description: "Master Git hooks setup with Husky, lint-staged, pre-commit framework, and commitlint. Automate code quality gates, formatting, linting, and commit message enforcement before code reaches CI."
+description: Master Git hooks setup with Husky, lint-staged, pre-commit framework, and commitlint. Automate code quality gates, formatting, linting, and commit message enforcement before code reaches CI. Use when the task involves git hooks automation.
 risk: safe
 source: community
 date_added: "2026-03-07"
@@ -253,7 +253,7 @@ if [ -n "$LARGE_FILES" ]; then
 fi
 
 # 4. Check for secrets patterns
-if git diff --cached --diff-filter=ACM | grep -nEi '(AKIA[0-9A-Z]{16}|sk-[a-zA-Z0-9]{48}|ghp_[a-zA-Z0-9]{36}|password\s*=\s*["\x27][^"\x27]+["\x27])' > /dev/null 2>&1; then
+if git diff --cached --diff-filter=ACM | grep -nEi '(AKIA[0-9A-Z]{16}|sk-[a-zA-Z0-9]{48}|ghp_[a-zA-Z0-9]{36}|password/s*=/s*["/x27][^"/x27]+["/x27])' > /dev/null 2>&1; then
   echo "🚨 Potential secrets detected in staged changes! Review before committing."
   exit 1
 fi

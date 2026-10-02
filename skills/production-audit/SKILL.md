@@ -1,6 +1,6 @@
 ---
 name: production-audit
-description: "Audit a shipped repo for production-readiness gaps across RLS, webhooks, secrets, grants, Stripe idempotency, mobile UX, and deployment health."
+description: Audit a shipped repo for production-readiness gaps across RLS, webhooks, secrets, grants, Stripe idempotency, mobile UX, and deployment health. Use when the task involves production audit.
 category: security
 risk: critical
 source: community

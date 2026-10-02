@@ -1,6 +1,6 @@
 ---
 name: architect-review
-description: "Master software architect specializing in modern architecture"
+description: Master software architect specializing in modern architecture. Use when the task involves architect review.
 risk: unknown
 source: community
 date_added: "2026-02-27"

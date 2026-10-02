@@ -1,6 +1,6 @@
 ---
 name: ai-studio-image
-description: Geracao de imagens humanizadas via Google AI Studio (Gemini). Fotos realistas estilo influencer ou educacional com iluminacao natural e imperfeicoes sutis.
+description: Geracao de imagens humanizadas via Google AI Studio (Gemini). Fotos realistas estilo influencer ou educacional com iluminacao natural e imperfeicoes sutis. Use when the task involves ai studio image.
 risk: safe
 source: community
 date_added: '2026-03-06'
@@ -70,7 +70,7 @@ set GEMINI_API_KEY=sua-api-key-aqui
 export GEMINI_API_KEY=sua-api-key-aqui
 ```
 
-Ou crie um arquivo `.env` em `C:\Users\renat\skills\ai-studio-image\`:
+Ou crie um arquivo `.env` em `C:/Users/renat/skills/ai-studio-image\`:
 ```
 GEMINI_API_KEY=sua-api-key-aqui
 ```
@@ -78,13 +78,13 @@ GEMINI_API_KEY=sua-api-key-aqui
 ## 2. Instalar Dependencias
 
 ```bash
-pip install -r C:\Users\renat\skills\ai-studio-image\scripts\requirements.txt
+pip install -r C:/Users/renat/skills/ai-studio-image/scripts/requirements.txt
 ```
 
 ## 3. Gerar Sua Primeira Imagem
 
 ```bash
-python C:\Users\renat\skills\ai-studio-image\scripts\generate.py --prompt "mulher jovem tomando cafe em cafeteria" --mode influencer --format square
+python C:/Users/renat/skills/ai-studio-image/scripts/generate.py --prompt "mulher jovem tomando cafe em cafeteria" --mode influencer --format square
 ```
 
 ## Workflow Principal
@@ -120,7 +120,7 @@ Se nao especificado, deduza pelo contexto (stories → 9:16, feed → 1:1, etc).
 Sempre passe pelo motor de humanizacao:
 
 ```bash
-python C:\Users\renat\skills\ai-studio-image\scripts\prompt_engine.py --prompt "prompt do usuario" --mode influencer
+python C:/Users/renat/skills/ai-studio-image/scripts/prompt_engine.py --prompt "prompt do usuario" --mode influencer
 ```
 
 O motor de humanizacao adiciona camadas de realismo:
@@ -158,12 +158,12 @@ O motor de humanizacao adiciona camadas de realismo:
 ## Passo 4: Gerar A Imagem
 
 ```bash
-python C:\Users\renat\skills\ai-studio-image\scripts\generate.py \
+python C:/Users/renat/skills/ai-studio-image/scripts/generate.py \
   --prompt "prompt humanizado gerado no passo anterior" \
   --mode influencer \
   --format square \
   --model gemini-2-flash-exp \
-  --output C:\Users\renat\skills\ai-studio-image\data\outputs\
+  --output C:/Users/renat/skills/ai-studio-image/data/outputs\
 ```
 
 **Modelos disponiveis (em ordem de recomendacao):**
@@ -190,7 +190,7 @@ Mostre o resultado ao usuario. Se precisar ajustar:
 Para cenarios comuns, use templates prontos. Execute:
 
 ```bash
-python C:\Users\renat\skills\ai-studio-image\scripts\templates.py --list
+python C:/Users/renat/skills/ai-studio-image/scripts/templates.py --list
 ```
 
 Templates disponiveis:
@@ -227,7 +227,7 @@ Templates disponiveis:
 
 Usar template:
 ```bash
-python C:\Users\renat\skills\ai-studio-image\scripts\generate.py \
+python C:/Users/renat/skills/ai-studio-image/scripts/generate.py \
   --template cafe-lifestyle \
   --custom "mulher ruiva, 30 anos, lendo livro" \
   --format square
@@ -245,7 +245,7 @@ Controle quanto "imperfeicao" injetar:
 | `editorial` | Estilo revista, natural mas com producao |
 
 ```bash
-python C:\Users\renat\skills\ai-studio-image\scripts\generate.py \
+python C:/Users/renat/skills/ai-studio-image/scripts/generate.py \
   --prompt "..." --humanization natural
 ```
 
@@ -267,7 +267,7 @@ A iluminacao muda drasticamente:
 Para gerar multiplas variacoes:
 
 ```bash
-python C:\Users\renat\skills\ai-studio-image\scripts\generate.py \
+python C:/Users/renat/skills/ai-studio-image/scripts/generate.py \
   --prompt "..." --variations 4 --format square
 ```
 

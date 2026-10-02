@@ -1,5 +1,5 @@
 ---
-name: claude-in-chrome-troubleshooting
+name: in-chrome-troubleshooting
 description: Diagnose and fix Claude in Chrome MCP extension connectivity issues. Use when mcp__claude-in-chrome__* tools fail, return "Browser extension is not connected", or behave erratically.
 risk: critical
 source: community
@@ -207,22 +207,22 @@ export TMPDIR="${TMPDIR:-$(getconf DARWIN_USER_TEMP_DIR)}"
 echo "=== Native Host Binary ==="
 ps aux | grep chrome-native-host | grep -v grep
 
-echo -e "\n=== Socket (Claude Code location) ==="
+echo -e "/n=== Socket (Claude Code location) ==="
 ls -la "$(getconf DARWIN_USER_TEMP_DIR)/claude-mcp-browser-bridge-$USER" 2>&1
 
-echo -e "\n=== Socket (Claude.app location) ==="
+echo -e "/n=== Socket (Claude.app location) ==="
 ls -la /tmp/claude-mcp-browser-bridge-$USER/ 2>&1
 
-echo -e "\n=== Native Host Open Files ==="
+echo -e "/n=== Native Host Open Files ==="
 pgrep -f chrome-native-host | xargs -I {} lsof -p {} 2>/dev/null | grep -E "(sock|claude-mcp)"
 
-echo -e "\n=== Active Native Messaging Configs ==="
+echo -e "/n=== Active Native Messaging Configs ==="
 ls ~/Library/Application\ Support/Google/Chrome/NativeMessagingHosts/com.anthropic*.json 2>/dev/null
 
-echo -e "\n=== Custom Wrapper Contents ==="
+echo -e "/n=== Custom Wrapper Contents ==="
 cat ~/.claude/chrome/chrome-native-host 2>/dev/null || echo "No custom wrapper"
 
-echo -e "\n=== TMPDIR ==="
+echo -e "/n=== TMPDIR ==="
 echo "TMPDIR=$TMPDIR"
 echo "Expected: $(getconf DARWIN_USER_TEMP_DIR)"
 ```

@@ -1,6 +1,6 @@
 ---
 name: test-automator
-description: Master AI-powered test automation with modern frameworks, self-healing tests, and comprehensive quality engineering. Build scalable testing strategies with advanced CI/CD integration.
+description: Master AI-powered test automation with modern frameworks, self-healing tests, and comprehensive quality engineering. Build scalable testing strategies with advanced CI/CD integration. Use when the task involves test automator.
 risk: unknown
 source: community
 date_added: '2026-02-27'

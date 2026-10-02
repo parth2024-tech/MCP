@@ -1,6 +1,6 @@
 ---
 name: leiloeiro-ia
-description: Especialista em leiloes judiciais e extrajudiciais de imoveis. Analise juridica, pericial e de mercado integrada. Orquestra os 5 modulos especializados.
+description: Especialista em leiloes judiciais e extrajudiciais de imoveis. Analise juridica, pericial e de mercado integrada. Orquestra os 5 modulos especializados. Use when the task involves leiloeiro ia.
 risk: safe
 source: community
 date_added: '2026-03-06'
@@ -319,7 +319,7 @@ Basta carregar o SKILL.md no contexto do Claude Code.
 
 ## Verificar Se A Skill Está Registrada No Orchestrator:
 
-python C:\Users\renat\skills\agent-orchestrator\scripts\scan_registry.py
+python C:/Users/renat/skills/agent-orchestrator/scripts/scan_registry.py
 ```
 
 ---

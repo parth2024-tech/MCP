@@ -1,6 +1,6 @@
 ---
 name: oral-health-analyzer
-description: 分析口腔健康数据、识别口腔问题模式、评估口腔健康状况、提供个性化口腔健康建议。支持与营养、慢性病、用药等其他健康数据的关联分析。
+description: 分析口腔健康数据、识别口腔问题模式、评估口腔健康状况、提供个性化口腔健康建议。支持与营养、慢性病、用药等其他健康数据的关联分析。. Use when the task involves oral health analyzer.
 risk: safe
 source: community
 ---
@@ -483,55 +483,6 @@ name: oral-health-analyzer
 - 龋齿风险评估工具（CAT）
 
 ### 数据源
-- 用户记录数据
-- 营养模块数据
-- 慢性病模块数据
-- 用药模块数据
-- 眼健康模块数据
 
-## 局限性
 
-### 系统局限
-- 不能替代专业口腔检查
-- 不能进行影像学检查
-- 不能进行实验室检测
-- 分析结果受数据质量影响
-
-### 数据局限
-- 依赖用户记录准确性
-- 可能存在遗漏记录
-- 主观评估存在偏差
-- 时间跨度可能不足
-
-### 建议局限
-- 不能考虑所有个体因素
-- 不能预测所有并发症
-- 需要结合临床判断
-- 不能保证100%准确性
-
-## 未来扩展
-
-### 计划功能
-- AI影像识别（牙片分析）
-- 语音记录录入
-- 智能提醒系统
-- 社区支持功能
-- 与牙医系统对接
-
-### 研究方向
-- 机器学习预测模型
-- 个性化预防策略
-- 基因风险分析
-- 微生物组分析
-
----
-name: oral-health-analyzer
-
-**版本**: v1.0.0
-**最后更新**: 2025-01-06
-**维护者**: WellAlly Tech
-
-## Limitations
-- Use this skill only when the task clearly matches the scope described above.
-- Do not treat the output as a substitute for environment-specific validation, testing, or expert review.
-- Stop and ask for clarification if required inputs, permissions, safety boundaries, or success criteria are missing.
+> See [references/details.md](references/details.md) for extended content.

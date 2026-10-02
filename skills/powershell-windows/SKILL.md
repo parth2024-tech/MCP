@@ -1,6 +1,6 @@
 ---
 name: powershell-windows
-description: "PowerShell Windows patterns. Critical pitfalls, operator syntax, error handling."
+description: PowerShell Windows patterns. Critical pitfalls, operator syntax, error handling. Use when the task involves powershell windows.
 risk: unknown
 source: community
 date_added: "2026-02-27"
@@ -92,7 +92,7 @@ Write-Output "Value: $value"
 
 | Pattern | Use |
 |---------|-----|
-| Literal path | `C:\Users\User\file.txt` |
+| Literal path | `C:/Users/User/file.txt` |
 | Variable path | `Join-Path $env:USERPROFILE "file.txt"` |
 | Relative | `Join-Path $ScriptDir "data"` |
 

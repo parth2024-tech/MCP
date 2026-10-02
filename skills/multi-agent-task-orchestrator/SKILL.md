@@ -1,6 +1,6 @@
 ---
 name: multi-agent-task-orchestrator
-description: "Route tasks to specialized AI agents with anti-duplication, quality gates, and 30-minute heartbeat monitoring"
+description: Route tasks to specialized AI agents with anti-duplication, quality gates, and 30-minute heartbeat monitoring. Use when the task involves multi agent task orchestrator.
 category: agent-orchestration
 risk: safe
 source: community

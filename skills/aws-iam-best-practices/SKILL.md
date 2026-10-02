@@ -1,6 +1,6 @@
 ---
 name: aws-iam-best-practices
-description: "IAM policy review, hardening, and least privilege implementation"
+description: IAM policy review, hardening, and least privilege implementation. Use when the task involves aws iam best practices.
 category: security
 risk: safe
 source: community
@@ -352,15 +352,15 @@ if __name__ == "__main__":
     print("IAM Hardening Report")
     print("=" * 50)
     
-    print("\nUsers without MFA:")
+    print("/nUsers without MFA:")
     for user in enforce_mfa():
         print(f"  - {user}")
     
-    print("\nOld access keys (>90 days):")
+    print("/nOld access keys (>90 days):")
     for key in rotate_old_keys():
         print(f"  - {key['user']}: {key['age_days']} days")
     
-    print("\nOverpermissive policies:")
+    print("/nOverpermissive policies:")
     for policy in find_overpermissive_policies():
         print(f"  - {policy}")
 ```

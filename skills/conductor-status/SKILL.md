@@ -1,6 +1,6 @@
 ---
 name: conductor-status
-description: "Display project status, active tracks, and next actions"
+description: Display project status, active tracks, and next actions. Use when the task involves conductor status.
 risk: unknown
 source: community
 date_added: "2026-02-27"

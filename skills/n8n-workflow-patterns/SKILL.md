@@ -1,6 +1,6 @@
 ---
 name: n8n-workflow-patterns
-description: "Proven architectural patterns for building n8n workflows."
+description: Proven architectural patterns for building n8n workflows. Use when the task involves n8n workflow patterns.
 risk: unknown
 source: community
 ---

@@ -1,6 +1,6 @@
 ---
 name: project-skill-audit
-description: Audit a project and recommend the highest-value skills to add or update.
+description: Audit a project and recommend the highest-value skills to add or update. Use when the task involves project skill audit.
 risk: safe
 source: "Dimillian/Skills (MIT)"
 date_added: "2026-03-25"

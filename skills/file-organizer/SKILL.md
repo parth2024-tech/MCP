@@ -1,6 +1,6 @@
 ---
 name: file-organizer
-description: "6. Reduces Clutter: Identifies old files you probably don't need anymore"
+description: "6. Reduces Clutter: Identifies old files you probably don't need anymore. Use when the task involves file organizer."
 risk: unknown
 source: community
 date_added: "2026-02-27"
@@ -103,10 +103,10 @@ When a user requests file organization help:
    find [directory] -type f -exec md5 {} \; | sort | uniq -d
 
    # Find files with similar names
-   find [directory] -type f -printf '%f\n' | sort | uniq -d
+   find [directory] -type f -printf '%f/n' | sort | uniq -d
 
    # Find similar-sized files
-   find [directory] -type f -printf '%s %p\n' | sort -n
+   find [directory] -type f -printf '%s %p/n' | sort -n
    ```
 
    For each set of duplicates:

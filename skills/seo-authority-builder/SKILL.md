@@ -1,6 +1,6 @@
 ---
 name: seo-authority-builder
-description: 'Analyzes content for E-E-A-T signals and suggests improvements to
+description: Analyzes content for E-E-A-T signals and suggests improvements to. Use when the task involves seo authority builder.
 
   build authority and trust. Identifies missing credibility elements. Use
 

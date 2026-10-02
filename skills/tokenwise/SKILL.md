@@ -1,6 +1,6 @@
 ---
 name: tokenwise
-description: "Measurement-driven model router for Claude Code. Routes Haiku/Sonnet/Opus per task class, logs every routed task with real $ numbers, and A/B tests cheaper tiers before you trust the savings."
+description: Measurement-driven model router for Claude Code. Routes Haiku/Sonnet/Opus per task class, logs every routed task with real $ numbers, and A/B tests cheaper tiers before you trust the savings. Use when the task involves tokenwise.
 category: developer-tools
 risk: critical
 source: community

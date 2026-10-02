@@ -1,6 +1,6 @@
 ---
 name: agent-framework-azure-ai-py
-description: "Build persistent agents on Azure AI Foundry using the Microsoft Agent Framework Python SDK."
+description: Build persistent agents on Azure AI Foundry using the Microsoft Agent Framework Python SDK. Use when the task involves agent framework azure ai py.
 risk: unknown
 source: community
 date_added: "2026-02-27"
@@ -299,7 +299,7 @@ async def main():
         print(f"Response: {result.text}")
         
         # Streaming
-        print("\nStreaming: ", end="")
+        print("/nStreaming: ", end="")
         async for chunk in agent.run_stream("Continue with examples", thread=thread):
             if chunk.text:
                 print(chunk.text, end="", flush=True)
@@ -312,7 +312,7 @@ async def main():
             response_format=AnalysisResult,
         )
         analysis = AnalysisResult.model_validate_json(result.text)
-        print(f"\nConfidence: {analysis.confidence}")
+        print(f"/nConfidence: {analysis.confidence}")
 
 
 if __name__ == "__main__":

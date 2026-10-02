@@ -1,6 +1,6 @@
 ---
 name: deep-research
-description: "Run autonomous research tasks that plan, search, read, and synthesize information into comprehensive reports."
+description: Run autonomous research tasks that plan, search, read, and synthesize information into comprehensive reports. Use when the task involves deep research.
 risk: safe
 source: "https://github.com/sanjay3290/ai-skills/tree/main/skills/deep-research"
 date_added: "2026-02-27"
@@ -45,7 +45,7 @@ python3 scripts/research.py --query "Research the history of Kubernetes"
 ### With structured output format
 ```bash
 python3 scripts/research.py --query "Compare Python web frameworks" \
-  --format "1. Executive Summary\n2. Comparison Table\n3. Recommendations"
+  --format "1. Executive Summary/n2. Comparison Table/n3. Recommendations"
 ```
 
 ### Stream progress in real-time

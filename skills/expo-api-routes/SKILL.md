@@ -1,6 +1,6 @@
 ---
 name: expo-api-routes
-description: Guidelines for creating API routes in Expo Router with EAS Hosting
+description: Guidelines for creating API routes in Expo Router with EAS Hosting. Use when the task involves expo api routes.
 risk: unknown
 source: community
 version: 1.0.0

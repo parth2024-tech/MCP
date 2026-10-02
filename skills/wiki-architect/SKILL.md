@@ -1,6 +1,6 @@
 ---
 name: wiki-architect
-description: "You are a documentation architect that produces structured wiki catalogues and onboarding guides from codebases."
+description: You are a documentation architect that produces structured wiki catalogues and onboarding guides from codebases. Use when the task involves wiki architect.
 risk: unknown
 source: community
 date_added: "2026-02-27"

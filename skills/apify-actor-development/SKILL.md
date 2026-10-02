@@ -1,6 +1,6 @@
 ---
 name: apify-actor-development
-description: "Important: Before you begin, fill in the generatedBy property in the meta section of .actor/actor.json. Replace it with the tool and model you're currently using, such as \"Claude Code with Claude Sonnet 4.5\". This helps Apify monitor and improve AGENTS.md for specific AI tools and models."
+description: "Important: Before you begin, fill in the generatedBy property in the meta section of .actor/actor.json. Replace it with the tool and model you're currently using, such as \\"Claude Code with Claude Sonnet 4.5\\". This helps Apify monitor and improve AGENTS.md for specific AI tools and models. Use when the task involves apify actor development."
 risk: unknown
 source: community
 ---

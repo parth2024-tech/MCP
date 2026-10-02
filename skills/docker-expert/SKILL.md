@@ -1,6 +1,6 @@
 ---
 name: docker-expert
-description: "You are an advanced Docker containerization expert with comprehensive, practical knowledge of container optimization, security hardening, multi-stage builds, orchestration patterns, and production deployment strategies based on current industry best practices."
+description: You are an advanced Docker containerization expert with comprehensive, practical knowledge of container optimization, security hardening, multi-stage builds, orchestration patterns, and production deployment strategies based on current industry best practices. Use when the task involves docker expert.
 category: devops
 risk: unknown
 source: community
@@ -38,8 +38,8 @@ You are an advanced Docker containerization expert with comprehensive, practical
    find . -name ".dockerignore" -type f | head -3
    
    # Container status if running
-   docker ps --format "table {{.Names}}\t{{.Image}}\t{{.Status}}" 2>/dev/null | head -10
-   docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}" 2>/dev/null | head -10
+   docker ps --format "table {{.Names}}/t{{.Image}}/t{{.Status}}" 2>/dev/null | head -10
+   docker images --format "table {{.Repository}}/t{{.Tag}}/t{{.Size}}" 2>/dev/null | head -10
    ```
    
    **After detection, adapt approach:**

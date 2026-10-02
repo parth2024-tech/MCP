@@ -1,6 +1,6 @@
 ---
 name: azure-storage-file-share-ts
-description: Azure File Share JavaScript/TypeScript SDK (@azure/storage-file-share) for SMB file share operations.
+description: Azure File Share JavaScript/TypeScript SDK (@azure/storage-file-share) for SMB file share operations. Use when the task involves azure storage file share ts.
 risk: unknown
 source: community
 date_added: '2026-02-27'
@@ -494,9 +494,6 @@ import {
 | Anonymous/SAS access | ✅ | ✅ |
 
 ## When to Use
-This skill is applicable to execute the workflow or actions described in the overview.
 
-## Limitations
-- Use this skill only when the task clearly matches the scope described above.
-- Do not treat the output as a substitute for environment-specific validation, testing, or expert review.
-- Stop and ask for clarification if required inputs, permissions, safety boundaries, or success criteria are missing.
+
+> Extended reference material: [references/details.md](references/details.md)

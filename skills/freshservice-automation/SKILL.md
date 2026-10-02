@@ -1,6 +1,6 @@
 ---
 name: freshservice-automation
-description: "Automate Freshservice ITSM tasks via Rube MCP (Composio): create/update tickets, bulk operations, service requests, and outbound emails. Always search tools first for current schemas."
+description: "Automate Freshservice ITSM tasks via Rube MCP (Composio): create/update tickets, bulk operations, service requests, and outbound emails. Always search tools first for current schemas. Use when the task involves freshservice automation."
 risk: critical
 source: community
 date_added: "2026-02-27"

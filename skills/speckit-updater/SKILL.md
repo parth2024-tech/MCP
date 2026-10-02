@@ -1,6 +1,6 @@
 ---
 name: speckit-updater
-description: SpecKit Safe Update
+description: SpecKit Safe Update. Use when the task involves speckit updater.
 risk: unknown
 source: community
 ---
@@ -22,7 +22,7 @@ When the user invokes `/speckit-updater`, you should:
 
 1. **Run the update orchestrator script** without any flags (conversational mode):
    ```powershell
-   pwsh -NoProfile -Command "& 'C:\Users\bobby\.claude\skills\speckit-updater\scripts\update-wrapper.ps1'"
+   pwsh -NoProfile -Command "& 'C:/Users/bobby\.claude/skills/speckit-updater/scripts/update-wrapper.ps1'"
    ```
 
 2. **Parse the output** for markers:
@@ -51,7 +51,7 @@ When the user invokes `/speckit-updater`, you should:
 
 5. **Execute approved action** by re-running with `-Proceed` flag:
    ```powershell
-   pwsh -NoProfile -Command "& 'C:\Users\bobby\.claude\skills\speckit-updater\scripts\update-wrapper.ps1' -Proceed"
+   pwsh -NoProfile -Command "& 'C:/Users/bobby\.claude/skills/speckit-updater/scripts/update-wrapper.ps1' -Proceed"
    ```
 
 **Special cases:**

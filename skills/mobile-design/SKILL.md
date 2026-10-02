@@ -1,6 +1,6 @@
 ---
 name: mobile-design
-description: "(Mobile-First · Touch-First · Platform-Respectful)"
+description: (Mobile-First · Touch-First · Platform-Respectful). Use when the task involves mobile design.
 risk: unknown
 source: community
 date_added: "2026-02-27"

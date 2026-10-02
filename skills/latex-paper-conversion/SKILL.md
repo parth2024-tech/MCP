@@ -1,6 +1,6 @@
 ---
 name: latex-paper-conversion
-description: "This skill should be used when the user asks to convert an academic paper in LaTeX from one format (e.g., Springer, IPOL) to another format (e.g., MDPI, IEEE, Nature). It automates extraction, injection, fixing formatting, and compiling."
+description: This skill should be used when the user asks to convert an academic paper in LaTeX from one format (e.g., Springer, IPOL) to another format (e.g., MDPI, IEEE, Nature). It automates extraction, injection, fixing formatting, and compiling. Use when the task involves latex paper conversion.
 risk: safe
 source: community
 date_added: "2026-03-14"
@@ -28,10 +28,10 @@ Create a Python script (e.g., `convert_format.py`) to parse the source LaTeX fil
 
 ### Step 3: Systematic Fixing
 Perform generic fixes on the extracted body text before writing the final file, or in subsequent calls:
-- Convert math environment cases (e.g., `\begin{theorem}` to `\begin{Theorem}`).
+- Convert math environment cases (e.g., `/begin{theorem}` to `/begin{Theorem}`).
 - Adjust aggressive float placements (e.g., `[!t]` or `[h!]`) to template-supported options. Avoid forcing `[H]` unless the `float` package is explicitly loaded.
-- Ensure `\includegraphics` paths are relative to the new `.tex` file location.
-- Convert `\begin{tabular}` to `\begin{tabularx}{\textwidth}` or use `\resizebox` if moving to a double-column layout.
+- Ensure `/includegraphics` paths are relative to the new `.tex` file location.
+- Convert `/begin{tabular}` to `/begin{tabularx}{/textwidth}` or use `/resizebox` if moving to a double-column layout.
 
 ### Step 4: Compilation & Debugging
 Run a build cycle (`pdflatex` -> `bibtex` -> `pdflatex`). Check the `.log` file using `grep` or `rg` to systematically fix any packages conflicts, undefined commands, or compilation halts.
@@ -54,14 +54,14 @@ AGENT: *Triggers latex-paper-conversion skill*
 - ✅ Always write a Python extraction script; DO NOT manually copy-paste thousands of lines of LaTeX.
 - ✅ Always run `pdflatex` and verify the `.log` to ensure the final output compiles.
 - ✅ Explicitly ask the user for the structural mapping if the source and target differ drastically (e.g., merging abstract and keywords).
-- ❌ Don't assume all math packages automatically exist in the new template (e.g., add `\usepackage{amsmath}` if missing).
+- ❌ Don't assume all math packages automatically exist in the new template (e.g., add `/usepackage{amsmath}` if missing).
 
 ## Common Pitfalls
 
 - **Problem:** Overfull hboxes in tables when moving from single to double column.
-  **Solution:** Detect `\begin{tabular}` and automatically wrap in `\resizebox{\columnwidth}{!}{...}` or suggest a format change.
+  **Solution:** Detect `/begin{tabular}` and automatically wrap in `/resizebox{/columnwidth}{!}{...}` or suggest a format change.
 - **Problem:** Undefined control sequence errors during compilation.
-  **Solution:** Search the `Paper.log` and include the missing `\usepackage{}` in the converted template.
+  **Solution:** Search the `Paper.log` and include the missing `/usepackage{}` in the converted template.
 
 ## Additional Resources
 

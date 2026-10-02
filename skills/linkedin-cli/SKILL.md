@@ -75,27 +75,7 @@ Error:
   "success": false,
   "error": { "type": "personNotFound", "message": "Person not found" }
 }
-```
-
-Exit code 0 means the API call succeeded – always check the `success` field for the action outcome. Non-zero exit codes indicate infrastructure errors:
-
-| Exit Code | Meaning                                                                                     |
-| --------- | ------------------------------------------------------------------------------------------- |
-| 0         | Success (check `success` field – action may have returned an error like "person not found") |
-| 1         | General/unexpected error                                                                    |
-| 2         | Missing or invalid tokens                                                                   |
-| 3         | Subscription/plan required                                                                  |
-| 4         | LinkedIn account issue                                                                      |
-| 5         | Invalid arguments                                                                           |
-| 6         | Rate limited                                                                                |
-| 7         | Network error                                                                               |
-| 8         | Workflow timeout (workflowId returned for recovery)                                         |
-
-## Commands
-
-### Fetch a Person Profile
-
-```bash
+> See [references/details.md](references/details.md) for full code examples.
 linkedin person fetch <url> [flags] --json -q
 ```
 
@@ -128,18 +108,7 @@ linkedin person fetch https://www.linkedin.com/in/username --posts --posts-limit
 linkedin person search [flags] --json -q
 ```
 
-| Flag                   | Description                            |
-| ---------------------- | -------------------------------------- |
-| `--term`               | Search keyword or phrase               |
-| `--limit`              | Max results                            |
-| `--first-name`         | Filter by first name                   |
-| `--last-name`          | Filter by last name                    |
-| `--position`           | Filter by job position                 |
-| `--locations`          | Comma-separated locations              |
-| `--industries`         | Comma-separated industries             |
-| `--current-companies`  | Comma-separated current company names  |
-| `--previous-companies` | Comma-separated previous company names |
-| `--schools`            | Comma-separated school names           |
+> See [references/details.md](references/details.md) for full code examples.
 
 ```bash
 linkedin person search --term "product manager" --locations "San Francisco" --json -q
@@ -150,33 +119,7 @@ linkedin person search --current-companies "Google" --position "Engineer" --limi
 
 ```bash
 linkedin company fetch <url> [flags] --json -q
-```
-
-Optional flags:
-
-- `--employees` – include employees
-- `--dms` – include decision makers
-- `--posts` – include company posts
-
-Employee filters (require `--employees`):
-
-| Flag                     | Description                  |
-| ------------------------ | ---------------------------- |
-| `--employees-limit`      | Max employees to retrieve    |
-| `--employees-first-name` | Filter by first name         |
-| `--employees-last-name`  | Filter by last name          |
-| `--employees-position`   | Filter by position           |
-| `--employees-locations`  | Comma-separated locations    |
-| `--employees-industries` | Comma-separated industries   |
-| `--employees-schools`    | Comma-separated school names |
-
-| Flag            | Description                                        |
-| --------------- | -------------------------------------------------- |
-| `--dms-limit`   | Max decision makers to retrieve (requires `--dms`) |
-| `--posts-limit` | Max posts to retrieve (requires `--posts`)         |
-| `--posts-since` | Posts since ISO timestamp (requires `--posts`)     |
-
-```bash
+> See [references/details.md](references/details.md) for full code examples.
 # Basic company info
 linkedin company fetch https://www.linkedin.com/company/name --json -q
 
@@ -250,18 +193,7 @@ linkedin connection send <url> [--note 'text'] [--email user@example.com] --json
 linkedin connection list [flags] --json -q
 ```
 
-| Flag                   | Description                                                                          |
-| ---------------------- | ------------------------------------------------------------------------------------ |
-| `--limit`              | Max connections to return                                                            |
-| `--since`              | Only connections made since ISO timestamp (only works when no filter flags are used) |
-| `--first-name`         | Filter by first name                                                                 |
-| `--last-name`          | Filter by last name                                                                  |
-| `--position`           | Filter by job position                                                               |
-| `--locations`          | Comma-separated locations                                                            |
-| `--industries`         | Comma-separated industries                                                           |
-| `--current-companies`  | Comma-separated current company names                                                |
-| `--previous-companies` | Comma-separated previous company names                                               |
-| `--schools`            | Comma-separated school names                                                         |
+> See [references/details.md](references/details.md) for full code examples.
 
 ```bash
 linkedin connection list --limit 50 --json -q
@@ -400,19 +332,7 @@ linkedin navigator person fetch <hashed-url> --json -q
 linkedin navigator person search [flags] --json -q
 ```
 
-| Flag                    | Description                                                                                 |
-| ----------------------- | ------------------------------------------------------------------------------------------- |
-| `--term`                | Search keyword or phrase                                                                    |
-| `--limit`               | Max results                                                                                 |
-| `--first-name`          | Filter by first name                                                                        |
-| `--last-name`           | Filter by last name                                                                         |
-| `--position`            | Filter by job position                                                                      |
-| `--locations`           | Comma-separated locations                                                                   |
-| `--industries`          | Comma-separated industries                                                                  |
-| `--current-companies`   | Comma-separated current company names                                                       |
-| `--previous-companies`  | Comma-separated previous company names                                                      |
-| `--schools`             | Comma-separated school names                                                                |
-| `--years-of-experience` | Comma-separated ranges: `lessThanOne`, `oneToTwo`, `threeToFive`, `sixToTen`, `moreThanTen` |
+> See [references/details.md](references/details.md) for full code examples.
 
 ```bash
 linkedin navigator person search --term "VP Marketing" --locations "United States" --json -q
@@ -423,28 +343,7 @@ linkedin navigator person search --years-of-experience "moreThanTen" --position 
 
 ```bash
 linkedin navigator company fetch <hashed-url> [flags] --json -q
-```
-
-Optional flags:
-
-- `--employees` – include employees
-- `--dms` – include decision makers
-
-Employee filters (require `--employees`):
-
-| Flag                              | Description                                        |
-| --------------------------------- | -------------------------------------------------- |
-| `--employees-limit`               | Max employees to retrieve                          |
-| `--employees-first-name`          | Filter by first name                               |
-| `--employees-last-name`           | Filter by last name                                |
-| `--employees-positions`           | Comma-separated positions                          |
-| `--employees-locations`           | Comma-separated locations                          |
-| `--employees-industries`          | Comma-separated industries                         |
-| `--employees-schools`             | Comma-separated school names                       |
-| `--employees-years-of-experience` | Comma-separated experience ranges                  |
-| `--dms-limit`                     | Max decision makers to retrieve (requires `--dms`) |
-
-```bash
+> See [references/details.md](references/details.md) for full code examples.
 linkedin navigator company fetch https://www.linkedin.com/sales/company/97ural --employees --dms --json -q
 linkedin navigator company fetch https://www.linkedin.com/sales/company/97ural \
   --employees --employees-positions "Engineer,Designer" --employees-locations "Europe" --json -q

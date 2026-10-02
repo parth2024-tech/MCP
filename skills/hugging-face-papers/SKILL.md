@@ -1,7 +1,7 @@
 ---
 source: "https://github.com/huggingface/skills/tree/main/skills/huggingface-papers"
 name: hugging-face-papers
-description: Read and analyze Hugging Face paper pages or arXiv papers with markdown and papers API metadata.
+description: Read and analyze Hugging Face paper pages or arXiv papers with markdown and papers API metadata. Use when the task involves hugging face papers.
 risk: unknown
 ---
 
@@ -189,7 +189,7 @@ curl "https://huggingface.co/api/papers/index" \
 - Endpoint: `POST /api/papers/index`
 - Body:
   - `arxivId` (string, required): arXiv ID to index, for example `2301.00001`
-- Pattern: `^\d{4}\.\d{4,5}$`
+- Pattern: `^/d{4}\./d{4,5}$`
 - Response: empty JSON object on success
 
 #### Update paper links

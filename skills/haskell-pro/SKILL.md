@@ -1,6 +1,6 @@
 ---
 name: haskell-pro
-description: "Expert Haskell engineer specializing in advanced type systems, pure"
+description: Expert Haskell engineer specializing in advanced type systems, pure. Use when the task involves haskell pro.
 risk: safe
 source: community
 date_added: "2026-02-27"

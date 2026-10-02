@@ -1,6 +1,6 @@
 ---
 name: security-scanning-security-hardening
-description: "Coordinate multi-layer security scanning and hardening across application, infrastructure, and compliance controls."
+description: Coordinate multi-layer security scanning and hardening across application, infrastructure, and compliance controls. Use when the task involves security scanning security hardening.
 risk: unknown
 source: community
 date_added: "2026-02-27"

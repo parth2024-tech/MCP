@@ -1,6 +1,6 @@
 ---
 name: apify-market-research
-description: Analyze market conditions, geographic opportunities, pricing, consumer behavior, and product validation across Google Maps, Facebook, Instagram, Booking.com, and TripAdvisor.
+description: Analyze market conditions, geographic opportunities, pricing, consumer behavior, and product validation across Google Maps, Facebook, Instagram, Booking.com, and TripAdvisor. Use when the task involves apify market research.
 risk: unknown
 source: community
 ---

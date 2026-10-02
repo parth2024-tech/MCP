@@ -1,6 +1,6 @@
 ---
 name: x-twitter-scraper
-description: "X/Twitter automation skill for tweet search, follower export, posting, DMs, webhooks, MCP, SDKs, Hermes Tweet, and TweetClaw."
+description: X/Twitter automation skill for tweet search, follower export, posting, DMs, webhooks, MCP, SDKs, Hermes Tweet, and TweetClaw. Use when the task involves x twitter scraper.
 category: data
 risk: critical
 source: community

@@ -1,6 +1,6 @@
 ---
 name: emotional-arc-designer
-description: "One sentence - what this skill does and when to invoke it"
+description: One sentence - what this skill does and when to invoke it. Use when the task involves emotional arc designer.
 risk: safe
 source: community
 date_added: "2026-04-04"

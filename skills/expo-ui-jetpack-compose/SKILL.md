@@ -1,6 +1,6 @@
 ---
 name: expo-ui-jetpack-compose
-description: expo-ui-jetpack-compose
+description: expo-ui-jetpack-compose. Use when the task involves expo ui jetpack compose.
 risk: unknown
 source: community
 ---

@@ -1,6 +1,6 @@
 ---
 name: yann-lecun-filosofia
-description: "Sub-skill filosófica e pedagógica de Yann LeCun."
+description: Sub-skill filosófica e pedagógica de Yann LeCun. Use when the task involves yann lecun filosofia.
 risk: safe
 source: community
 date_added: '2026-03-06'

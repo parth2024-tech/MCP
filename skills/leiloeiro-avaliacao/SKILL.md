@@ -1,6 +1,6 @@
 ---
 name: leiloeiro-avaliacao
-description: Avaliacao pericial de imoveis em leilao. Valor de mercado, liquidacao forcada, ABNT NBR 14653, metodos comparativo/renda/custo, CUB e margem de seguranca.
+description: Avaliacao pericial de imoveis em leilao. Valor de mercado, liquidacao forcada, ABNT NBR 14653, metodos comparativo/renda/custo, CUB e margem de seguranca. Use when the task involves leiloeiro avaliacao.
 risk: safe
 source: community
 date_added: '2026-03-06'
@@ -435,7 +435,7 @@ Skill baseada em conhecimento (knowledge-only). Não requer instalação de depe
 
 ## Verificar Se A Skill Está Registrada:
 
-python C:\Users\renat\skills\agent-orchestrator\scripts\scan_registry.py
+python C:/Users/renat/skills/agent-orchestrator/scripts/scan_registry.py
 ```
 
 ---
@@ -494,19 +494,4 @@ Fontes normativas e referências:
 
 ## Common Pitfalls
 
-- Using this skill for tasks outside its domain expertise
-- Applying recommendations without understanding your specific context
-- Not providing enough project context for accurate analysis
-
-## Related Skills
-
-- `junta-leiloeiros` - Complementary skill for enhanced analysis
-- `leiloeiro-edital` - Complementary skill for enhanced analysis
-- `leiloeiro-ia` - Complementary skill for enhanced analysis
-- `leiloeiro-juridico` - Complementary skill for enhanced analysis
-- `leiloeiro-mercado` - Complementary skill for enhanced analysis
-
-## Limitations
-- Use this skill only when the task clearly matches the scope described above.
-- Do not treat the output as a substitute for environment-specific validation, testing, or expert review.
-- Stop and ask for clarification if required inputs, permissions, safety boundaries, or success criteria are missing.
+> See [references/details.md](references/details.md) for additional content.

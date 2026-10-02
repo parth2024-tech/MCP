@@ -1,6 +1,6 @@
 ---
 name: bamboohr-automation
-description: "Automate BambooHR tasks via Rube MCP (Composio): employees, time-off, benefits, dependents, employee updates. Always search tools first for current schemas."
+description: "Automate BambooHR tasks via Rube MCP (Composio): employees, time-off, benefits, dependents, employee updates. Always search tools first for current schemas. Use when the task involves bamboohr automation."
 risk: critical
 source: community
 date_added: "2026-02-27"

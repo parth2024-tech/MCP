@@ -1,6 +1,6 @@
 ---
 name: react-flow-node-ts
-description: "Create React Flow node components following established patterns with proper TypeScript types and store integration."
+description: Create React Flow node components following established patterns with proper TypeScript types and store integration. Use when the task involves react flow node ts.
 risk: unknown
 source: community
 date_added: "2026-02-27"

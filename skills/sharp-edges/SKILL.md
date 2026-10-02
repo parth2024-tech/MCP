@@ -1,6 +1,6 @@
 ---
 name: sharp-edges
-description: sharp-edges
+description: sharp-edges. Use when the task involves sharp edges.
 risk: unknown
 source: community
 ---

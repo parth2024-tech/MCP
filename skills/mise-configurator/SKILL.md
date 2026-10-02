@@ -1,6 +1,6 @@
 ---
 name: mise-configurator
-description: "Generate production-ready mise.toml setups for local development, CI/CD pipelines, and toolchain standardization."
+description: Generate production-ready mise.toml setups for local development, CI/CD pipelines, and toolchain standardization. Use when the task involves mise configurator.
 category: devops
 risk: safe
 source: self

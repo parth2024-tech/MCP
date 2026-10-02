@@ -1,6 +1,6 @@
 ---
 name: not-human-search-mcp
-description: "Search AI-ready websites, inspect indexed site details, verify MCP endpoints, and discover tools and APIs using the Not Human Search MCP server"
+description: Search AI-ready websites, inspect indexed site details, verify MCP endpoints, and discover tools and APIs using the Not Human Search MCP server. Use when the task involves not human search mcp.
 category: mcp
 risk: safe
 source: "https://nothumansearch.ai"

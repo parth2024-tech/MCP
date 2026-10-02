@@ -1,6 +1,6 @@
 ---
 name: kotlin-coroutines-expert
-description: "Expert patterns for Kotlin Coroutines and Flow, covering structured concurrency, error handling, and testing."
+description: Expert patterns for Kotlin Coroutines and Flow, covering structured concurrency, error handling, and testing. Use when the task involves kotlin coroutines expert.
 risk: safe
 source: community
 date_added: "2026-02-27"

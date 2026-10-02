@@ -1,6 +1,6 @@
 ---
 name: gitlab-ci-patterns
-description: "Comprehensive GitLab CI/CD pipeline patterns for automated testing, building, and deployment."
+description: Comprehensive GitLab CI/CD pipeline patterns for automated testing, building, and deployment. Use when the task involves gitlab ci patterns.
 risk: critical
 source: community
 date_added: "2026-02-27"
@@ -68,7 +68,7 @@ test:
     - npm ci
     - npm run lint
     - npm test
-  coverage: '/Lines\s*:\s*(\d+\.\d+)%/'
+  coverage: '/Lines/s*:/s*(/d+\./d+)%/'
   artifacts:
     reports:
       coverage_report:

@@ -337,8 +337,8 @@ export BURP_JAR="/Applications/Burp Suite Professional.app/Contents/Resources/ap
 ### Windows
 
 ```powershell
-$env:BURP_JAVA = "C:\Program Files\BurpSuiteProfessional\jre\bin\java.exe"
-$env:BURP_JAR = "C:\Program Files\BurpSuiteProfessional\burpsuite_pro.jar"
+$env:BURP_JAVA = "C:/Program Files/BurpSuiteProfessional/jre/bin/java.exe"
+$env:BURP_JAR = "C:/Program Files/BurpSuiteProfessional/burpsuite_pro.jar"
 ```
 
 ### Linux

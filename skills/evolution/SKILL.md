@@ -1,6 +1,6 @@
 ---
 name: evolution
-description: "This skill enables makepad-skills to self-improve continuously during development."
+description: This skill enables makepad-skills to self-improve continuously during development. Use when the task involves evolution.
 risk: critical
 source: community
 ---

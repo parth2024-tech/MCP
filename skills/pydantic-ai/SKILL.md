@@ -1,6 +1,6 @@
 ---
 name: pydantic-ai
-description: "Build production-ready AI agents with PydanticAI — type-safe tool use, structured outputs, dependency injection, and multi-model support."
+description: Build production-ready AI agents with PydanticAI — type-safe tool use, structured outputs, dependency injection, and multi-model support. Use when the task involves pydantic ai.
 category: ai-agents
 risk: safe
 source: community
@@ -250,7 +250,7 @@ code_review_agent = Agent(
 )
 
 def review_code(diff: str) -> CodeReview:
-    result = code_review_agent.run_sync(f"Review this code:\n\n{diff}")
+    result = code_review_agent.run_sync(f"Review this code:/n/n{diff}")
     return result.data
 ```
 
@@ -302,9 +302,9 @@ async def research_and_write(topic: str) -> BlogPost:
 
     # Stage 2: write based on research
     post = await writer.run(
-        f'Write a blog post about: {topic}\n\nResearch:\n' +
-        '\n'.join(f'- {p}' for p in research.data.key_points) +
-        f'\n\nConclusion: {research.data.conclusion}'
+        f'Write a blog post about: {topic}/n/nResearch:/n' +
+        '/n'.join(f'- {p}' for p in research.data.key_points) +
+        f'/n/nConclusion: {research.data.conclusion}'
     )
     return post.data
 ```

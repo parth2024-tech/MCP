@@ -105,9 +105,9 @@ date_added: "2026-02-27"
 set -euo pipefail  # Exit on error, undefined var, pipe fail
 
 # Colors (optional)
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-NC='\033[0m'
+RED='/033[0;31m'
+GREEN='/033[0;32m'
+NC='/033[0m'
 
 # Script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

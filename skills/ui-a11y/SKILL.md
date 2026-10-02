@@ -1,6 +1,6 @@
 ---
 name: ui-a11y
-description: "Audit a StyleSeed-based component or page for WCAG 2.2 AA issues and apply practical accessibility fixes where the code makes them safe."
+description: Audit a StyleSeed-based component or page for WCAG 2.2 AA issues and apply practical accessibility fixes where the code makes them safe. Use when the task involves ui a11y.
 category: design
 risk: safe
 source: community

@@ -1,6 +1,6 @@
 ---
 name: upgrading-expo
-description: "Upgrade Expo SDK versions"
+description: Upgrade Expo SDK versions. Use when the task involves upgrading expo.
 risk: safe
 source: "https://github.com/expo/skills/tree/main/plugins/upgrading-expo"
 date_added: "2026-02-27"

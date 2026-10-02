@@ -1,6 +1,6 @@
 ---
 name: cloudflare-workers-expert
-description: "Expert in Cloudflare Workers and the Edge Computing ecosystem. Covers Wrangler, KV, D1, Durable Objects, and R2 storage."
+description: Expert in Cloudflare Workers and the Edge Computing ecosystem. Covers Wrangler, KV, D1, Durable Objects, and R2 storage. Use when the task involves cloudflare workers expert.
 risk: safe
 source: community
 date_added: "2026-02-27"

@@ -1,6 +1,6 @@
 ---
 name: langfuse
-description: Expert in Langfuse - the open-source LLM observability platform.
+description: Expert in Langfuse - the open-source LLM observability platform. Use when the task involves langfuse.
   Covers tracing, prompt management, evaluation, datasets, and integration with
   LangChain, LlamaIndex, and OpenAI. Essential for debugging, monitoring, and
   improving LLM applications in production.
@@ -394,7 +394,7 @@ def chat_handler(user_id: str, message: str) -> str:
 def get_context(message: str) -> str:
     # RAG retrieval
     docs = retriever.get_relevant_documents(message)
-    return "\n".join([d.page_content for d in docs])
+    return "/n".join([d.page_content for d in docs])
 
 @observe(as_type="generation")  # LLM generation span
 def generate_response(message: str, context: str) -> str:
@@ -493,10 +493,5 @@ Works well with: `langgraph`, `crewai`, `structured-output`, `autonomous-agents`
 - User mentions or implies: llm tracing
 - User mentions or implies: prompt management
 - User mentions or implies: llm evaluation
-- User mentions or implies: monitor llm
-- User mentions or implies: debug llm
 
-## Limitations
-- Use this skill only when the task clearly matches the scope described above.
-- Do not treat the output as a substitute for environment-specific validation, testing, or expert review.
-- Stop and ask for clarification if required inputs, permissions, safety boundaries, or success criteria are missing.
+> See [references/details.md](references/details.md) for additional content.

@@ -1,6 +1,6 @@
 ---
 name: seo-aeo-landing-page-writer
-description: "Writes complete, structured landing pages optimized for SEO ranking, AEO citation, and visitor conversion. Activate when the user wants to write or generate a landing page for a product, service, or offer."
+description: Writes complete, structured landing pages optimized for SEO ranking, AEO citation, and visitor conversion. Activate when the user wants to write or generate a landing page for a product, service, or offer. Use when the task involves seo aeo landing page writer.
 risk: safe
 source: community
 date_added: "2026-04-01"

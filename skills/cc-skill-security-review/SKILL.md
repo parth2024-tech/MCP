@@ -221,7 +221,7 @@ const securityHeaders = [
       img-src 'self' data: https:;
       font-src 'self';
       connect-src 'self' https://api.example.com;
-    `.replace(/\s{2,}/g, ' ').trim()
+    `.replace(//s{2,}/g, ' ').trim()
   }
 ]
 ```
@@ -495,10 +495,5 @@ Before ANY production deployment:
 
 **Remember**: Security is not optional. One vulnerability can compromise the entire platform. When in doubt, err on the side of caution.
 
-### When to Use
-This skill is applicable to execute the workflow or actions described in the overview.
 
-## Limitations
-- Use this skill only when the task clearly matches the scope described above.
-- Do not treat the output as a substitute for environment-specific validation, testing, or expert review.
-- Stop and ask for clarification if required inputs, permissions, safety boundaries, or success criteria are missing.
+> Extended reference material: [references/details.md](references/details.md)

@@ -1,6 +1,6 @@
 ---
 name: conversation-memory
-description: Persistent memory systems for LLM conversations including
+description: Persistent memory systems for LLM conversations including. Use when the task involves conversation memory.
   short-term, long-term, and entity-based memory
 risk: unknown
 source: vibeship-spawner-skills (Apache 2.0)
@@ -98,22 +98,22 @@ class TieredMemory implements MemorySystem {
         // Relevant long-term memories
         const longTermRelevant = await this.longTerm.search(query, 3);
         if (longTermRelevant.length) {
-            parts.push('## Relevant Memories\n' +
-                longTermRelevant.map(m => `- ${m.content}`).join('\n'));
+            parts.push('## Relevant Memories/n' +
+                longTermRelevant.map(m => `- ${m.content}`).join('/n'));
         }
 
         // Relevant entities
         const entities = await this.entity.getRelevant(query);
         if (entities.length) {
-            parts.push('## Known Entities\n' +
-                entities.map(e => `- ${e.name}: ${e.facts.join(', ')}`).join('\n'));
+            parts.push('## Known Entities/n' +
+                entities.map(e => `- ${e.name}: ${e.facts.join(', ')}`).join('/n'));
         }
 
         // Recent conversation
         const recent = this.buffer.getRecent(10);
-        parts.push('## Recent Conversation\n' + formatMessages(recent));
+        parts.push('## Recent Conversation/n' + formatMessages(recent));
 
-        return parts.join('\n\n');
+        return parts.join('/n/n');
     }
 }
 
@@ -215,13 +215,13 @@ async function promptWithMemory(
 ${systemPrompt}
 
 ## User Context
-${entities.length ? `Known about user:\n${entities.map(e =>
+${entities.length ? `Known about user:/n${entities.map(e =>
     `- ${e.name}: ${e.facts.map(f => f.content).join('; ')}`
-).join('\n')}` : ''}
+).join('/n')}` : ''}
 
-${relevantMemories.length ? `Relevant past interactions:\n${relevantMemories.map(m =>
+${relevantMemories.length ? `Relevant past interactions:/n${relevantMemories.map(m =>
     `- [${formatDate(m.timestamp)}] ${m.content}`
-).join('\n')}` : ''}
+).join('/n')}` : ''}
 
 ## Recent Conversation
 ${formatMessages(recentContext)}

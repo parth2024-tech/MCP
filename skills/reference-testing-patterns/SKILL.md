@@ -1,6 +1,6 @@
 ---
-name: reference/testing-patterns
-description: Comprehensive testing patterns, examples, and anti-patterns across frameworks. Load as a companion to test-driven-development for detailed guidance on test structure, mocking strategies, and framework-specific patterns.
+name: testing-patterns
+description: Comprehensive testing patterns, examples, and anti-patterns across frameworks. Load as a companion to test-driven-development for detailed guidance on test structure, mocking strategies, and framework-specific patterns. Use when the task involves reference testing patterns.
 token_estimate: 956
 activation_keywords:
   - "testing"

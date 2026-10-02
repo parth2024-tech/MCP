@@ -1,6 +1,6 @@
 ---
 name: pr-writer
-description: "Create pull requests following Sentry's engineering practices."
+description: Create pull requests following Sentry's engineering practices. Use when the task involves pr writer.
 risk: unknown
 source: community
 ---

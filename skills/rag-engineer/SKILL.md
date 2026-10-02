@@ -1,6 +1,6 @@
 ---
 name: rag-engineer
-description: Expert in building Retrieval-Augmented Generation systems. Masters
+description: Expert in building Retrieval-Augmented Generation systems. Masters. Use when the task involves rag engineer.
   embedding models, vector databases, chunking strategies, and retrieval
   optimization for LLM applications.
 risk: unknown

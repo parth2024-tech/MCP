@@ -1,6 +1,6 @@
 ---
 name: azure-identity-ts
-description: "Authenticate to Azure services with various credential types."
+description: Authenticate to Azure services with various credential types. Use when the task involves azure identity ts.
 risk: unknown
 source: community
 date_added: "2026-02-27"

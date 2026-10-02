@@ -1,6 +1,6 @@
 ---
 name: azure-eventhub-dotnet
-description: Azure Event Hubs SDK for .NET.
+description: Azure Event Hubs SDK for .NET. Use when the task involves azure eventhub dotnet.
 risk: unknown
 source: community
 date_added: '2026-02-27'

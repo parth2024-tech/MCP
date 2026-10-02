@@ -1,6 +1,6 @@
 ---
 name: windows-shell-reliability
-description: "Reliable command execution on Windows: paths, encoding, and common binary pitfalls."
+description: "Reliable command execution on Windows: paths, encoding, and common binary pitfalls. Use when the task involves windows shell reliability."
 risk: safe
 source: community
 date_added: "2026-03-19"
@@ -41,7 +41,7 @@ Windows paths often contain spaces.
 | ❌ Wrong | ✅ Correct |
 |----------|-----------|
 | `dotnet build src/my project/file.fsproj` | `dotnet build "src/my project/file.fsproj"` |
-| `& C:\Path With Spaces\bin.exe` | `& "C:\Path With Spaces\bin.exe"` |
+| `& C:/Path With Spaces/bin.exe` | `& "C:/Path With Spaces/bin.exe"` |
 
 **Rule:** Always quote absolute and relative paths that may contain spaces.
 
@@ -50,7 +50,7 @@ In PowerShell, if an executable path starts with a quote, you MUST use the `&` o
 
 **Pattern:**
 ```powershell
-& "C:\Program Files\dotnet\dotnet.exe" build ...
+& "C:/Program Files/dotnet/dotnet.exe" build ...
 ```
 
 ---
@@ -92,7 +92,7 @@ In PowerShell, if an executable path starts with a quote, you MUST use the `&` o
 Windows has a 260-character path limit by default.
 
 **Fix:** If you hit long path errors, use the extended path prefix:
-`\\?\C:\Very\Long\Path\...`
+`\\?/C:/Very/Long/Path\...`
 
 ---
 

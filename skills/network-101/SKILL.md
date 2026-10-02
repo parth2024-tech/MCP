@@ -1,6 +1,6 @@
 ---
 name: network-101
-description: "Configure and test common network services (HTTP, HTTPS, SNMP, SMB) for penetration testing lab environments. Enable hands-on practice with service enumeration, log analysis, and security testing against properly configured target systems."
+description: Configure and test common network services (HTTP, HTTPS, SNMP, SMB) for penetration testing lab environments. Enable hands-on practice with service enumeration, log analysis, and security testing against properly configured target systems. Use when the task involves network 101.
 risk: unknown
 source: community
 author: zebbern
@@ -221,7 +221,7 @@ sudo tail -f /var/log/apache2/access.log
 sudo tail -f /var/log/apache2/error.log
 
 # Windows IIS logs
-# Location: C:\inetpub\logs\LogFiles\W3SVC1\
+# Location: C:/inetpub/logs/LogFiles/W3SVC1\
 ```
 
 **Parse Log for Credentials:**

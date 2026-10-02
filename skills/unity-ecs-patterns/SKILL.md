@@ -1,6 +1,6 @@
 ---
 name: unity-ecs-patterns
-description: "Production patterns for Unity's Data-Oriented Technology Stack (DOTS) including Entity Component System, Job System, and Burst Compiler."
+description: Production patterns for Unity's Data-Oriented Technology Stack (DOTS) including Entity Component System, Job System, and Burst Compiler. Use when the task involves unity ecs patterns.
 risk: safe
 source: community
 date_added: "2026-02-27"

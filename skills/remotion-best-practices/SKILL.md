@@ -1,6 +1,6 @@
 ---
 name: remotion-best-practices
-description: "Best practices for Remotion - Video creation in React"
+description: Best practices for Remotion - Video creation in React. Use when the task involves remotion best practices.
 risk: safe
 source: community
 tags: "remotion, video, react, animation, composition"

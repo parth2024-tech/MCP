@@ -1,7 +1,7 @@
 ---
 source: "https://github.com/huggingface/skills/tree/main/skills/huggingface-gradio"
 name: hugging-face-gradio
-description: Build or edit Gradio apps, layouts, components, and chat interfaces in Python.
+description: Build or edit Gradio apps, layouts, components, and chat interfaces in Python. Use when the task involves hugging face gradio.
 risk: unknown
 ---
 

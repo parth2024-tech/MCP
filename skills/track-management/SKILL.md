@@ -1,6 +1,6 @@
 ---
 name: track-management
-description: Use this skill when creating, managing, or working with Conductor tracks - the logical work units for features, bugs, and refactors. Applies to spec.md, plan.md, and track lifecycle operations.
+description: Use this skill when creating, managing, or working with Conductor tracks - the logical work units for features, bugs, and refactors. Applies to spec.md, plan.md, and track lifecycle operations. Use when the task involves track management.
 risk: safe
 source: community
 date_added: '2026-02-27'

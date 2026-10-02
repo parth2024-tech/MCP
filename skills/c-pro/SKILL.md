@@ -1,6 +1,6 @@
 ---
 name: c-pro
-description: "Write efficient C code with proper memory management, pointer"
+description: Write efficient C code with proper memory management, pointer. Use when the task involves c pro.
 risk: unknown
 source: community
 date_added: "2026-02-27"

@@ -1,6 +1,6 @@
 ---
 name: bug-hunter
-description: "Systematically finds and fixes bugs using proven debugging techniques. Traces from symptoms to root cause, implements fixes, and prevents regression."
+description: Systematically finds and fixes bugs using proven debugging techniques. Traces from symptoms to root cause, implements fixes, and prevents regression. Use when the task involves bug hunter.
 category: development
 risk: safe
 source: community

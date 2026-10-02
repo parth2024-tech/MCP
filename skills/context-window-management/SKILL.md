@@ -1,6 +1,6 @@
 ---
 name: context-window-management
-description: Strategies for managing LLM context windows including
+description: Strategies for managing LLM context windows including. Use when the task involves context window management.
   summarization, trimming, routing, and avoiding context rot
 risk: unknown
 source: vibeship-spawner-skills (Apache 2.0)
@@ -107,7 +107,7 @@ function buildOptimalPrompt(components: {
 
     // CRITICAL CONTEXT: Right after system (high primacy)
     if (components.criticalContext) {
-        parts.push(`## Key Context\n${components.criticalContext}`);
+        parts.push(`## Key Context/n${components.criticalContext}`);
     }
 
     // MIDDLE: Conversation history (lower weight)
@@ -116,20 +116,20 @@ function buildOptimalPrompt(components: {
     if (history.length > 10) {
         const oldSummary = summarize(history.slice(0, -5));
         const recent = history.slice(-5);
-        parts.push(`## Earlier Conversation (Summary)\n${oldSummary}`);
-        parts.push(`## Recent Messages\n${formatMessages(recent)}`);
+        parts.push(`## Earlier Conversation (Summary)/n${oldSummary}`);
+        parts.push(`## Recent Messages/n${formatMessages(recent)}`);
     } else {
-        parts.push(`## Conversation\n${formatMessages(history)}`);
+        parts.push(`## Conversation/n${formatMessages(history)}`);
     }
 
     // END: Current query (high recency)
     // Restate critical requirements here
-    parts.push(`## Current Request\n${components.currentQuery}`);
+    parts.push(`## Current Request/n${components.currentQuery}`);
 
     // FINAL: Reminder of key constraints
     parts.push(`Remember: ${extractKeyConstraints(components.systemPrompt)}`);
 
-    return parts.join('\n\n');
+    return parts.join('/n/n');
 }
 
 ### Intelligent Summarization
@@ -228,7 +228,7 @@ async function buildWithBudget(
     };
 
     // Reallocate unused budget
-    const used = await countTokens(Object.values(prepared).join('\n'));
+    const used = await countTokens(Object.values(prepared).join('/n'));
     const remaining = modelMaxTokens - used - budget.response;
 
     if (remaining > 0) {

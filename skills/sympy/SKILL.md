@@ -1,6 +1,6 @@
 ---
 name: sympy
-description: "SymPy is a Python library for symbolic mathematics that enables exact computation using mathematical symbols rather than numerical approximations."
+description: SymPy is a Python library for symbolic mathematics that enables exact computation using mathematical symbols rather than numerical approximations. Use when the task involves sympy.
 license: https://github.com/sympy/sympy/blob/master/LICENSE
 metadata:
     skill-author: K-Dense Inc.
@@ -493,12 +493,5 @@ f(np.array([1, 2, 3]))
 
 ## Additional Resources
 
-- Official Documentation: https://docs.sympy.org/
-- Tutorial: https://docs.sympy.org/latest/tutorials/intro-tutorial/index.html
-- API Reference: https://docs.sympy.org/latest/reference/index.html
-- Examples: https://github.com/sympy/sympy/tree/master/examples
 
-## Limitations
-- Use this skill only when the task clearly matches the scope described above.
-- Do not treat the output as a substitute for environment-specific validation, testing, or expert review.
-- Stop and ask for clarification if required inputs, permissions, safety boundaries, or success criteria are missing.
+> See [references/details.md](references/details.md) for additional content.

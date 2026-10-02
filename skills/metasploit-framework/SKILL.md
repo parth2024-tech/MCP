@@ -1,6 +1,6 @@
 ---
 name: metasploit-framework
-description: "⚠️ AUTHORIZED USE ONLY > This skill is for educational purposes or authorized security assessments only. > You must have explicit, written permission from the system owner before using this tool. > Misuse of this tool is illegal and strictly prohibited."
+description: "AUTHORIZED USE ONLY. Metasploit Framework patterns for authorized penetration testing and security assessments. Use when running authorized exploitation, post-exploitation, or vulnerability validation with Metasploit."
 risk: offensive
 source: community
 author: zebbern
@@ -247,8 +247,8 @@ meterpreter > keyscan_stop
 
 # Shell Access
 meterpreter > shell
-C:\Windows\system32> whoami
-C:\Windows\system32> exit
+C:/Windows/system32> whoami
+C:/Windows/system32> exit
 meterpreter >
 
 # Background Session

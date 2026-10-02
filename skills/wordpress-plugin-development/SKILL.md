@@ -1,6 +1,6 @@
 ---
 name: wordpress-plugin-development
-description: "WordPress plugin development workflow covering plugin architecture, hooks, admin interfaces, REST API, security best practices, and WordPress 7.0 features: Real-Time Collaboration, AI Connectors, Abilities API, DataViews, and PHP-only blocks."
+description: "WordPress plugin development workflow covering plugin architecture, hooks, admin interfaces, REST API, security best practices, and WordPress 7.0 features: Real-Time Collaboration, AI Connectors, Abilities API, DataViews, and PHP-only blocks. Use when the task involves wordpress plugin development."
 category: granular-workflow-bundle
 risk: safe
 source: personal
@@ -495,7 +495,6 @@ plugin-name/
 - `wordpress-theme-development` - Theme development
 - `wordpress-woocommerce` - WooCommerce
 
-## Limitations
-- Use this skill only when the task clearly matches the scope described above.
-- Do not treat the output as a substitute for environment-specific validation, testing, or expert review.
-- Stop and ask for clarification if required inputs, permissions, safety boundaries, or success criteria are missing.
+
+
+> Extended reference material: [references/details.md](references/details.md)

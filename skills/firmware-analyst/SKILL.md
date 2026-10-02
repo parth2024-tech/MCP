@@ -1,6 +1,6 @@
 ---
 name: firmware-analyst
-description: Expert firmware analyst specializing in embedded systems, IoT security, and hardware reverse engineering.
+description: Expert firmware analyst specializing in embedded systems, IoT security, and hardware reverse engineering. Use when the task involves firmware analyst.
 risk: unknown
 source: community
 date_added: '2026-02-27'

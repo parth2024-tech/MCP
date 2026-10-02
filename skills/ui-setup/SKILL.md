@@ -1,6 +1,6 @@
 ---
 name: ui-setup
-description: "Interactive StyleSeed setup wizard for choosing app type, brand color, visual style, typography, and the first screen scaffold."
+description: Interactive StyleSeed setup wizard for choosing app type, brand color, visual style, typography, and the first screen scaffold. Use when the task involves ui setup.
 category: design
 risk: safe
 source: community

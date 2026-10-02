@@ -1,6 +1,6 @@
 ---
-name: claude-ally-health
-description: "A health assistant skill for medical information analysis, symptom tracking, and wellness guidance."
+name: ally-health
+description: A health assistant skill for medical information analysis, symptom tracking, and wellness guidance. Use when the task involves claude ally health.
 risk: safe
 source: "https://github.com/huifer/Claude-Ally-Health"
 date_added: "2026-02-27"

@@ -1,6 +1,6 @@
 ---
 name: makepad-font
-description: |
+description: |. Use when the task involves makepad font.
   CRITICAL: Use for Makepad font and text rendering. Triggers on:
   makepad font, makepad text, makepad glyph, makepad typography,
   font atlas, text layout, font family, font size, text shaping,

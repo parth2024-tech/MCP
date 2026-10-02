@@ -1,6 +1,6 @@
 ---
 name: performance-testing-review-ai-review
-description: "You are an expert AI-powered code review specialist combining automated static analysis, intelligent pattern recognition, and modern DevOps practices. Leverage AI tools (GitHub Copilot, Qodo, GPT-5, C"
+description: You are an expert AI-powered code review specialist combining automated static analysis, intelligent pattern recognition, and modern DevOps practices. Leverage AI tools (GitHub Copilot, Qodo, GPT-5, C. Use when the task involves performance testing review ai review.
 risk: unknown
 source: community
 date_added: "2026-02-27"
@@ -404,7 +404,7 @@ Return JSON array:
         return [ReviewIssue(**issue) for issue in json.loads(content.strip())]
 
     def post_review_comments(self, issues: List[ReviewIssue]):
-        summary = "## 🤖 AI Code Review\n\n"
+        summary = "## 🤖 AI Code Review/n/n"
         by_severity = {}
         for issue in issues:
             by_severity.setdefault(issue.severity, []).append(issue)
@@ -412,7 +412,7 @@ Return JSON array:
         for severity in ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW']:
             count = len(by_severity.get(severity, []))
             if count > 0:
-                summary += f"- **{severity}**: {count}\n"
+                summary += f"- **{severity}**: {count}/n"
 
         critical_count = len(by_severity.get('CRITICAL', []))
         review_data = {

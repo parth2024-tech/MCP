@@ -1,6 +1,6 @@
 ---
 name: hugging-face-datasets
-description: Create and manage datasets on Hugging Face Hub. Supports initializing repos, defining configs/system prompts, streaming row updates, and SQL-based dataset querying/transformation. Designed to work alongside HF MCP server for comprehensive dataset workflows.
+description: Create and manage datasets on Hugging Face Hub. Supports initializing repos, defining configs/system prompts, streaming row updates, and SQL-based dataset querying/transformation. Designed to work alongside HF MCP server for comprehensive dataset workflows. Use when the task involves hugging face datasets.
 risk: unknown
 source: community
 ---
@@ -117,7 +117,7 @@ SELECT question, choices[answer] AS correct_answer FROM data
 SELECT * FROM data WHERE regexp_matches(question, 'nutrition|diet')
 
 -- String functions
-SELECT regexp_replace(question, '\n', '') AS cleaned FROM data
+SELECT regexp_replace(question, '/n', '') AS cleaned FROM data
 ```
 
 ## Common Operations
@@ -220,48 +220,7 @@ uv run scripts/sql_manager.py raw --sql "
 
 ## Python API Usage
 
-```python
-from sql_manager import HFDatasetSQL
-
-sql = HFDatasetSQL()
-
-# Query
-results = sql.query("cais/mmlu", "SELECT * FROM data WHERE subject='nutrition' LIMIT 10")
-
-# Get schema
-schema = sql.describe("cais/mmlu")
-
-# Sample
-samples = sql.sample("cais/mmlu", n=5, seed=42)
-
-# Count
-count = sql.count("cais/mmlu", where="subject='nutrition'")
-
-# Histogram
-dist = sql.histogram("cais/mmlu", "subject")
-
-# Filter and transform
-results = sql.filter_and_transform(
-    "cais/mmlu",
-    select="subject, COUNT(*) as cnt",
-    group_by="subject",
-    order_by="cnt DESC",
-    limit=10
-)
-
-# Push to Hub
-url = sql.push_to_hub(
-    "cais/mmlu",
-    "username/nutrition-subset",
-    sql="SELECT * FROM data WHERE subject='nutrition'",
-    private=True
-)
-
-# Export locally
-sql.export_to_parquet("cais/mmlu", "output.parquet", sql="SELECT * FROM data LIMIT 100")
-
-sql.close()
-```
+> See [references/details.md](references/details.md) for full code examples.
 
 ## HF Path Format
 
@@ -278,29 +237,7 @@ The `@~parquet` revision provides auto-converted Parquet files for any dataset f
 
 ## Useful DuckDB SQL Functions
 
-```sql
--- String functions
-LENGTH(column)                    -- String length
-regexp_replace(col, '\n', '')     -- Regex replace
-regexp_matches(col, 'pattern')    -- Regex match
-LOWER(col), UPPER(col)           -- Case conversion
-
--- Array functions  
-choices[0]                        -- Array indexing (0-based)
-array_length(choices)             -- Array length
-unnest(choices)                   -- Expand array to rows
-
--- Aggregations
-COUNT(*), SUM(col), AVG(col)
-GROUP BY col HAVING condition
-
--- Sampling
-USING SAMPLE 10                   -- Random sample
-USING SAMPLE 10 (RESERVOIR, 42)   -- Reproducible sample
-
--- Window functions
-ROW_NUMBER() OVER (PARTITION BY col ORDER BY col2)
-```
+> See [references/details.md](references/details.md) for full code examples.
 
 ---
 

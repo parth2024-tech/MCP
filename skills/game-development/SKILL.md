@@ -1,6 +1,6 @@
 ---
 name: game-development
-description: "Game development orchestrator. Routes to platform-specific skills based on project needs."
+description: Game development orchestrator. Routes to platform-specific skills based on project needs. Use when the task involves game development.
 risk: unknown
 source: community
 date_added: "2026-02-27"

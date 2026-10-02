@@ -1,6 +1,6 @@
 ---
 name: robius-state-management
-description: |
+description: |. Use when the task involves robius state management.
   CRITICAL: Use for Robius state management patterns. Triggers on:
   AppState, persistence, theme switch, 状态管理,
   Scope::with_data, save state, load state, serde,

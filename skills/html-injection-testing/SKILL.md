@@ -1,6 +1,6 @@
 ---
 name: html-injection-testing
-description: "Identify and exploit HTML injection vulnerabilities that allow attackers to inject malicious HTML content into web applications. This vulnerability enables attackers to modify page appearance, create phishing pages, and steal user credentials through injected forms."
+description: Identify and exploit HTML injection vulnerabilities that allow attackers to inject malicious HTML content into web applications. This vulnerability enables attackers to modify page appearance, create phishing pages, and steal user credentials through injected forms. Use when the task involves html injection testing.
 risk: offensive
 source: community
 author: zebbern
@@ -332,7 +332,7 @@ Evade basic filters:
 %253Ch1%253EDouble%2520Encoded%253C%252Fh1%253E
 
 <!-- Unicode encoding -->
-\u003ch1\u003eUnicode\u003c/h1\u003e
+/u003ch1/u003eUnicode/u003c/h1/u003e
 
 <!-- Attribute-based -->
 <div onmouseover="alert(1)">Hover me</div>
@@ -470,7 +470,7 @@ Server-side protections:
 | URL encoding | `%3Ch1%3E` = `<h1>` |
 | HTML entities | `&#60;h1&#62;` = `<h1>` |
 | Double encoding | `%253C` = `<` |
-| Unicode | `\u003c` = `<` |
+| Unicode | `/u003c` = `<` |
 
 ## Constraints and Limitations
 
@@ -495,10 +495,6 @@ Server-side protections:
 ## Troubleshooting
 
 | Issue | Solutions |
-|-------|-----------|
-| HTML not rendering | Check if output HTML-encoded; try encoding variations; verify HTML context |
-| Payload stripped | Use encoding variations; try tag splitting; test null bytes; nested tags |
-| XSS not working (HTML only) | JS filtered but HTML allowed; leverage phishing forms, meta refresh redirects |
 
-## When to Use
-This skill is applicable to execute the workflow or actions described in the overview.
+
+> Extended reference material: [references/details.md](references/details.md)

@@ -1,6 +1,6 @@
 ---
 name: ux-flow
-description: "Design user flows and screen structure using StyleSeed UX patterns such as progressive disclosure, hub-and-spoke navigation, and information pyramids."
+description: Design user flows and screen structure using StyleSeed UX patterns such as progressive disclosure, hub-and-spoke navigation, and information pyramids. Use when the task involves ux flow.
 category: design
 risk: safe
 source: community

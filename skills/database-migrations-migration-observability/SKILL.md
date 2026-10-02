@@ -1,6 +1,6 @@
 ---
 name: database-migrations-migration-observability
-description: "Migration monitoring, CDC, and observability infrastructure"
+description: Migration monitoring, CDC, and observability infrastructure. Use when the task involves database migrations migration observability.
 risk: unknown
 source: community
 tags: "database, cdc, debezium, kafka, prometheus, grafana, monitoring"

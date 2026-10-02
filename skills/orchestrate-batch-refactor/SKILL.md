@@ -1,6 +1,6 @@
 ---
 name: "orchestrate-batch-refactor"
-description: "Plan and execute large refactors with dependency-aware work packets and parallel analysis."
+description: Plan and execute large refactors with dependency-aware work packets and parallel analysis. Use when the task involves orchestrate batch refactor.
 risk: safe
 source: "Dimillian/Skills (MIT)"
 date_added: "2026-03-25"

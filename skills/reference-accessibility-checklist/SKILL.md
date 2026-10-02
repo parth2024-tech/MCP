@@ -1,6 +1,6 @@
 ---
-name: reference/accessibility-checklist
-description: Accessibility verification checklist based on WCAG 2.1 AA. Load as a companion to browser-testing-with-devtools and shipping-and-launch for verification of keyboard navigation, screen reader support, color contrast, and semantic HTML.
+name: accessibility-checklist
+description: Accessibility verification checklist based on WCAG 2.1 AA. Load as a companion to browser-testing-with-devtools and shipping-and-launch for verification of keyboard navigation, screen reader support, color contrast, and semantic HTML. Use when the task involves reference accessibility checklist.
 token_estimate: 1026
 activation_keywords:
   - "accessibility"

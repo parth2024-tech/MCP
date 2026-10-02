@@ -1,6 +1,6 @@
 ---
 name: agenttrace-session-audit
-description: "Audit local AI coding-agent sessions with agenttrace for cost, tool failures, latency, anomalies, health, diffs, and CI gates."
+description: Audit local AI coding-agent sessions with agenttrace for cost, tool failures, latency, anomalies, health, diffs, and CI gates. Use when the task involves agenttrace session audit.
 category: development
 risk: safe
 source: community

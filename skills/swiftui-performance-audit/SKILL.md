@@ -1,6 +1,6 @@
 ---
 name: swiftui-performance-audit
-description: Audit SwiftUI performance issues from code review and profiling evidence.
+description: Audit SwiftUI performance issues from code review and profiling evidence. Use when the task involves swiftui performance audit.
 risk: safe
 source: "Dimillian/Skills (MIT)"
 date_added: "2026-03-25"

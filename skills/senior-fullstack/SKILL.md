@@ -1,6 +1,6 @@
 ---
 name: senior-fullstack
-description: "Complete toolkit for senior fullstack with modern tools and best practices."
+description: Complete toolkit for senior fullstack with modern tools and best practices. Use when the task involves senior fullstack.
 risk: critical
 source: community
 date_added: "2026-02-27"

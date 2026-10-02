@@ -1,6 +1,6 @@
 ---
 name: auri-core
-description: "Auri: assistente de voz inteligente (Alexa + Claude claude-opus-4-20250805). Visao do produto, persona Vitoria Neural, stack AWS, modelo Free/Pro/Business/Enterprise, roadmap 4 fases, GTM, north star WAC e analise competitiva."
+description: "Auri: assistente de voz inteligente (Alexa + Claude claude-opus-4-20250805). Visao do produto, persona Vitoria Neural, stack AWS, modelo Free/Pro/Business/Enterprise, roadmap 4 fases, GTM, north star WAC e analise competitiva. Use when the task involves auri core."
 risk: none
 source: community
 date_added: '2026-03-06'
@@ -194,7 +194,7 @@ Enterprise: Ilimitado, persona customizavel, integracao CRM/ERP, SLA 99.9%.
 
 ## Projecao De Receita (Ano 1)
 
-Meta conservadora: Pro 250 x R\9 = R$ 7.250/mes | Business 25 x R\9 = R$ 2.475/mes
+Meta conservadora: Pro 250 x R/9 = R$ 7.250/mes | Business 25 x R/9 = R$ 2.475/mes
 MRR Ano 1: R$ 9.725/mes (~R$ 117k ARR)
 
 Meta otimista: Pro 800 = R$ 23.200/mes | Business 80 = R$ 7.920/mes
@@ -359,18 +359,7 @@ Metricas customizadas publicadas:
 
 ## Tabela Comparativa
 
-| Feature | Auri | Alexa Pura | Siri | Google Assistant | ChatGPT Voice |
-|---------|------|------------|------|------------------|---------------|
-| Idioma PT-BR nativo | Alta | Media | Media | Alta | Media |
-| Raciocinio profundo | Alta | Baixa | Media | Media | Alta |
-| Memoria multi-sessao | Alta | Baixa | Media | Media | Alta |
-| Integracao smart home | Alta | Maxima | Media | Alta | Baixa |
-| Personalidade consistente | Alta | Media | Media | Media | Alta |
-| Hardware proprio | Usa Echo | Echo | HomePod | Nest | App only |
-| Modelo base | Claude Opus 4 | Alexa LLM | Apple LLM | Gemini | GPT-4o |
-| Privacidade | Alta | Media | Maxima | Baixa | Media |
-| Preco | R\/usr/bin/bash-99/mes | Gratis | Gratis | Gratis | R /mes |
-| Disponivel no Brasil | Sim | Sim | Sim | Sim | Sim |
+> See [references/details.md](references/details.md) for full code examples.
 
 ## Posicionamento No Mapa Competitivo
 
@@ -388,7 +377,7 @@ Nenhum concorrente ocupa esse quadrante simultaneamente:
 |---------|---------------|
 | Por que nao ChatGPT? | ChatGPT e app, sem voz-first. Auri e native no Echo. |
 | Alexa ja resolve | Para comandos sim. Para conversas reais, nao. |
-| R\9 e caro | Menos que 1 cafe/dia por assistente pessoal 24/7. |
+| R/9 e caro | Menos que 1 cafe/dia por assistente pessoal 24/7. |
 | E a privacidade? | Dados na sua AWS, retencao configuravel, LGPD compliant. |
 | Amazon vai copiar? | Amazon incentiva ecossistema de skills. Somos parceiros. |
 
@@ -504,100 +493,3 @@ Verificar deployment:
 
 ## Fallback Strategy (Claude Api Indisponivel)
 
-Se a API da Anthropic estiver indisponivel, o sistema retorna respostas pre-configuradas:
-- api_down: Estou com instabilidade. Pode tentar em alguns minutinhos?
-- timeout: Preciso de mais tempo nessa pergunta. Me faz de novo daqui a pouco?
-- rate_limit: Muitas conversas simultaneas. Tente em alguns segundos!
-
-## Gestao De Custos
-
-| Componente | Custo Estimado (1000 usuarios Pro) |
-|-----------|-----------------------------------|
-| Claude API | R$ 4.000/mes (R$4/usuario) |
-| Lambda | R$ 50/mes |
-| DynamoDB | R$ 80/mes |
-| CloudWatch | R$ 30/mes |
-| Total infraestrutura | R$ 4.160/mes |
-| Receita 1000 Pro | R$ 29.000/mes |
-| Margem bruta | ~86% |
-
----
-
-## Lgpd (Lei 13.709/2018)
-
-- Base legal: Execucao de contrato (Art. 7, V) para usuarios Pro/Business.
-- Consentimento: Coletado no onboarding da skill via voz + confirmacao.
-- Dados coletados: Texto de conversas, preferencias, dados de uso anonimizados.
-- Retencao: Free = 0 dias | Pro = 90 dias | Business = 365 dias.
-- Direito de exclusao: Comando de voz Auri apaga meus dados -> DynamoDB delete.
-- DPO: Designar antes do lancamento publico.
-
-## Alexa Skills Store - Politicas
-
-- Skill deve seguir Alexa Skills Kit Policies integralmente.
-- Proibido coletar dados sensiveis (saude, financeiros, criancas < 13 anos).
-- In-Skill Purchasing exige aprovacao previa da Amazon.
-- Privacy Policy URL obrigatoria na submissao da skill.
-- Monetizacao: Amazon retira 30% via In-Skill Purchasing.
-
----
-
-## 11. Glossario
-
-| Termo | Definicao |
-|-------|-----------|
-| WAC | Weekly Active Conversationalists - North Star Metric da Auri |
-| ASK | Alexa Skills Kit - SDK oficial Amazon para Skills |
-| SSML | Speech Synthesis Markup Language - markup para controle de voz |
-| Intent | Acao que o usuario quer executar (ex: me explica X) |
-| Slot | Variavel dentro de um intent (ex: query em me explica {query}) |
-| Utterance | Frase de exemplo que aciona um intent |
-| Session | Uma conversa continua com a Auri (inicio ate encerrar) |
-| Long-term Memory | Dados persistidos no DynamoDB entre sessoes |
-| In-Skill Purchasing | Sistema de cobranca nativo da Alexa Skills Store |
-| Vitoria Neural | Voz Amazon Polly pt-BR de alta qualidade usada pela Auri |
-| Claude claude-opus-4-20250805 | Modelo de linguagem Anthropic usado como motor da Auri |
-| DynamoDB | Banco NoSQL AWS usado para memoria persistente dos usuarios |
-| Lambda | Funcao AWS serverless que processa as requisicoes da Auri |
-| Anthropic | Empresa criadora do Claude, fornecedora da API de IA |
-| MRR | Monthly Recurring Revenue - Receita Mensal Recorrente |
-| LTV | Lifetime Value - Valor do ciclo de vida do cliente |
-| CAC | Customer Acquisition Cost - Custo de aquisicao de cliente |
-
----
-
-## 12. Links E Recursos
-
-| Recurso | URL / Localizacao |
-|---------|-------------------|
-| Alexa Skills Kit Docs | https://developer.amazon.com/en-US/alexa/alexa-skills-kit |
-| ASK SDK Python | https://github.com/alexa/alexa-skills-kit-sdk-for-python |
-| Amazon Polly Vitoria Neural | https://docs.aws.amazon.com/polly/latest/dg/voicelist.html |
-| Anthropic Claude API | https://docs.anthropic.com/en/api/getting-started |
-| Claude claude-opus-4-20250805 Docs | https://docs.anthropic.com/en/docs/models-overview |
-| Alexa Skills Store Brasil | https://www.amazon.com.br/alexa-skills |
-| DynamoDB Best Practices | https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/best-practices.html |
-| In-Skill Purchasing | https://developer.amazon.com/en-US/docs/alexa/in-skill-purchase/isp-overview.html |
-| Codigo-fonte Auri | C:/Users/renat/skills/auri-core/ |
-| Amazon Alexa Skill (skill tecnica) | C:/Users/renat/skills/amazon-alexa/SKILL.md |
-
----
-
-*Auri Core Skill - v1.0.0 | Criado em 2026-03-03 | Skills Ecosystem*
-
-## Best Practices
-
-- Provide clear, specific context about your project and requirements
-- Review all suggestions before applying them to production code
-- Combine with other complementary skills for comprehensive analysis
-
-## Common Pitfalls
-
-- Using this skill for tasks outside its domain expertise
-- Applying recommendations without understanding your specific context
-- Not providing enough project context for accurate analysis
-
-## Limitations
-- Use this skill only when the task clearly matches the scope described above.
-- Do not treat the output as a substitute for environment-specific validation, testing, or expert review.
-- Stop and ask for clarification if required inputs, permissions, safety boundaries, or success criteria are missing.

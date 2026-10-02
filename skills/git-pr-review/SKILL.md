@@ -1,6 +1,6 @@
 ---
 name: git-pr-review
-description: Generate a concise and structured PR description from commit history with minimal token usage
+description: Generate a concise and structured PR description from commit history with minimal token usage. Use when the task involves git pr review.
 risk: safe
 source: community
 source_type: community

@@ -1,6 +1,6 @@
 ---
 name: content-creator
-description: "Professional-grade brand voice analysis, SEO optimization, and platform-specific content frameworks."
+description: Professional-grade brand voice analysis, SEO optimization, and platform-specific content frameworks. Use when the task involves content creator.
 category: marketing
 risk: unknown
 source: community

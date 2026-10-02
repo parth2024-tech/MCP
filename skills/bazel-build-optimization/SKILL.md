@@ -305,7 +305,7 @@ bazel query "rdeps(//..., //libs/utils:utils)"
 bazel query "//libs/..."
 
 # Find changed targets since commit
-bazel query "rdeps(//..., set($(git diff --name-only HEAD~1 | sed 's/.*/"&"/' | tr '\n' ' ')))"
+bazel query "rdeps(//..., set($(git diff --name-only HEAD~1 | sed 's/.*/"&"/' | tr '/n' ' ')))"
 
 # Generate dependency graph
 bazel query "deps(//apps/web:web)" --output=graph | dot -Tpng > deps.png

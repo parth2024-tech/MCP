@@ -1,6 +1,6 @@
 ---
 name: apify-audience-analysis
-description: Understand audience demographics, preferences, behavior patterns, and engagement quality across Facebook, Instagram, YouTube, and TikTok.
+description: Understand audience demographics, preferences, behavior patterns, and engagement quality across Facebook, Instagram, YouTube, and TikTok. Use when the task involves apify audience analysis.
 risk: unknown
 source: community
 ---

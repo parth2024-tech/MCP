@@ -1,6 +1,6 @@
 ---
 name: google-docs-automation
-description: "Lightweight Google Docs integration with standalone OAuth authentication. No MCP server required."
+description: Lightweight Google Docs integration with standalone OAuth authentication. No MCP server required. Use when the task involves google docs automation.
 license: Apache-2.0
 risk: critical
 source: community
@@ -46,7 +46,7 @@ All operations via `scripts/docs.py`. Auto-authenticates on first use if not log
 python scripts/docs.py create "Meeting Notes"
 
 # Create a document with initial content
-python scripts/docs.py create "Project Plan" --content "# Overview\n\nThis is the project plan."
+python scripts/docs.py create "Project Plan" --content "# Overview/n/nThis is the project plan."
 
 # Find documents by title
 python scripts/docs.py find "meeting" --limit 10
@@ -61,7 +61,7 @@ python scripts/docs.py get-text "https://docs.google.com/document/d/1BxiMVs0XRA5
 python scripts/docs.py append-text 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms "New paragraph at the end."
 
 # Insert text at beginning of document
-python scripts/docs.py insert-text 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms "Text at the beginning.\n\n"
+python scripts/docs.py insert-text 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms "Text at the beginning./n/n"
 
 # Replace text in document
 python scripts/docs.py replace-text 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms "old text" "new text"

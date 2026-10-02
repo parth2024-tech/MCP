@@ -1,6 +1,6 @@
 ---
 name: astro
-description: "Build content-focused websites with Astro — zero JS by default, islands architecture, multi-framework components, and Markdown/MDX support."
+description: Build content-focused websites with Astro — zero JS by default, islands architecture, multi-framework components, and Markdown/MDX support. Use when the task involves astro.
 category: frontend
 risk: safe
 source: community

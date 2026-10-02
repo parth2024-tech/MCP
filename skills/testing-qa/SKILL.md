@@ -1,6 +1,6 @@
 ---
 name: testing-qa
-description: "Comprehensive testing and QA workflow covering unit testing, integration testing, E2E testing, browser automation, and quality assurance."
+description: Comprehensive testing and QA workflow covering unit testing, integration testing, E2E testing, browser automation, and quality assurance. Use when the task involves testing qa.
 category: workflow-bundle
 risk: safe
 source: personal

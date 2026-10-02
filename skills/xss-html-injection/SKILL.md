@@ -1,6 +1,6 @@
 ---
 name: xss-html-injection
-description: "Execute comprehensive client-side injection vulnerability assessments on web applications to identify XSS and HTML injection flaws, demonstrate exploitation techniques for session hijacking and credential theft, and validate input sanitization and output encoding mechanisms."
+description: Execute comprehensive client-side injection vulnerability assessments on web applications to identify XSS and HTML injection flaws, demonstrate exploitation techniques for session hijacking and credential theft, and validate input sanitization and output encoding mechanisms. Use when the task involves xss html injection.
 risk: offensive
 source: community
 author: zebbern
@@ -307,10 +307,10 @@ Fake login form or misleading content here
 <img src=x onerror=&#x61;&#x6c;&#x65;&#x72;&#x74;(1)>
 
 <!-- Unicode encoding -->
-<script>\u0061lert(1)</script>
+<script>/u0061lert(1)</script>
 
 <!-- Mixed encoding -->
-<img src=x onerror=\u0061\u006cert(1)>
+<img src=x onerror=/u0061/u006cert(1)>
 ```
 
 #### JavaScript Obfuscation
@@ -495,11 +495,6 @@ Content-Security-Policy: script-src 'self' https://cdn.trusted.com
 
 | Issue | Solutions |
 |-------|-----------|
-| Script not executing | Check CSP blocking; verify encoding; try event handlers (img, svg onerror); confirm JS enabled |
-| Payload appears but doesn't execute | Break out of attribute context with `"` or `'`; check if inside comment; test different contexts |
-| Cookies not accessible | Check HttpOnly flag; try localStorage/sessionStorage; use no-cors mode |
-| CSP blocking payloads | Find JSONP on whitelisted domains; check for unsafe-inline; test base-uri bypass |
-| WAF blocking requests | Use encoding variations; fragment payload; null bytes; case variations |
 
-## When to Use
-This skill is applicable to execute the workflow or actions described in the overview.
+
+> Extended reference material: [references/details.md](references/details.md)

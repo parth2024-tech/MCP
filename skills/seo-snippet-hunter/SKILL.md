@@ -1,6 +1,6 @@
 ---
 name: seo-snippet-hunter
-description: Formats content to be eligible for featured snippets and SERP features. Creates snippet-optimized content blocks based on best practices. Use PROACTIVELY for question-based content.
+description: Formats content to be eligible for featured snippets and SERP features. Creates snippet-optimized content blocks based on best practices. Use PROACTIVELY for question-based content. Use when the task involves seo snippet hunter.
 risk: unknown
 source: community
 date_added: '2026-02-27'

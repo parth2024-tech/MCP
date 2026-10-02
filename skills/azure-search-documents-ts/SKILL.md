@@ -1,6 +1,6 @@
 ---
 name: azure-search-documents-ts
-description: "Build search applications with vector, hybrid, and semantic search capabilities."
+description: Build search applications with vector, hybrid, and semantic search capabilities. Use when the task involves azure search documents ts.
 risk: unknown
 source: community
 date_added: "2026-02-27"

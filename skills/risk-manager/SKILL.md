@@ -1,6 +1,6 @@
 ---
 name: risk-manager
-description: Monitor portfolio risk, R-multiples, and position limits. Creates hedging strategies, calculates expectancy, and implements stop-losses.
+description: Monitor portfolio risk, R-multiples, and position limits. Creates hedging strategies, calculates expectancy, and implements stop-losses. Use when the task involves risk manager.
 risk: safe
 source: community
 date_added: '2026-02-27'

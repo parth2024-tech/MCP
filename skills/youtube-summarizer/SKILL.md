@@ -1,6 +1,6 @@
 ---
 name: youtube-summarizer
-description: "Extract transcripts from YouTube videos and generate comprehensive, detailed summaries using intelligent analysis frameworks"
+description: Extract transcripts from YouTube videos and generate comprehensive, detailed summaries using intelligent analysis frameworks. Use when the task involves youtube summarizer.
 category: content
 risk: safe
 source: community
@@ -118,10 +118,10 @@ URL="$USER_PROVIDED_URL"
 
 # Pattern 1: youtube.com/watch?v=VIDEO_ID
 if echo "$URL" | grep -qE 'youtube\.com/watch\?v='; then
-    VIDEO_ID=$(echo "$URL" | sed -E 's/.*[?&]v=([^&]+).*/\1/')
+    VIDEO_ID=$(echo "$URL" | sed -E 's/.*[?&]v=([^&]+).*//1/')
 # Pattern 2: youtu.be/VIDEO_ID  
 elif echo "$URL" | grep -qE 'youtu\.be/'; then
-    VIDEO_ID=$(echo "$URL" | sed -E 's/.*youtu\.be\/([^?]+).*/\1/')
+    VIDEO_ID=$(echo "$URL" | sed -E 's/.*youtu\.be\/([^?]+).*//1/')
 else
     echo "❌ Invalid YouTube URL format"
     exit 1

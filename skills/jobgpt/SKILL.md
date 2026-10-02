@@ -1,6 +1,6 @@
 ---
 name: jobgpt
-description: "Job search automation, auto apply, resume generation, application tracking, salary intelligence, and recruiter outreach using the JobGPT MCP server."
+description: Job search automation, auto apply, resume generation, application tracking, salary intelligence, and recruiter outreach using the JobGPT MCP server. Use when the task involves jobgpt.
 risk: safe
 source: community
 date_added: "2026-03-23"

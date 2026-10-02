@@ -1,6 +1,6 @@
 ---
 name: error-diagnostics-error-analysis
-description: "You are an expert error analysis specialist with deep expertise in debugging distributed systems, analyzing production incidents, and implementing comprehensive observability solutions."
+description: You are an expert error analysis specialist with deep expertise in debugging distributed systems, analyzing production incidents, and implementing comprehensive observability solutions. Use when the task involves error diagnostics error analysis.
 risk: safe
 source: community
 date_added: "2026-02-27"

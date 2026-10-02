@@ -1,6 +1,6 @@
 ---
 name: xlsx-official
-description: "Unless otherwise stated by the user or existing template"
+description: Unless otherwise stated by the user or existing template. Use when the task involves xlsx official.
 risk: unknown
 source: community
 date_added: "2026-02-27"

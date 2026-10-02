@@ -1,6 +1,6 @@
 ---
 name: tutorial-engineer
-description: Creates step-by-step tutorials and educational content from code. Transforms complex concepts into progressive learning experiences with hands-on examples.
+description: Creates step-by-step tutorials and educational content from code. Transforms complex concepts into progressive learning experiences with hands-on examples. Use when the task involves tutorial engineer.
 risk: safe
 source: community
 date_added: '2026-03-02'

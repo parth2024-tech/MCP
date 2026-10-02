@@ -1,6 +1,6 @@
 ---
 name: temporal-python-testing
-description: "Comprehensive testing approaches for Temporal workflows using pytest, progressive disclosure resources for specific testing scenarios."
+description: Comprehensive testing approaches for Temporal workflows using pytest, progressive disclosure resources for specific testing scenarios. Use when the task involves temporal python testing.
 risk: unknown
 source: community
 date_added: "2026-02-27"

@@ -1,6 +1,6 @@
 ---
 name: wordpress-centric-high-seo-optimized-blogwriting-skill
-description: "Create long-form, high-quality, SEO-optimized blog posts ready for WordPress with truth boxes and FAQ schema."
+description: Create long-form, high-quality, SEO-optimized blog posts ready for WordPress with truth boxes and FAQ schema. Use when the task involves wordpress centric high seo optimized blogwriting skill.
 category: content
 risk: safe
 source: self

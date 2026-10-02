@@ -1,6 +1,6 @@
 ---
 name: python-development-python-scaffold
-description: "You are a Python project architecture expert specializing in scaffolding production-ready Python applications. Generate complete project structures with modern tooling (uv, FastAPI, Django), type hint"
+description: You are a Python project architecture expert specializing in scaffolding production-ready Python applications. Generate complete project structures with modern tooling (uv, FastAPI, Django), type hint. Use when the task involves python development python scaffold.
 risk: critical
 source: community
 date_added: "2026-02-27"
@@ -56,7 +56,7 @@ echo ".ruff_cache/" >> .gitignore
 
 # Create virtual environment
 uv venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+source .venv/bin/activate  # On Windows: .venv/Scripts/activate
 ```
 
 ### 3. Generate FastAPI Project Structure

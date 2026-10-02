@@ -1,6 +1,6 @@
 ---
 name: fix-review
-description: "Verify fix commits address audit findings without new bugs"
+description: Verify fix commits address audit findings without new bugs. Use when the task involves fix review.
 risk: safe
 source: "https://github.com/trailofbits/skills/tree/main/plugins/fix-review"
 date_added: "2026-02-27"

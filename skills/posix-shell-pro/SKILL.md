@@ -1,6 +1,6 @@
 ---
 name: posix-shell-pro
-description: Expert in strict POSIX sh scripting for maximum portability across Unix-like systems. Specializes in shell scripts that run on any POSIX-compliant shell (dash, ash, sh, bash --posix).
+description: Expert in strict POSIX sh scripting for maximum portability across Unix-like systems. Specializes in shell scripts that run on any POSIX-compliant shell (dash, ash, sh, bash --posix). Use when the task involves posix shell pro.
 risk: critical
 source: community
 date_added: '2026-02-27'
@@ -142,7 +142,7 @@ Since POSIX sh lacks arrays, use these patterns:
 
 - **Positional Parameters**: `set -- item1 item2 item3; for arg; do echo "$arg"; done`
 - **Delimited Strings**: `items="a:b:c"; IFS=:; set -- $items; IFS=' '`
-- **Newline-Separated**: `items="a\nb\nc"; while IFS= read -r item; do echo "$item"; done <<EOF`
+- **Newline-Separated**: `items="a/nb/nc"; while IFS= read -r item; do echo "$item"; done <<EOF`
 - **Counters**: `i=0; while [ $i -lt 10 ]; do i=$((i+1)); done`
 - **Field Splitting**: Use `cut`, `awk`, or parameter expansion for string splitting
 

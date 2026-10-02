@@ -1,6 +1,6 @@
 ---
 name: internal-comms-community
-description: "To write internal communications, use this skill for:"
+description: "To write internal communications, use this skill for:. Use when the task involves internal comms community."
 risk: unknown
 source: community
 date_added: "2026-02-27"

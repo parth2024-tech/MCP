@@ -1,6 +1,6 @@
 ---
 name: azure-ai-translation-ts
-description: "Text and document translation with REST-style clients."
+description: Text and document translation with REST-style clients. Use when the task involves azure ai translation ts.
 risk: unknown
 source: community
 date_added: "2026-02-27"

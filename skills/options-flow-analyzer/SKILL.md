@@ -1,6 +1,6 @@
 ---
 name: options-flow-analyzer
-description: Real vs lottery call separation for options P/C ratio analysis — prevents signal inversion from deep OTM noise
+description: Real vs lottery call separation for options P/C ratio analysis — prevents signal inversion from deep OTM noise. Use when the task involves options flow analyzer.
 category: finance
 risk: safe
 source: community

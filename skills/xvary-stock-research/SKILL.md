@@ -1,6 +1,6 @@
 ---
 name: xvary-stock-research
-description: "Thesis-driven equity analysis from public SEC EDGAR and market data; /analyze, /score, /compare workflows with bundled Python tools (Claude Code, Cursor, Codex)."
+description: Thesis-driven equity analysis from public SEC EDGAR and market data; /analyze, /score, /compare workflows with bundled Python tools (Claude Code, Cursor, Codex). Use when the task involves xvary stock research.
 risk: safe
 source: community
 date_added: "2026-03-23"

@@ -1,6 +1,6 @@
 ---
 name: prompt-engineering-patterns
-description: "Master advanced prompt engineering techniques to maximize LLM performance, reliability, and controllability."
+description: Master advanced prompt engineering techniques to maximize LLM performance, reliability, and controllability. Use when the task involves prompt engineering patterns.
 risk: unknown
 source: community
 date_added: "2026-02-27"
@@ -77,7 +77,7 @@ from prompt_optimizer import PromptTemplate, FewShotSelector
 # Define a structured prompt template
 template = PromptTemplate(
     system="You are an expert SQL developer. Generate efficient, secure SQL queries.",
-    instruction="Convert the following natural language query to SQL:\n{query}",
+    instruction="Convert the following natural language query to SQL:/n{query}",
     few_shot_examples=True,
     output_format="SQL code block with explanatory comments"
 )

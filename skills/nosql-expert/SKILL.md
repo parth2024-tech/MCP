@@ -1,6 +1,6 @@
 ---
 name: nosql-expert
-description: "Expert guidance for distributed NoSQL databases (Cassandra, DynamoDB). Focuses on mental models, query-first modeling, single-table design, and avoiding hot partitions in high-scale systems."
+description: Expert guidance for distributed NoSQL databases (Cassandra, DynamoDB). Focuses on mental models, query-first modeling, single-table design, and avoiding hot partitions in high-scale systems. Use when the task involves nosql expert.
 risk: unknown
 source: community
 date_added: "2026-02-27"

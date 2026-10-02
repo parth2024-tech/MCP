@@ -1,6 +1,6 @@
 ---
 name: smtp-penetration-testing
-description: "Conduct comprehensive security assessments of SMTP (Simple Mail Transfer Protocol) servers to identify vulnerabilities including open relays, user enumeration, weak authentication, and misconfiguration."
+description: Conduct comprehensive security assessments of SMTP (Simple Mail Transfer Protocol) servers to identify vulnerabilities including open relays, user enumeration, weak authentication, and misconfiguration. Use when the task involves smtp penetration testing.
 risk: offensive
 source: community
 author: zebbern
@@ -495,12 +495,6 @@ nmap -p 25 --script smtp-open-relay --script-args smtp-open-relay.from=test@atta
 2. **Disable VRFY/EXPN** - Prevent user enumeration
 3. **Enforce TLS** - Require STARTTLS for all connections
 4. **Implement SPF/DKIM/DMARC** - Prevent email spoofing
-5. **Rate Limiting** - Prevent brute force attacks
-6. **Account Lockout** - Lock accounts after failed attempts
-7. **Banner Hardening** - Minimize server information disclosure
-8. **Log Monitoring** - Alert on suspicious activity
-9. **Patch Management** - Keep SMTP software updated
-10. **Access Controls** - Restrict SMTP to authorized IPs
 
-## When to Use
-This skill is applicable to execute the workflow or actions described in the overview.
+
+> Extended reference material: [references/details.md](references/details.md)

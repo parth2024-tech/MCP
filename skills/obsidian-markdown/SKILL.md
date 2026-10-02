@@ -129,11 +129,11 @@ This entire block is hidden in reading view.
 ## Math (LaTeX)
 
 ```markdown
-Inline: $e^{i\pi} + 1 = 0$
+Inline: $e^{i/pi} + 1 = 0$
 
 Block:
 $$
-\frac{a}{b} = c
+/frac{a}{b} = c
 $$
 ```
 
@@ -188,7 +188,7 @@ This project aims to [[improve workflow]] using modern techniques.
 
 ## Notes
 
-The algorithm uses $O(n \log n)$ sorting. See [[Algorithm Notes#Sorting]] for details.
+The algorithm uses $O(n /log n)$ sorting. See [[Algorithm Notes#Sorting]] for details.
 
 ![[Architecture Diagram.png|600]]
 

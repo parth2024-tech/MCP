@@ -1,6 +1,6 @@
 ---
 name: data-storytelling
-description: "Transform raw data into compelling narratives that drive decisions and inspire action."
+description: Transform raw data into compelling narratives that drive decisions and inspire action. Use when the task involves data storytelling.
 risk: safe
 source: community
 date_added: "2026-02-27"
@@ -254,7 +254,7 @@ ax.plot(dates, revenue, linewidth=2, color='#2E86AB')
 
 # Add annotation for key events
 ax.annotate(
-    'Product Launch\n+32% spike',
+    'Product Launch/n+32% spike',
     xy=(launch_date, launch_revenue),
     xytext=(launch_date, launch_revenue * 1.2),
     fontsize=10,

@@ -1,6 +1,6 @@
 ---
 name: api-security-testing
-description: "API security testing workflow for REST and GraphQL APIs covering authentication, authorization, rate limiting, input validation, and security best practices."
+description: API security testing workflow for REST and GraphQL APIs covering authentication, authorization, rate limiting, input validation, and security best practices. Use when the task involves api security testing.
 category: granular-workflow-bundle
 risk: safe
 source: personal

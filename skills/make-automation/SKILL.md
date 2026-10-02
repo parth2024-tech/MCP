@@ -1,6 +1,6 @@
 ---
 name: make-automation
-description: "Automate Make (Integromat) tasks via Rube MCP (Composio): operations, enums, language and timezone lookups. Always search tools first for current schemas."
+description: "Automate Make (Integromat) tasks via Rube MCP (Composio): operations, enums, language and timezone lookups. Always search tools first for current schemas. Use when the task involves make automation."
 risk: critical
 source: community
 date_added: "2026-02-27"

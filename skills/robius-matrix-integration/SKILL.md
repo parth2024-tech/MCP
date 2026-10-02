@@ -1,6 +1,6 @@
 ---
 name: robius-matrix-integration
-description: |
+description: |. Use when the task involves robius matrix integration.
   CRITICAL: Use for Matrix SDK integration with Makepad. Triggers on:
   Matrix SDK, sliding sync, MatrixRequest, timeline,
   matrix-sdk, matrix client, robrix, matrix room,

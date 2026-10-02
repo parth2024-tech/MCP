@@ -1,6 +1,6 @@
 ---
 name: jq
-description: "Expert jq usage for JSON querying, filtering, transformation, and pipeline integration. Practical patterns for real shell workflows."
+description: Expert jq usage for JSON querying, filtering, transformation, and pipeline integration. Practical patterns for real shell workflows. Use when the task involves jq.
 category: development
 risk: safe
 source: community
@@ -201,14 +201,14 @@ jq -s 'add' file1.json file2.json
 kubectl get pods -o json | jq '.items[] | {name: .metadata.name, status: .status.phase}'
 
 # GitHub CLI: extract PR numbers
-gh pr list --json number,title | jq -r '.[] | "\(.number)\t\(.title)"'
+gh pr list --json number,title | jq -r '.[] | "\(.number)/t\(.title)"'
 
 # AWS CLI: list running instance IDs
 aws ec2 describe-instances \
   | jq -r '.Reservations[].Instances[] | select(.State.Name=="running") | .InstanceId'
 
 # Docker: show container names and images
-docker inspect $(docker ps -q) | jq -r '.[] | "\(.Name)\t\(.Config.Image)"'
+docker inspect $(docker ps -q) | jq -r '.[] | "\(.Name)/t\(.Config.Image)"'
 ```
 
 ### Advanced Patterns

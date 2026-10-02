@@ -1,6 +1,6 @@
 ---
-name: claude-monitor
-description: Monitor de performance do Claude Code e sistema local. Diagnostica lentidao, mede CPU/RAM/disco, verifica API latency e gera relatorios de saude do sistema.
+name: monitor
+description: Monitor de performance do Claude Code e sistema local. Diagnostica lentidao, mede CPU/RAM/disco, verifica API latency e gera relatorios de saude do sistema. Use when the task involves claude monitor.
 risk: safe
 source: community
 date_added: '2026-03-06'
@@ -57,7 +57,7 @@ Determina se o gargalo é local (PC) ou remoto (API Claude) e sugere ações cor
 Rode SEMPRE como primeiro passo:
 
 ```bash
-python C:\Users\renat\skills\claude-monitor\scripts\health_check.py
+python C:/Users/renat/skills/claude-monitor/scripts/health_check.py
 ```
 
 O script analisa em ~3 segundos:
@@ -91,7 +91,7 @@ Baseado no diagnóstico, ofereça ao usuário:
 
 #### Se browsers pesados (>5GB RAM ou >40 processos):
 ```bash
-python C:\Users\renat\skills\claude-monitor\scripts\health_check.py --browsers-detail
+python C:/Users/renat/skills/claude-monitor/scripts/health_check.py --browsers-detail
 ```
 Mostra RAM por browser e sugere quais fechar. **Nunca fechar processos sem permissão explícita do usuário.**
 
@@ -108,7 +108,7 @@ Mostra RAM por browser e sugere quais fechar. **Nunca fechar processos sem permi
 Se o usuário quiser monitoramento em background:
 
 ```bash
-python C:\Users\renat\skills\claude-monitor\scripts\monitor.py --interval 30 --duration 300
+python C:/Users/renat/skills/claude-monitor/scripts/monitor.py --interval 30 --duration 300
 ```
 
 Parâmetros:
@@ -129,7 +129,7 @@ O monitor salva snapshots periódicos e gera um relatório ao final com:
 Para testar se a lentidão é da API:
 
 ```bash
-python C:\Users\renat\skills\claude-monitor\scripts\api_bench.py
+python C:/Users/renat/skills/claude-monitor/scripts/api_bench.py
 ```
 
 Mede o tempo de resposta do processo Claude Code local (não faz chamadas à API).

@@ -1,6 +1,6 @@
 ---
 name: azure-identity-java
-description: "Authenticate Java applications with Azure services using Microsoft Entra ID (Azure AD)."
+description: Authenticate Java applications with Azure services using Microsoft Entra ID (Azure AD). Use when the task involves azure identity java.
 risk: unknown
 source: community
 date_added: "2026-02-27"

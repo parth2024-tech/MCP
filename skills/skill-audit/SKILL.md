@@ -1,6 +1,6 @@
 ---
 name: skill-audit
-description: "Pre-install security scanner for AI agent skills. 7.5% of 14,706 skills are malicious. Audit before you trust."
+description: Pre-install security scanner for AI agent skills. 7.5% of 14,706 skills are malicious. Audit before you trust. Use when the task involves skill audit.
 category: security
 risk: safe
 source: community

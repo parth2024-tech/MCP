@@ -1,6 +1,6 @@
 ---
 name: molykit
-description: |
+description: |. Use when the task involves molykit.
   CRITICAL: Use for MolyKit AI chat toolkit. Triggers on:
   BotClient, OpenAI, SSE streaming, AI chat, molykit,
   PlatformSend, spawn(), ThreadToken, cross-platform async,
@@ -329,7 +329,7 @@ where
     S: Stream<Item = Result<B, E>>,
     B: AsRef<[u8]>,
 {
-    // Split on "\n\n", extract "data:" content
+    // Split on "/n/n", extract "data:" content
     // Filter comments and [DONE] messages
 }
 

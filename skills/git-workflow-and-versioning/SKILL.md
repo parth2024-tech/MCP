@@ -1,5 +1,5 @@
 ---
-name: lifecycle/git-workflow-and-versioning
+name: git-workflow-and-versioning
 description: Structures git workflow practices. Use when making any code change. Use when committing, branching, resolving conflicts, or when you need to organize work across multiple parallel streams.
 token_estimate: 2004
 activation_keywords:
