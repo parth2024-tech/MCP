@@ -1,8 +1,6 @@
 ---
 name: loopy
-description: Implements the Loop Engineering framework. Use when giving an AI agent an autonomous goal to work toward iteratively without babysitting: try, check, fix, and repeat until the work passes a hard gate.
-version: 1.0.0
-min_ase_version: 4.2.0
+description: Executes autonomous iterative goal loops with Doer, Independent Checker, and Gate validation. Use when solving complex tasks, multi-iteration bug fixes, refactoring code, or enforcing quality gates without manual intervention.
 risk: safe
 category: automation
 ---

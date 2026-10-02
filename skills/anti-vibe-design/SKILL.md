@@ -1,9 +1,8 @@
 ---
 name: anti-vibe-design
-description: "Strict anti-vibe-coding rules and production web guidelines: eliminate AI slop patterns (purple gradients, pill buttons, fake metrics/reviews, emoji icons, crazy animations, em dashes) and mandate production essentials (custom domain, favicon, privacy policy, T&C, clean human copy)."
+description: Enforces strict anti-vibe-coding rules and production web guidelines to eliminate AI slop patterns (purple gradients, pill CTA buttons, fake metrics/reviews, emoji icons, em dash spam). Use when designing web interfaces, creating landing pages, writing CSS/Tailwind, or reviewing UI aesthetics.
 category: frontend
 risk: safe
-date_added: "2026-09-30"
 tags: [ui-ux, web-design, anti-vibe-coding, unslop, frontend-guidelines, production-ready]
 ---
 

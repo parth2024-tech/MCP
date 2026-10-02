@@ -1,9 +1,8 @@
 ---
 name: git-pushing
-description: "Stage all changes, create a conventional commit, and push to the remote branch. Use when explicitly asks to push changes (\"push this\", \"commit and push\"), mentions saving work to remote (\"save to github\", \"push to remote\"), or completes a feature and wants to share it."
+description: Stages changes, creates conventional commits, and pushes to remote Git branches. Use when the user asks to push changes, save work to GitHub/remote, or synchronize committed work.
 risk: critical
-source: community
-date_added: "2026-02-27"
+category: git
 ---
 
 # Git Push Workflow

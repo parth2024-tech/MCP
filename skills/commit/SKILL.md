@@ -1,8 +1,8 @@
 ---
 name: commit
-description: ALWAYS use this skill when committing code changes — never commit directly without it. Creates commits following Sentry conventions with proper conventional commit format and issue references. Trigger on any commit, git commit, save changes, or commit message task.
+description: Creates Git commits following Sentry and conventional commit standards with issue references and branch safety checks. Use when preparing commit messages, committing code changes, saving git progress, or reviewing staged diffs.
 risk: critical
-source: community
+category: git
 ---
 
 # Sentry Commit Messages
