@@ -14,11 +14,12 @@ export function createToolCallHandler(container: Container) {
   // Pipeline order (outermost → innermost):
   //
   //   0. ErrorMiddleware        ← catches ANYTHING that escapes from below
-  //   1. AuthMiddleware         ← validate agent_token before consuming semaphore permits
-  //   2. ConcurrencyMiddleware  ← semaphore gate — only authenticated calls acquire permits
-  //   3. MetricsMiddleware      ← time everything (including queued wait time)
-  //   4. SpokeProxyMiddleware   ← forward spoke-namespaced tools (tool__spoke)
-  //   5. CacheMiddleware        ← serve from cache or populate after execution
+  //   1. AuthMiddleware         ← validate agent_token before anything else
+  //   2. CacheMiddleware        ← serve from cache BEFORE acquiring semaphore
+  //                               (cache hits never consume concurrency permits)
+  //   3. ConcurrencyMiddleware  ← semaphore gate — only non-cached calls acquire permits
+  //   4. MetricsMiddleware      ← time everything (including queued wait time)
+  //   5. SpokeProxyMiddleware   ← forward spoke-namespaced tools (tool__spoke)
   //   6. ToolExecutionMiddleware← actually run the tool with timeout + retry
   //
   const concurrencyMiddleware = new ConcurrencyMiddleware();
@@ -27,10 +28,10 @@ export function createToolCallHandler(container: Container) {
   const pipeline = new Pipeline()
     .use(new ErrorMiddleware())          // Layer 0: catch-all error boundary
     .use(new AuthMiddleware())           // Layer 1: token authentication
-    .use(concurrencyMiddleware)          // Layer 2: backpressure semaphore
-    .use(new MetricsMiddleware())        // Layer 3: timing + observability
-    .use(new SpokeProxyMiddleware())     // Layer 4: spoke federation proxy
-    .use(new CacheMiddleware())          // Layer 5: response caching
+    .use(new CacheMiddleware())          // Layer 2: dedupe + session cache (before semaphore!)
+    .use(concurrencyMiddleware)          // Layer 3: backpressure semaphore
+    .use(new MetricsMiddleware())        // Layer 4: timing + observability
+    .use(new SpokeProxyMiddleware())     // Layer 5: spoke federation proxy
     .use(new ToolExecutionMiddleware()); // Layer 6: tool execution core
 
   return async (request: any, extra: any) => {

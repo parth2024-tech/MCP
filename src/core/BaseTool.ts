@@ -7,6 +7,9 @@ export interface ToolContext {
   reqId: string;
   reqLogger?: any; // To be typed properly later
   extra?: any;
+  /** Cancellation signal — fires when the tool's timeout expires. Tools should
+   *  observe this signal to abort in-flight I/O and release resources early. */
+  signal?: AbortSignal;
 }
 
 export abstract class BaseTool<TArgs> {

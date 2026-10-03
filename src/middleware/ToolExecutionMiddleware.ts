@@ -29,22 +29,41 @@ function isTransientError(err: unknown): boolean {
 }
 
 /**
- * Race a promise against a hard timeout.
- * Throws a typed TimeoutError (not a plain Error) so ErrorMiddleware and
- * the retry logic can correctly classify it.
+ * Race an async factory against a hard timeout, passing an AbortSignal so the
+ * underlying work can observe cancellation and clean up resources.
+ *
+ * Unlike a bare Promise.race, this ensures the in-flight execution receives an
+ * abort signal when the deadline fires — preventing the "ghost work" problem
+ * where timed-out tasks keep running and consuming CPU/memory/locks after their
+ * semaphore slot has been released.
  */
-function withTimeout<T>(promise: Promise<T>, timeoutMs: number, toolName: string, reqId: string): Promise<T> {
-  return new Promise<T>((resolve, reject) => {
-    const timer = setTimeout(() => {
+async function withTimeout<T>(
+  factory: (signal: AbortSignal) => Promise<T>,
+  timeoutMs: number,
+  toolName: string,
+  reqId: string,
+): Promise<T> {
+  const controller = new AbortController();
+  const { signal } = controller;
+
+  let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutHandle = setTimeout(() => {
+      controller.abort();  // signal cancellation to the underlying work
       reject(new TimeoutError(toolName, timeoutMs, { reqId }));
     }, timeoutMs);
-
-    promise.then(
-      (v) => { clearTimeout(timer); resolve(v); },
-      (e) => { clearTimeout(timer); reject(e); }
-    );
   });
+
+  try {
+    return await Promise.race([factory(signal), timeoutPromise]);
+  } finally {
+    // Always clear the timer — prevents it from firing after success/error
+    if (timeoutHandle !== undefined) clearTimeout(timeoutHandle);
+    // If we resolved normally, abort the (already-resolved) factory cleanup path
+    if (!signal.aborted) controller.abort();
+  }
 }
+
 
 export class ToolExecutionMiddleware implements Middleware {
   async handle(context: MiddlewareContext, next: () => Promise<void>): Promise<void> {
@@ -103,15 +122,14 @@ export class ToolExecutionMiddleware implements Middleware {
 
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
-        const executionPromise = tool.validateAndExecute
-          ? (tool as BaseTool<any>).validateAndExecute(context.args, {
-              container: context.container,
-              reqId: context.reqId,
-            })
-          : tool.handler(context.args || {}, { reqId: context.reqId });
-
         const rawResult = await withTimeout(
-          executionPromise,
+          (signal) => tool.validateAndExecute
+            ? (tool as BaseTool<any>).validateAndExecute(context.args, {
+                container: context.container,
+                reqId: context.reqId,
+                signal,
+              })
+            : tool.handler(context.args || {}, { reqId: context.reqId, signal }),
           TOOL_EXECUTION_TIMEOUT_MS,
           context.name,
           context.reqId

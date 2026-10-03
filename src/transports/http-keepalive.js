@@ -61,6 +61,26 @@ async function startHttpTransport(mcpServer, port = 3100) {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
 
+    // S-2: DNS Rebinding Protection — validate Host and Origin headers.
+    // A malicious web page can reach a 127.0.0.1 server through DNS rebinding;
+    // blocking unexpected Host/Origin values shuts that vector.
+    const ALLOWED_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
+    const ALLOWED_ORIGIN_RE = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/;
+
+    const reqHost = (req.headers.host || '').split(':')[0].toLowerCase();
+    if (!ALLOWED_HOSTS.has(reqHost)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Forbidden: unexpected Host header', host: reqHost }));
+      return;
+    }
+
+    const origin = req.headers.origin;
+    if (origin && !ALLOWED_ORIGIN_RE.test(origin)) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Forbidden: origin not allowed', origin }));
+      return;
+    }
+
     // S-1: HTTP Bearer Token Authentication
     const requiredToken = process.env.ASE_HTTP_TOKEN;
     if (requiredToken) {
@@ -76,18 +96,23 @@ async function startHttpTransport(mcpServer, port = 3100) {
     res.setHeader('Connection', 'keep-alive');
     res.setHeader('Keep-Alive', 'timeout=120, max=1000');
 
-    // CORS for local dev tools
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    // CORS: echo the specific allowed origin (never wildcard '*').
+    // Only set ACAO if the request included an Origin header we already validated above.
+    if (origin && ALLOWED_ORIGIN_RE.test(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Vary', 'Origin');
+    }
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, mcp-session-id');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, mcp-session-id, Authorization');
 
     const parsedUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
 
-    // OPTIONS check bypasses rate limiting
+    // OPTIONS preflight
     if (req.method === 'OPTIONS') {
       res.writeHead(204);
       res.end();
       return;
+
     }
 
     // 1. Rate Limiting (sliding window per-IP)
@@ -144,7 +169,9 @@ async function startHttpTransport(mcpServer, port = 3100) {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
-        'Access-Control-Allow-Origin': '*'
+        // Do not set ACAO here — the main request handler already validated Origin/Host
+        // and emitted the correct ACAO header for allowed origins. Repeating it in
+        // writeHead would override that value and could re-introduce wildcard CORS.
       });
       res.write(': ok\n\n');
 
