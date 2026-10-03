@@ -348,9 +348,9 @@ function getConfigTemplate() {
     },
     sprint_focus: 'Building the user onboarding flow with email verification and profile setup.',
     sprint_skills: [
-      'lifecycle/security-and-hardening',
-      'lifecycle/api-and-interface-design',
-      'lifecycle/test-driven-development'
+      'security-and-hardening',
+      'api-and-interface-design',
+      'test-driven-development'
     ],
     never_do: [
       'Never use useEffect for data fetching — use Server Components or SWR',
@@ -359,7 +359,10 @@ function getConfigTemplate() {
       'Never use `any` TypeScript type — always type explicitly',
       'Never mix database queries into React components',
       'Never output verbose unsolicited recaps, exhaustive changelogs, or repetitive summaries that waste tokens — mention ONLY the most critical points unless explicitly asked',
-      'Never use purple gradients, pill buttons, fake reviews/metrics/counters, vague hero text, emoji icons, em dashes, crazy scroll/cursor animations, or AI slop photos/copy on websites'
+      'Never use purple gradients, pill buttons, fake reviews/metrics/counters, vague hero text, emoji icons, em dashes, crazy scroll/cursor animations, or AI slop photos/copy on websites',
+      'Never let an AI grade its own work without independent gate verification',
+      'Never leave completed work uncommitted or unpushed to GitHub',
+      'Never run unsolicited background daemons, update pollers, or indexing services on Arch Linux'
     ],
     preferred_patterns: [
       'Practice extreme token economy: keep responses concise, high-signal, and directly answer user requests without unprompted changelogs or filler',
@@ -367,18 +370,22 @@ function getConfigTemplate() {
       'Use Drizzle ORM for all database access',
       'Use server actions for mutations',
       'Use Next.js Image component for all images',
-      'Always mandate production web essentials: custom domain, custom favicon suite, remove AI badges, /privacy page, and /terms page'
+      'Always mandate production web essentials: custom domain, custom favicon suite, remove AI badges, /privacy page, and /terms page',
+      'Always follow the 6-step Second Brain closed loop: Load Conventions -> Select Model -> Autonomous Loop -> Validate Output -> Continuous Learning -> Automated Git Push',
+      'Always enforce Arch Linux On-Demand System Governance (run interactive tools on-demand, terminate completely on exit)'
     ],
     agent_skills: {
-      directory: '/home/thor/skiils',
+      directory: '/home/thor/skiils/skills',
       default_skills: [
-        'lifecycle/using-agent-skills',
-        'lifecycle/context-engineering',
+        'using-agent-skills',
+        'context-engineering',
         'anti-vibe-design'
       ],
       mandatory_skills: {
-        api: 'lifecycle/api-and-interface-design',
-        auth: 'lifecycle/security-and-hardening'
+        api: 'api-and-interface-design',
+        auth: 'security-and-hardening',
+        frontend: 'anti-vibe-design',
+        ui: 'anti-vibe-design'
       },
       session_reporting_preference: true
     }

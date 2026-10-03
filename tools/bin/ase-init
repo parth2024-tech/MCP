@@ -330,22 +330,26 @@ if (transcriptIdx !== -1) {
 const hasCommand = args.includes('--validate') || args.includes('--route') || args.includes('--budget') || args.includes('--check') || args.includes('--export-vault') || args.includes('--lessons') || args.includes('--compact') || args.includes('--worktree') || args.includes('--transcript');
 
 if (!hasCommand) {
-  const configPath = path.join(cwd, CONFIG_FILE);
-  const isUpdate = args.includes('--update');
-  const projectType = detectProjectType(cwd);
+  (async () => {
+    const configPath = path.join(cwd, CONFIG_FILE);
+    const isUpdate = args.includes('--update');
+    const detection = await detectProjectType(cwd);
+    const projectType = typeof detection === 'object' ? (detection.type || 'generic') : detection;
 
-  if (fs.existsSync(configPath) && !isUpdate) {
-    log(c.green, '✅', `${CONFIG_FILE} already exists. Use ${c.bold}ase-init --update${c.reset} to regenerate.`);
-    const existing = generateProjectPrompt(cwd);
-    if (existing.prompt) {
-      console.log(`\n${c.gray}${existing.prompt.slice(0, 300)}...${c.reset}`);
+    if (fs.existsSync(configPath) && !isUpdate) {
+      log(c.green, '✅', `${CONFIG_FILE} already exists. Use ${c.bold}ase-init --update${c.reset} to regenerate.`);
+      const existing = generateProjectPrompt(cwd);
+      if (existing.prompt) {
+        console.log(`\n${c.gray}${existing.prompt.slice(0, 300)}...${c.reset}`);
+      }
+      safeExit(0);
+      return;
     }
-    safeExit(0);
-  }
 
-  console.log(`\n${c.bold}${c.cyan}🚀 ASE Project Initializer${c.reset}\n`);
-  log(c.gray, '📁', `Directory: ${cwd}`);
-  log(c.gray, '🔍', `Detected project type: ${c.bold}${projectType}${c.reset}`);
+    console.log(`\n${c.bold}${c.cyan}🚀 ASE Project Initializer${c.reset}\n`);
+    log(c.gray, '📁', `Directory: ${cwd}`);
+    log(c.gray, '🔍', `Detected project type: ${c.bold}${projectType}${c.reset}`);
+
 
 // Auto-detect project name from package.json or directory name
 let autoName = path.basename(cwd);
@@ -389,4 +393,11 @@ console.log(`\n${c.gray}Next steps:${c.reset}`);
 console.log(`  ${c.bold}1.${c.reset} Open ${c.cyan}${configPath}${c.reset} and fill in your tech stack, conventions, and never-do rules.`);
 console.log(`  ${c.bold}2.${c.reset} Run ${c.bold}ase-init --validate${c.reset} after generating code to check for issues.`);
 console.log(`  ${c.bold}3.${c.reset} Run ${c.bold}ase-init --route "your task"${c.reset} to get the optimal model config.\n`);
+  safeExit(0);
+  })().catch(err => {
+    console.error('Initialization failed:', err.message);
+    safeExit(1);
+  });
 }
+
+
