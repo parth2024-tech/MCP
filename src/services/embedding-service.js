@@ -13,7 +13,11 @@ const { warn, logger } = require('../utils/logger');
 const metrics = require('../utils/metrics');
 const CircuitBreaker = require('./circuit-breaker');
 
-const SKILLS_DIR = path.resolve(__dirname, '../../../../');
+const SKILLS_DIR = process.env.ASE_SKILLS_DIR || (
+  require('fs').existsSync(path.resolve(__dirname, '../../skills'))
+    ? path.resolve(__dirname, '../../skills')
+    : '/home/thor/skiils/skills'
+);
 const DB_PATH = path.join(__dirname, 'skills.db');
 const EMBEDDING_DIMENSIONS = 384;
 
@@ -101,6 +105,10 @@ class EmbeddingService {
     // Rebuild the full index from SQLite, then cross-validate for integrity.
     this._rebuildHnswIndex();
     this._repairHnswFromSqlite();
+  }
+
+  async embed(text) {
+    return this.workerPool.generateEmbeddingForeground(text);
   }
 
   _rebuildHnswIndex() {

@@ -2,7 +2,13 @@ const fs = require('fs').promises;
 const path = require('path');
 const { logAccess, logger } = require('../utils/logger');
 
-const CONFIG_PATH = path.join(__dirname, '../../../config/model-params.json');
+const CONFIG_PATH = [
+  path.join(__dirname, '../../tools/config/model-params.json'),
+  path.join(__dirname, '../../../config/model-params.json'),
+  path.join(__dirname, '../../../tools/config/model-params.json'),
+  '/home/thor/skiils/tools/config/model-params.json'
+].find(p => require('fs').existsSync(p)) || path.join(__dirname, '../../tools/config/model-params.json');
+
 
 let config = null;
 let compiledSignals = {};

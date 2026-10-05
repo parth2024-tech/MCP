@@ -2,46 +2,46 @@ const path = require('path');
 const os = require('os');
 const Piscina = require('piscina');
 
+// Pre-load native addons in main thread to ensure clean symbol registration across worker threads
+try { require('sharp'); } catch (_) {}
+try { require('onnxruntime-node'); } catch (_) {}
+
+
 class WorkerPool {
   constructor() {
     const cores = os.cpus().length;
-    const foregroundCount = Math.max(2, cores - 4);
+    const threadCount = Math.max(2, Math.min(cores - 2, 4));
     const workerFile = path.resolve(__dirname, 'worker.js');
 
-    this.foregroundPool = new Piscina({
+    // Single unified pool to ensure native onnxruntime-node addon is loaded cleanly once
+    this.pool = new Piscina({
       filename: workerFile,
-      maxThreads: foregroundCount,
+      maxThreads: threadCount,
       minThreads: 0
-    });
-
-    this.backgroundPool = new Piscina({
-      filename: workerFile,
-      maxThreads: 1,
-      minThreads: 0  // Don't pre-spawn — the ONNX model load will happen on first use
     });
   }
 
   async generateEmbeddingForeground(text) {
     const buffer = new SharedArrayBuffer(384 * 4);
-    await this.foregroundPool.run({ type: 'generateEmbedding', payload: { text, buffer } });
+    await this.pool.run({ type: 'generateEmbedding', payload: { text, buffer } });
     return Array.from(new Float32Array(buffer));
   }
 
   async generateEmbeddingBackground(text) {
     const buffer = new SharedArrayBuffer(384 * 4);
-    await this.backgroundPool.run({ type: 'generateEmbedding', payload: { text, buffer } });
+    await this.pool.run({ type: 'generateEmbedding', payload: { text, buffer } });
     return Array.from(new Float32Array(buffer));
   }
   
   get stats() {
     return {
       foreground: {
-        utilization: this.foregroundPool.utilization,
-        completed: this.foregroundPool.completed
+        utilization: this.pool.utilization,
+        completed: this.pool.completed
       },
       background: {
-        utilization: this.backgroundPool.utilization,
-        completed: this.backgroundPool.completed
+        utilization: this.pool.utilization,
+        completed: this.pool.completed
       }
     };
   }

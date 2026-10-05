@@ -22,7 +22,13 @@ const { findMainMdSync } = require('../utils/fs-utils');
 const { parseFrontmatter } = require('../utils/context-optimizer');
 
 const SKILLS_DIR = path.join(__dirname, '../../');
-const CONFIG_PATH = path.join(__dirname, '../../../config/model-params.json');
+const CONFIG_PATH = [
+  path.join(__dirname, '../../tools/config/model-params.json'),
+  path.join(__dirname, '../../../config/model-params.json'),
+  path.join(__dirname, '../../../tools/config/model-params.json'),
+  '/home/thor/skiils/tools/config/model-params.json'
+].find(p => fs.existsSync(p)) || path.join(__dirname, '../../tools/config/model-params.json');
+
 
 // ─────────────────────────────────────────────────────────────
 // Load global constraints from config

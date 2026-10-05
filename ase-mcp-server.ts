@@ -17,7 +17,12 @@ import {
   PingRequestSchema
 } from '@modelcontextprotocol/sdk/types.js';
 
+// Pre-load native addons in main thread to ensure clean registration across worker threads
+try { require('sharp'); } catch (_) {}
+try { require('onnxruntime-node'); } catch (_) {}
+
 import { Container } from './src/core/Container';
+
 import { RedisService } from './src/services/redis-service';
 import { DeadLetterQueue } from './src/services/dead-letter-queue';
 import { startMemoryMonitoring, stopMemoryMonitoring } from './src/utils/memory-guard';
