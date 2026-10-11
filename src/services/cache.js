@@ -5,7 +5,7 @@ const { logAccess, warn } = require('../utils/logger');
 const { findMainMd } = require('../utils/fs-utils');
 const metrics = require('../utils/metrics');
 
-const SKILLS_DIR = process.env.ASE_ROOT || path.resolve(__dirname, __dirname.includes('tools/server') ? '../../../../' : '../../');
+const getSkillsDir = () => process.env.ASE_ROOT || path.resolve(__dirname, __dirname.includes('tools/server') ? '../../../../' : '../../');
 
 class SkillCache {
   constructor() {
@@ -42,12 +42,13 @@ class SkillCache {
       metrics.inc('cache_misses');
     }
 
-    let skillPath = path.join(SKILLS_DIR, 'skills', skillName);
+    const skillsDir = getSkillsDir();
+    let skillPath = path.join(skillsDir, 'skills', skillName);
     try {
       const stat = await fs.stat(skillPath);
-      if (!stat.isDirectory()) skillPath = path.join(SKILLS_DIR, skillName);
+      if (!stat.isDirectory()) skillPath = path.join(skillsDir, skillName);
     } catch {
-      skillPath = path.join(SKILLS_DIR, skillName);
+      skillPath = path.join(skillsDir, skillName);
     }
     
     // Quick existence check

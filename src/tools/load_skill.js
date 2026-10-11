@@ -5,7 +5,7 @@ const { logAccess, logger } = require('../utils/logger');
 const { toolError } = require('../utils/errors');
 const { parseFrontmatter } = require('../utils/context-optimizer');
 
-const SKILLS_DIR = process.env.ASE_ROOT || path.resolve(__dirname, __dirname.includes('tools/server') ? '../../../../' : '../../');
+const getSkillsDir = () => process.env.ASE_ROOT || path.resolve(__dirname, __dirname.includes('tools/server') ? '../../../../' : '../../');
 const AUTH_FILE = '/home/thor/.agents/auth.json';
 
 // Load authentication registry
@@ -93,9 +93,10 @@ module.exports = (deps) => ({
     const { skill_name, auth_token } = args;
     const startTime = Date.now();
     
+    const skillsDir = getSkillsDir();
     // Canonical path traversal prevention
-    const resolvedPath = path.resolve(SKILLS_DIR, skill_name);
-    const resolvedRoot = path.resolve(SKILLS_DIR);
+    const resolvedPath = path.resolve(skillsDir, skill_name);
+    const resolvedRoot = path.resolve(skillsDir);
     if (!resolvedPath.startsWith(resolvedRoot + path.sep) && resolvedPath !== resolvedRoot) {
       if (deps.sessionState && typeof deps.sessionState.logToolCall === 'function') {
         deps.sessionState.logToolCall('load_skill', Date.now() - startTime, true);
@@ -130,8 +131,9 @@ module.exports = (deps) => ({
     if (pinned && pinned.content) {
       content = pinned.content;
       version = pinned.version;
-      const subpath = path.resolve(SKILLS_DIR, 'skills', skill_name, 'SKILL.md');
-      mdFile = fs.existsSync(subpath) ? subpath : path.resolve(SKILLS_DIR, skill_name, 'SKILL.md');
+      const skillsDir = getSkillsDir();
+      const subpath = path.resolve(skillsDir, 'skills', skill_name, 'SKILL.md');
+      mdFile = fs.existsSync(subpath) ? subpath : path.resolve(skillsDir, skill_name, 'SKILL.md');
     } else {
       const skillData = await deps.skillCache.getSkillContent(skill_name);
 
