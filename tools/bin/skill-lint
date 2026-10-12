@@ -1,0 +1,227 @@
+#!/usr/bin/env node
+/**
+ * Agent Skills Linter, Budget Calculator & Scaffolder
+ * Enforces Google Antigravity & AgentSkills.io Ground Truth standards.
+ *
+ * Usage:
+ *   skill-lint <path-to-skill-dir>
+ *   skill-lint --budget <path-to-skills-root>
+ *   skill-lint --scaffold <skill-name> <output-dir>
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+const ALLOWED_SUBDIRS = new Set(['scripts', 'examples', 'resources']);
+const BANNED_SUBDIRS = new Set(['evals', 'assets', 'references']);
+
+function estimateTokens(text) {
+  return Math.ceil(text.length / 4);
+}
+
+function lintSkill(skillDir) {
+  const errors = [];
+  const warnings = [];
+  const dirName = path.basename(path.resolve(skillDir));
+
+  const skillFile = path.join(skillDir, 'SKILL.md');
+  if (!fs.existsSync(skillFile)) {
+    return { ok: false, errors: [`Missing required SKILL.md in ${skillDir}`], warnings: [], dirName };
+  }
+
+  // Check subdirectories
+  const entries = fs.readdirSync(skillDir, { withFileTypes: true });
+  for (const entry of entries) {
+    if (entry.isDirectory()) {
+      if (BANNED_SUBDIRS.has(entry.name)) {
+        errors.push(`Invented/banned folder '${entry.name}/' found. Use only scripts/, examples/, or resources/.`);
+      } else if (!ALLOWED_SUBDIRS.has(entry.name)) {
+        warnings.push(`Non-standard subdirectory '${entry.name}/' detected.`);
+      }
+    }
+  }
+
+  const content = fs.readFileSync(skillFile, 'utf8');
+
+  // Check Frontmatter
+  const frontmatterMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!frontmatterMatch) {
+    errors.push('Missing YAML frontmatter block (--- ... ---)');
+    return { ok: false, errors, warnings, dirName };
+  }
+
+  const fmText = frontmatterMatch[1];
+  const nameMatch = fmText.match(/^name:\s*(.+)$/m);
+  const descMatch = fmText.match(/^description:\s*([\s\S]+?)(?=\n[a-zA-Z0-9_-]+:|$)/m);
+
+  if (!descMatch) {
+    errors.push("Missing required 'description' in frontmatter.");
+  } else {
+    const desc = descMatch[1].trim().replace(/^>-\s*/, '').replace(/\n\s+/g, ' ');
+    if (desc.length > 1024) {
+      errors.push(`Description length (${desc.length} chars) exceeds 1024 character limit.`);
+    }
+    if (!/^[A-Z][a-z0-9\s]+/.test(desc)) {
+      warnings.push("Description should start with third-person active phrasing (e.g. 'Creates...', 'Reviews...').");
+    }
+  }
+
+  if (nameMatch) {
+    const name = nameMatch[1].trim();
+    if (name !== dirName) {
+      errors.push(`Frontmatter name '${name}' does not match directory name '${dirName}'.`);
+    }
+    if (!/^[a-z0-9-]+$/.test(name)) {
+      errors.push(`Skill name '${name}' must use lowercase letters, numbers, and hyphens only.`);
+    }
+    if (name.length > 64) {
+      errors.push(`Skill name '${name}' exceeds 64 characters.`);
+    }
+  }
+
+  // Check Body Sections (9-part structure)
+  const requiredSections = [
+    { title: 'Scope', regex: /#+\s+(Scope|Purpose)/i },
+    { title: 'Preflight', regex: /#+\s+Preflight/i },
+    { title: 'Procedure', regex: /#+\s+Procedure/i },
+    { title: 'Decisions', regex: /#+\s+Decisions?/i },
+    { title: 'Output Contract', regex: /#+\s+Output Contract/i },
+    { title: 'Verification', regex: /#+\s+Verification/i },
+    { title: 'Stop & Escalate', regex: /#+\s+Stop (and|&) Escalate/i },
+    { title: 'Anti-patterns', regex: /#+\s+Anti-patterns?/i }
+  ];
+
+  for (const sec of requiredSections) {
+    if (!sec.regex.test(content)) {
+      warnings.push(`Missing recommended section: '${sec.title}'`);
+    }
+  }
+
+  // Check for explicit gates in Procedure
+  if (/Procedure/i.test(content) && !/Gate/i.test(content)) {
+    warnings.push("Procedure should contain at least one explicit 'Gate' checkpoint.");
+  }
+
+  const tokenEstimate = estimateTokens(content);
+  if (tokenEstimate > 5000) {
+    warnings.push(`SKILL.md is ~${tokenEstimate} tokens. Consider moving bulky references to resources/.`);
+  }
+
+  return {
+    ok: errors.length === 0,
+    skill: dirName,
+    tokenEstimate,
+    errors,
+    warnings
+  };
+}
+
+function calculateLibraryBudget(rootDir) {
+  const skills = [];
+  let totalChars = 0;
+
+  const entries = fs.readdirSync(rootDir, { withFileTypes: true });
+  for (const entry of entries) {
+    if (entry.isDirectory()) {
+      const skillFile = path.join(rootDir, entry.name, 'SKILL.md');
+      if (fs.existsSync(skillFile)) {
+        const content = fs.readFileSync(skillFile, 'utf8');
+        const fmMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+        if (fmMatch) {
+          const descMatch = fmMatch[1].match(/^description:\s*([\s\S]+?)(?=\n[a-zA-Z0-9_-]+:|$)/m);
+          const desc = descMatch ? descMatch[1].trim() : '';
+          const chars = entry.name.length + desc.length;
+          totalChars += chars;
+          skills.push({ name: entry.name, descLength: desc.length, estimatedTokens: estimateTokens(desc) });
+        }
+      }
+    }
+  }
+
+  const totalTokens = estimateTokens('x'.repeat(totalChars));
+  return {
+    skillCount: skills.length,
+    totalChars,
+    totalEstimatedTokens: totalTokens,
+    budgetCeilingTokens: 8000,
+    budgetUsagePercent: ((totalTokens / 8000) * 100).toFixed(1) + '%',
+    skills
+  };
+}
+
+function scaffoldSkill(name, targetDir) {
+  const skillPath = path.join(targetDir, name);
+  fs.mkdirSync(skillPath, { recursive: true });
+  fs.mkdirSync(path.join(skillPath, 'scripts'), { recursive: true });
+  fs.mkdirSync(path.join(skillPath, 'examples'), { recursive: true });
+  fs.mkdirSync(path.join(skillPath, 'resources'), { recursive: true });
+
+  const template = `---
+name: ${name}
+description: <Third-person capability>. Applies when <trigger context and keywords>. Not for <explicit exclusions>.
+---
+
+# ${name.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ')}
+
+## Scope
+Defines boundaries and applicability.
+
+## Preflight
+1. Validate required inputs and configuration.
+2. Read resources conditionally if needed.
+
+## Procedure
+1. Execute step one.
+2. **Gate**: Verify condition holds before proceeding.
+3. Execute step two.
+
+## Decisions
+| Condition | Action |
+|---|---|
+| Situation A | Action A |
+| Situation B | Action B |
+
+## Output Contract
+Defines structured deliverables and file paths.
+
+## Verification
+Step or command proving completion.
+
+## Stop and Escalate
+Conditions where execution must halt for human review.
+
+## Anti-patterns
+- Mistake one to avoid
+- Mistake two to avoid
+`;
+
+  fs.writeFileSync(path.join(skillPath, 'SKILL.md'), template);
+  return { ok: true, path: skillPath };
+}
+
+// CLI Argument Routing
+const args = process.argv.slice(2);
+if (args.length === 0 || args.includes('--help')) {
+  console.log(`Usage:
+  skill-lint <skill-dir>                  Lint a single skill
+  skill-lint --budget <skills-root-dir>   Calculate combined library discovery budget
+  skill-lint --scaffold <name> <out-dir>  Generate a spec-compliant skill structure
+`);
+  process.exit(0);
+}
+
+if (args[0] === '--budget') {
+  const result = calculateLibraryBudget(args[1] || '.');
+  console.log(JSON.stringify(result, null, 2));
+  process.exit(0);
+}
+
+if (args[0] === '--scaffold') {
+  const result = scaffoldSkill(args[1], args[2] || '.');
+  console.log(JSON.stringify(result, null, 2));
+  process.exit(0);
+}
+
+const lintRes = lintSkill(args[0]);
+console.log(JSON.stringify(lintRes, null, 2));
+process.exit(lintRes.ok ? 0 : 1);
