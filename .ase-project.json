@@ -13,7 +13,10 @@
     "All components use named exports, never default exports",
     "Database queries live exclusively in /lib/db/*.ts",
     "API routes are in /app/api/**/*.ts using Next.js Route Handlers",
-    "Zod schemas for all external input validation"
+    "Zod schemas for all external input validation",
+    "All agent skills must adhere to the AgentSkills.io open standard: strictly scripts/, examples/, resources/ subdirectories (never evals/ or assets/)",
+    "Skill descriptions must strictly follow formula: <third-person capability>. <trigger contexts and keywords>. <explicit exclusions>.",
+    "Skill bodies must follow the 9-part structure: Scope -> Preflight -> Procedure (with explicit gates) -> Decisions table -> Output contract -> Verification -> Stop and escalate -> Anti-patterns -> Examples/References"
   ],
   "architecture_patterns": [
     "Server Components for data fetching, Client Components for interactivity only",
@@ -53,6 +56,7 @@
     "Use Drizzle ORM for all database access",
     "Use server actions for mutations",
     "Use fast-jev decision-based compaction (fast_jev_compact / compactTranscript) for conversation history compression rather than lossy LLM summarization",
+    "Pass state between skills via persistent file artifacts at documented paths, never chat memory",
     "Use WorktreeManager (manage_worktree / ase-init --worktree) for isolated workspace branches during parallel tasks or experimental subagents without dirtying the working copy",
     "Use TranscriptReader (read_native_transcript / ase-init --transcript) for zero-overhead streaming log ingestion directly from disk without PTY scrapers or background daemons",
     "Always mandate production web essentials: custom domain, custom favicon suite (SVG/ICO/Apple Touch), and complete OpenGraph metadata",
