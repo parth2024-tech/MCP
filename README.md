@@ -1,157 +1,186 @@
-# 3D Web Animation Skill Library
+# Antigravity Skills Engine (ASE) & Second Brain
 
-A curated collection of **AI agent skill definitions** for building high-quality 3D and animation-heavy websites. This is a prompt library — structured Markdown guidelines that help AI agents (like Antigravity) produce better Three.js, GSAP, and CSS3D code.
+An enterprise-grade Model Context Protocol (MCP) server, multi-agent orchestration runtime, and autonomous skills repository built for Google Antigravity and modern AI coding agents.
 
-No runtime. No framework. No engine. Just well-organized, honest documentation.
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.4-blue.svg)](https://www.typescriptlang.org/)
+[![Model Context Protocol](https://img.shields.io/badge/MCP-1.29-green.svg)](https://modelcontextprotocol.io/)
+[![Engine](https://img.shields.io/badge/Architecture-Loop%20Engineering%20%2B%20DSPy-purple.svg)](#autonomous-agent-subsystems)
+[![License](https://img.shields.io/badge/License-ISC-gray.svg)](#license)
 
 ---
 
-## What's Actually In This Repo
+## Overview
 
-```text
-3d-web-experience/
-├── SKILL.md                        # Agent guidelines: which libraries to use, how to structure scenes
-├── references/
-│   ├── advanced-glsl-patterns.md   # GLSL snippets: fBm noise, Fresnel, Voronoi — annotated and Three.js-ready
-│   └── r3f-advanced-recipes.md     # React Three Fiber patterns: useFrame, portals, glass material, Rapier physics
-├── scripts/
-│   └── optimize-3d-assets.sh       # Calls gltf-transform + draco + cwebp to compress .glb files
-└── examples/
-    └── apex-landing/index.html     # A self-contained CSS3D + GSAP demo (no WebGL — runs without a GPU)
+The **Antigravity Skills Engine (ASE)** provides an autonomous intelligence layer for AI coding agents. It pairs a high-performance vector-indexed skills store with a structured execution engine featuring:
 
-.ase-project.json                   # Project-level rules the ASE server injects into agent context
+- **Strict Loop Engineering**: Autonomous *Doer + Independent Checker + Gate* verification cycles.
+- **Stanford DSPy-Style Optimization**: Declarative prompt modules with automatic trajectory harvesting and AST-scored few-shot prompt compilation.
+- **Persistent Episodic Memory**: Self-reinforcing Second Brain that records verified heuristics, debugging lessons, and project invariants.
+- **AgentSkills.io Spec Compliance**: Native linter and tooling enforcing production-grade progressive disclosure (`scripts/`, `examples/`, `resources/`).
+- **Resilient Multi-Transport Architecture**: Zero-overhead stdio transport, streaming transcript ingestion, and SQLite-first fallback degradation.
+
+---
+
+## Architecture & System Overview
+
+```
+                      ┌───────────────────────────────────────┐
+                      │        Google Antigravity Agent       │
+                      │       (IDE / Desktop / CLI agy)       │
+                      └──────────────────┬────────────────────┘
+                                         │ JSON-RPC / MCP
+                                         ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       ASE Model Context Protocol Server                     │
+│                             (ase-mcp-server.ts)                             │
+├────────────────────────────────┬───────────────────────────┬────────────────┤
+│       Autonomous Runtime       │        Memory & RAG       │   Tool Engine  │
+│  • Loop Engineering Engine     │  • HNSW Vector Search     │ • AST Evaluator│
+│    (Doer + Checker + Gate)     │  • Episodic Knowledge DB  │ • DAG Runner   │
+│  • DSPy Few-Shot Teleprompter  │  • Graph / Neo4j Linkage  │ • Skill Linter │
+│  • Worktree Manager Sandbox    │  • Obsidian Vault Sync    │ • Output Check │
+└────────────────────────────────┴───────────────────────────┴────────────────┘
+                                         │
+                    ┌────────────────────┴────────────────────┐
+                    ▼                                         ▼
+        ┌───────────────────────┐                 ┌───────────────────────┐
+        │   Skills Repository   │                 │   Persistent Storage  │
+        │   (/skills, /tools)   │                 │ (SQLite / WAL / Redis)│
+        └───────────────────────┘                 └───────────────────────┘
 ```
 
 ---
 
-## What This Actually Does
+## Core Capabilities
 
-When an AI agent in this workspace gets a task like *"build a 3D landing page"*, the ASE server loads the relevant `SKILL.md` into the agent's context. The agent then uses those guidelines to write code — similar to how a senior developer would write a team style guide.
+### 1. Loop Engineering (`run_goal_loop`)
+Implements an autonomous self-correcting development cycle:
+1. **Doer**: Formulates and executes solutions based on project conventions and AST constraints.
+2. **Independent Checker**: Evaluates artifacts against linting rules, syntax safety, and architectural boundaries.
+3. **Deterministic Gate**: Rejects defective iterations and feeds diagnostics back into the next loop (hard ceiling of 8 iterations).
 
-The value is in the **quality of the guidelines**, not a runtime system.
+### 2. Autonomous Prompt Optimization & DSPy Runtime
+Located in `src/core/dspy/` and `src/services/teleprompter.ts`:
+- **Declarative Modules**: Standardized `Predict`, `ChainOfThought`, and `ReAct` primitives.
+- **Trajectory Harvester**: Mines verified successful trajectories from execution ledgers.
+- **Few-Shot Teleprompter**: Compiles optimized prompts using Cobb-Douglas token budgeting and automated AST scoring.
 
----
+### 3. Episodic Learning & Second Brain
+- **Knowledge Reinforcement**: Retains validated resolutions and heuristics using dynamic scoring:
+  $$\text{Score} = 0.7 \times \text{Relevance} + 0.3 \times \text{Reinforcement}$$
+- **Obsidian Vault Exporter**: Serializes episodic memory, skills, and project invariants into bidirectional `[[wiki-links]]` markdown vaults for graph exploration.
 
-## The Real Performance Guidelines
-
-These aren't laws — they're patterns worth following, with the actual reasoning:
-
-| Pattern | Why It Matters |
-|---|---|
-| Pre-allocate `THREE.*` objects outside the render loop | Avoids GC pressure from thousands of short-lived objects per second |
-| `Math.min(devicePixelRatio, 2)` | Halves fill-rate cost on high-DPI displays with almost no visible quality loss |
-| Use `InstancedMesh` for repeated geometry | One draw call instead of N — critical for particle fields, crowds, foliage |
-| Call `.dispose()` on scene teardown | Prevents VRAM leaks — the GPU won't free textures/geometries automatically |
-| `powerPreference: 'high-performance'` | Hints to the OS to use the discrete GPU on dual-GPU laptops |
-| `Math.min(devicePixelRatio, 2)` on `AdaptiveDpr` in R3F | Lets `@react-three/drei` drop DPR automatically when FPS falls |
-
-Draw call count, shader complexity, overdraw, and texture memory all matter equally — there's no silver bullet.
-
----
-
-## What the GLSL Reference Actually Contains
-
-`references/advanced-glsl-patterns.md` includes annotated, self-contained snippets for:
-
-- **fBm (Fractal Brownian Motion)**: Layered noise for organic fog, terrain, fire
-- **Fresnel rim lighting**: Edge glow on objects based on view angle
-- **Chromatic aberration**: Per-channel UV offset in a post-processing pass
-- **Voronoi distance field**: Cell-pattern noise for cracked surfaces, holograms
-- **Holographic scanlines**: UV-space horizontal band animation
-
-All snippets are written for Three.js `ShaderMaterial` uniforms and `glsl-template-literal` (`/* glsl */`) syntax.
+### 4. AgentSkills.io Specification & Tooling
+- Includes `tools/bin/skill-lint` for full compliance auditing:
+  - Validates progressive disclosure subdirectories (`scripts/`, `examples/`, `resources/`).
+  - Enforces formulaic third-person capability descriptions ($\le 1024$ chars).
+  - Measures library-level token budgets against discovery context ceilings.
 
 ---
 
-## What the R3F Reference Actually Contains
+## Tooling Reference
 
-`references/r3f-advanced-recipes.md` covers practical R3F patterns:
-
-- **`useFrame` without per-frame allocations**: Using `useRef` for shared delta/clock values
-- **`MeshTransmissionMaterial`**: Proper frosted glass setup from `@react-three/drei`
-- **`useFBO` + `createPortal`**: Render-to-texture for mirrors and screens
-- **`@react-three/rapier`**: Physics body setup for rigid and soft bodies
-- **`LOD`**: Swapping geometry detail by camera distance
+| Tool | Category | Description |
+| :--- | :--- | :--- |
+| `run_goal_loop` | Runtime | Executes autonomous Doer + Independent Checker + Gate loops |
+| `execute_workflow_dag` | Orchestration | Executes resilient DAG tool workflows with variable interpolation |
+| `record_learned_lesson` | Second Brain | Persists verified debugging solutions into episodic memory |
+| `export_second_brain` | Second Brain | Exports skills and memory into an Obsidian-compatible graph vault |
+| `compile_optimized_prompt` | Optimization | Compiles demonstration-backed prompts scored via AST metrics |
+| `evaluate_prompt_metric` | Validation | Validates syntax, type safety, and `never_do` constraint adherence |
+| `search_tools` / `invoke_tool` | MCP Engine | Discovery and dynamic execution layer for internal capabilities |
 
 ---
 
-## The Asset Script
+## Getting Started
 
-`scripts/optimize-3d-assets.sh` runs three CLI tools in sequence:
+### Prerequisites
+
+- **Node.js**: `>= 20.0.0`
+- **pnpm** or **npm**
+- **tsx** (for direct TypeScript runtime execution)
+
+### Installation
 
 ```bash
-# What the script actually does:
-gltf-transform optimize input.glb --draco   # Draco mesh compression
-gltf-transform optimize input.glb --meshopt # MeshOptimizer quantization
-cwebp -q 85 texture.png -o texture.webp     # WebP texture compression
+git clone git@github.com:parth2024-tech/MCP.git
+cd MCP
+npm install
 ```
 
-It's a convenience wrapper. You need `@gltf-transform/cli`, `draco3d`, and `libwebp` installed globally. It is not a pipeline platform — it's a shell script.
+### Running the MCP Server
+
+```bash
+# Development mode with live reload
+npm run dev
+
+# Production start
+npm start
+```
+
+### Testing & Verification
+
+```bash
+# Run unit and integration tests
+npm test
+
+# Run validation test suites
+npm run verify
+```
 
 ---
 
-## The CSS3D Example
+## Antigravity MCP Configuration
 
-`examples/apex-landing/index.html` is a **single self-contained HTML file** demonstrating:
+Register the ASE server in your Antigravity MCP configuration (`~/.gemini/config/mcp_config.json`):
 
-- `perspective` + `transform-style: preserve-3d` for faux-3D floating cards
-- GSAP `ScrollTrigger` scroll-driven reveals
-- Mouse parallax via `gsap.to(el, { rotateX, rotateY })`
-- CSS `@keyframes` for ambient orb animations
-
-It doesn't use WebGL. It was built specifically for environments where hardware acceleration is disabled. It's a CSS demo, not a "fallback strategy" — calling it that was dishonest.
-
----
-
-## Included Skills
-
-This repository includes several core agent skills:
-
-- [commit](file:///home/thor/skiils/commit/SKILL.md): Enforces Sentry-style conventional commits, branch safety, and issue referencing.
-- [git-pushing](file:///home/thor/skiils/git-pushing/SKILL.md): Automates staging, committing, and pushing code using a dedicated helper script.
-- [loopy](file:///home/thor/skiils/loopy/SKILL.md): Implements the Loop Engineering framework (Doer + Independent Checker + Gate with iterative self-correction).
-
----
-
-## Autonomous Agent Engine & DSPy Subsystem
-
-The ASE MCP server provides a native TypeScript implementation of Stanford DSPy optimization, DAG workflow execution, and Loop Engineering:
-
-- **Declarative Signatures & Modules** (`src/core/dspy/`): Declarative inputs/outputs with `Predict`, `ChainOfThought`, and `ReAct` modules.
-- **Autonomous Teleprompter** (`src/services/teleprompter.ts`): Automatically harvests successful execution trajectories from `orchestration.db` and compiles few-shot prompts using Cobb-Douglas token budgeting and AST metric scoring.
-- **Workflow DAG Engine** (`src/services/workflow-engine.ts`): Activepieces-style multi-step DAG runner with dependency resolution, parallel execution, retries, and cross-step variable interpolation (`{{stepId.output}}`).
-- **Loop Engineering Engine** (`src/services/goal-loop-engine.ts`): Autonomous Doer + Independent Checker + Gate cycle with automatic self-correction and a hard 8-try ceiling.
-- **Second Brain Episodic Learning** (`src/services/episodic-learning.ts`): Self-evolving memory reinforcement that distills verified bug fixes and heuristics into SQLite memory ($Score = 0.7 \times \text{Relevance} + 0.3 \times \text{Reinforcement}$).
-- **Obsidian Vault Exporter** (`src/services/vault-exporter.ts`): Exports the entire second brain (skills, conventions, lessons) into an Obsidian-compatible markdown vault with bidirectional `[[wiki-links]]` for visual graph view.
-
-### Included Subsystem Tools
-
-| Tool | Description |
-| :--- | :--- |
-| `run_goal_loop` | Runs autonomous Loop Engineering cycles with Doer + Independent Checker + Gate verification |
-| `record_learned_lesson` | Distills and records actionable solutions into episodic memory with reinforcement tracking |
-| `export_second_brain` | Exports skills, conventions, and learned lessons into an Obsidian markdown vault with `[[wiki-links]]` |
-| `compile_optimized_prompt` | Compiles optimized few-shot prompts using historical success demonstrations and AST scoring |
-| `execute_workflow_dag` | Executes resilient multi-step tool workflows with state persistence and deduplication |
-| `evaluate_prompt_metric` | Scores code and completions against AST syntax safety and `never_do` constraint rules |
+```json
+{
+  "mcpServers": {
+    "ase": {
+      "command": "node",
+      "args": ["/absolute/path/to/MCP/dist/ase-mcp-server.js"],
+      "env": {
+        "NODE_ENV": "development",
+        "ASE_ALLOWED_DIRS": "/home/thor",
+        "ASE_AUTH_REQUIRED": "false"
+      }
+    }
+  }
+}
+```
 
 ---
 
-## How to Add Skills to ASE
+## Skill Authoring Standard
 
-The ASE MCP server (`tools/server/`) auto-indexes any `SKILL.md` file in the workspace via its embedding service. To add a new skill:
+All skills in this repository strictly adhere to the **AgentSkills.io** standard:
 
-1. Create a folder: `your-skill-name/SKILL.md`
-2. Add a YAML frontmatter block with `name` and `description`
-3. Restart the ASE server — it will vectorize and index the new skill automatically
-4. Verify the skill is indexed by querying the server health endpoint: `curl http://127.0.0.1:9090/health`
+```text
+skills/<skill-name>/
+├── SKILL.md           # Routing frontmatter + 9-stage procedure with gates
+├── scripts/           # Deterministic, non-interactive helper executables
+├── examples/          # Golden input/output reference cases
+└── resources/         # Schemas, templates, and conditional deep references
+```
+
+### Validating Skills
+
+Use the built-in CLI utility to lint skills and audit discovery token budgets:
+
+```bash
+# Lint an individual skill
+./tools/bin/skill-lint skills/<skill-name>
+
+# Measure context budget across a skill library
+./tools/bin/skill-lint --budget skills/
+
+# Scaffold a new spec-compliant skill
+./tools/bin/skill-lint --scaffold my-new-skill skills/
+```
 
 ---
 
-## Contributing
+## License
 
-If you add a GLSL pattern, R3F recipe, or optimization technique:
-
-- Include **working, tested code** — no pseudocode
-- Annotate the *why*, not just the *what*
-- Reference a live demo or Shadertoy link where applicable
+This project is licensed under the [ISC License](LICENSE).
