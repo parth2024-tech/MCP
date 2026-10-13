@@ -70,7 +70,10 @@ export class ToolExecutionMiddleware implements Middleware {
     const registry = context.container.resolve<any>('ToolRegistry');
     let loggerInstance = logger;
     try {
-      loggerInstance = context.container.resolve('logger');
+      const resolved = context.container?.resolve?.('logger');
+      if (resolved && typeof resolved.error === 'function') {
+        loggerInstance = resolved;
+      }
     } catch (e) {
       // Fallback
     }

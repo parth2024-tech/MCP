@@ -1,4 +1,7 @@
-export class Container {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Container = void 0;
+class Container {
     services = new Map();
     register(name, instance) {
         this.services.set(name, instance);
@@ -14,3 +17,4 @@ export class Container {
         return this.services.has(name);
     }
 }
+exports.Container = Container;
