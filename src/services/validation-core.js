@@ -206,10 +206,12 @@ async function getSteps(projectType, cwd, pkg, aseConfig) {
     case 'python': {
       const venvRuff = path.join(cwd, '.venv', 'bin', 'ruff');
       const venvMypy = path.join(cwd, '.venv', 'bin', 'mypy');
+      const venvTy = path.join(cwd, '.venv', 'bin', 'ty');
       const venvPytest = path.join(cwd, '.venv', 'bin', 'pytest');
 
       const hasVenvRuff = await fileExists(venvRuff);
       const hasVenvMypy = await fileExists(venvMypy);
+      const hasVenvTy = await fileExists(venvTy);
       const hasVenvPytest = await fileExists(venvPytest);
 
       steps.push({
@@ -219,17 +221,30 @@ async function getSteps(projectType, cwd, pkg, aseConfig) {
         available: hasVenvRuff || await commandExists('ruff', cwd, aseConfig),
         critical: false
       });
-      steps.push({
-        name: 'mypy type check',
-        cmd: hasVenvMypy ? venvMypy : 'mypy',
-        args: ['.', '--ignore-missing-imports'],
-        available: hasVenvMypy || await commandExists('mypy', cwd, aseConfig),
-        critical: false
-      });
+      if (hasVenvTy || (aseConfig && aseConfig.type_checker === 'ty')) {
+        steps.push({
+          name: 'Ty type check',
+          cmd: hasVenvTy ? venvTy : 'ty',
+          args: ['check'],
+          available: hasVenvTy || await commandExists('ty', cwd, aseConfig),
+          critical: true
+        });
+      } else {
+        steps.push({
+          name: 'mypy type check',
+          cmd: hasVenvMypy ? venvMypy : 'mypy',
+          args: ['.', '--ignore-missing-imports'],
+          available: hasVenvMypy || await commandExists('mypy', cwd, aseConfig),
+          critical: false
+        });
+      }
+      const pytestArgs = (aseConfig && aseConfig.testing_strategy && aseConfig.testing_strategy.test_paths)
+        ? ['-q', ...aseConfig.testing_strategy.test_paths]
+        : ['-q'];
       steps.push({
         name: 'pytest',
         cmd: hasVenvPytest ? venvPytest : 'pytest',
-        args: ['-q'],
+        args: pytestArgs,
         available: hasVenvPytest || await commandExists('pytest', cwd, aseConfig),
         critical: false
       });
