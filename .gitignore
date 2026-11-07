@@ -19,3 +19,10 @@ coverage/
 vault/
 # Untracked nested clones
 OpenHands/
+
+# AI agent local settings & secret caches
+.claude/settings.local.json
+*.local.json
+.env
+.env.local
+
