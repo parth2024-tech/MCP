@@ -1,0 +1,13 @@
+id: no-raw-console
+message: "Do not use raw console.log. Use centralized logger or contextual error logging."
+severity: error
+language: typescript
+files:
+  - "src/**/*.ts"
+  - "tools/server/src/**/*.ts"
+ignores:
+  - "**/*.test.ts"
+  - "**/logger.ts"
+  - "**/src/utils/logger.js"
+rule:
+  pattern: console.log($$$ARGS)

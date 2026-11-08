@@ -1,0 +1,12 @@
+id: no-direct-process-env
+message: "Avoid scattered direct process.env reads. Centralize configuration or provide fallback validation."
+severity: info
+language: typescript
+files:
+  - "src/**/*.ts"
+  - "tools/server/src/**/*.ts"
+ignores:
+  - "**/*.test.ts"
+  - "**/config/**"
+rule:
+  pattern: process.env.$PROP

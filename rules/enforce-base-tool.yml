@@ -1,0 +1,13 @@
+id: enforce-base-tool
+message: "Tool classes under tools/ should extend BaseTool to ensure schema validation and context handling."
+severity: warning
+language: typescript
+files:
+  - "src/tools/**/*.ts"
+  - "tools/server/src/tools/**/*.ts"
+ignores:
+  - "**/*.test.ts"
+rule:
+  pattern: class $NAME { $$$BODY }
+  not:
+    pattern: class $NAME extends BaseTool<$$$T> { $$$BODY }
