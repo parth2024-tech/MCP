@@ -1,0 +1,20 @@
+# Lefthook configuration for Antigravity Skills Engine (ASE)
+# Fast, parallel pre-commit and pre-push guardrails
+
+pre-commit:
+  parallel: true
+  commands:
+    gitleaks:
+      run: gitleaks protect --staged --verbose
+    ast-grep:
+      run: sg scan
+    types:
+      run: npx tsc --noEmit
+
+pre-push:
+  parallel: false
+  commands:
+    gitleaks-audit:
+      run: gitleaks protect --staged
+    validate:
+      run: node tools/bin/ase-init --validate

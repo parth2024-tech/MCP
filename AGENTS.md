@@ -50,3 +50,11 @@ When generating or modifying frontend code, landing pages, or web apps, you MUST
   3. ✅ Remove all "Made with AI", "Built with v0", or builder badges.
   4. ✅ Dedicated, accessible Privacy Policy page (/privacy).
   5. ✅ Dedicated, accessible Terms & Conditions page (/terms).
+
+## Mandatory Deterministic Guardrails & Tooling Laws (Permanent System Invariants)
+1. **Zero Secret Leakage (`gitleaks`):** Run `gitleaks protect --staged` before pushing to GitHub. Never commit API keys or unencrypted credentials.
+2. **Structural Code Invariants (`ast-grep` / `sg`):** Prefer AST-level syntax rules (`sg scan`) over fragile regex linters when auditing code structures.
+3. **Deterministic Task Execution (`just`):** Whenever a `justfile` is present, always execute project verification and tasks via `just <recipe>`.
+4. **Architectural Decisions & C4 Diagrams (`adr-tools` & `d2`):** Record all major system decisions in `docs/adr/` via `adr new` and compile architecture diagrams to SVG via `d2`.
+5. **Contract-First APIs (`tsp` / TypeSpec):** Compile API contracts to OpenAPI 3.1 via `tsp compile .` before writing route handlers.
+6. **Declarative Visualization (`vl-convert` & Typst CeTZ):** Compile Vega-Lite JSON charts to standalone SVG via `vl-convert` without headless browser overhead.

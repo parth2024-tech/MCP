@@ -72,20 +72,30 @@
     "For 3D: use getGPUTier() from detect-gpu to serve adaptive quality levels",
     "For 3D: use GSAP ScrollTrigger with scrub:1.5 for cinematic scroll-driven animation",
     "For 3D shaders: use /* glsl */ template literal tags for syntax highlighting",
-    "For 3D assets: always run optimize-3d-assets.sh before adding any .glb to /public"
+    "For 3D assets: always run optimize-3d-assets.sh before adding any .glb to /public",
+    "Use gitleaks (gitleaks protect --staged) for zero secret leakage verification before committing or pushing",
+    "Use ast-grep (sg scan) for structural AST-level syntax rules rather than regex linters",
+    "Use just (justfile) for deterministic project verification and task runs",
+    "Use adr-tools (adr new) and D2 (d2) for all architectural decision records and C4 system diagrams",
+    "Use TypeSpec (tsp compile) for contract-first API development and OpenAPI 3.1 generation",
+    "Use vl-convert (vl-convert vl2svg) and Typst CeTZ for declarative standalone vector charts"
   ],
   "agent_skills": {
     "directory": "/home/thor/skiils/skills",
     "default_skills": [
       "using-agent-skills",
       "context-engineering",
-      "anti-vibe-design"
+      "anti-vibe-design",
+      "secret-guard",
+      "ast-grep-enforcer"
     ],
     "mandatory_skills": {
-      "api": "api-and-interface-design",
+      "api": "contract-first-api",
       "auth": "security-and-hardening",
       "frontend": "anti-vibe-design",
-      "ui": "anti-vibe-design"
+      "ui": "anti-vibe-design",
+      "architecture": "adr-architecture",
+      "secrets": "secret-guard"
     },
     "session_reporting_preference": true
   },

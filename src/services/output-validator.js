@@ -58,8 +58,6 @@ async function validate(projectDir, timeoutMs = 30000) {
   let allPassed = true;
   let criticalFailure = false;
 
-  const effectiveTimeout = (aseConfig && aseConfig.validation_timeout_ms) ? aseConfig.validation_timeout_ms : timeoutMs;
-
   // Execute all steps in parallel
   const promises = steps.map(async (step) => {
     if (!step.available) {
