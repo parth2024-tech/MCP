@@ -410,6 +410,18 @@ scan-secrets:
 # Run AST structural linting
 lint-ast:
     sg scan
+
+# Prune dead code and unused exports
+prune-dead-code:
+    knip
+
+# Benchmark deterministic verification loop
+bench:
+    hyperfine --warmup 1 'just verify'
+
+# Declarative schema diffing
+schema-diff:
+    atlas schema diff
 `;
   fs.writeFileSync(justfilePath, justfileContent, 'utf8');
   log(c.green, '✅', `Created ${c.bold}Justfile${c.reset} (run with ${c.cyan}just verify${c.reset})`);

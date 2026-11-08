@@ -1,0 +1,103 @@
+direction: right
+
+title: ASE System Architecture & Invariant Enforcement {
+  near: top-center
+  shape: text
+  style.font-size: 20
+  style.bold: true
+}
+
+User: User / Client {
+  shape: person
+}
+
+AgentRuntime: Agent Runtime Environment {
+  style.fill: "#f8fafc"
+  style.stroke: "#94a3b8"
+
+  AgentsMD: AGENTS.md Invariants {
+    shape: page
+    style.fill: "#fef3c7"
+    style.stroke: "#f59e0b"
+  }
+
+  PromptGen: Project Prompt Generator {
+    shape: step
+    style.fill: "#e0e7ff"
+  }
+
+  Agent: Autonomous AI Agent {
+    shape: class
+    style.fill: "#dbeafe"
+  }
+}
+
+ASE_Server: ASE MCP Execution Layer {
+  style.fill: "#f1f5f9"
+  style.stroke: "#64748b"
+
+  Auth: Auth & Key Middleware {
+    shape: step
+  }
+
+  Cache: Cache Middleware {
+    shape: step
+  }
+
+  Concurrency: Concurrency Semaphore {
+    shape: step
+  }
+
+  ToolMiddleware: ToolExecutionMiddleware.ts {
+    shape: step
+    style.fill: "#fed7aa"
+    style.stroke: "#f97316"
+    style.stroke-width: 2
+  }
+
+  ToolImpl: MCP Tool Handlers {
+    shape: package
+    style.fill: "#ede9fe"
+  }
+}
+
+DeterministicGate: Deterministic Guardrail Gate {
+  style.fill: "#ecfdf5"
+  style.stroke: "#10b981"
+
+  OutputValidator: output-validator.js {
+    shape: hexagon
+    style.fill: "#a7f3d0"
+    style.stroke: "#059669"
+    style.stroke-width: 2
+  }
+
+  JustRunner: Justfile Runner {
+    shape: queue
+    style.fill: "#d1fae5"
+  }
+
+  Lefthook: Lefthook Pre-Commit {
+    shape: diamond
+    style.fill: "#bbf7d0"
+  }
+}
+
+GitStorage: GitHub Repository {
+  shape: cylinder
+  style.fill: "#f3f4f6"
+}
+
+# Connections
+User -> AgentRuntime.Agent: Task Request
+AgentRuntime.AgentsMD -> AgentRuntime.PromptGen: Invariant Rules
+AgentRuntime.PromptGen -> AgentRuntime.Agent: Second Brain Context
+AgentRuntime.Agent -> ASE_Server.Auth: MCP Tool Call
+ASE_Server.Auth -> ASE_Server.Cache: Authenticate
+ASE_Server.Cache -> ASE_Server.Concurrency: Acquire Permit
+ASE_Server.Concurrency -> ASE_Server.ToolMiddleware: Execute
+ASE_Server.ToolMiddleware -> ASE_Server.ToolImpl: Safe Invocation
+ASE_Server.ToolImpl -> DeterministicGate.OutputValidator: Validate Output
+DeterministicGate.OutputValidator -> DeterministicGate.JustRunner: just verify
+DeterministicGate.JustRunner -> DeterministicGate.Lefthook: Pre-commit Verification
+DeterministicGate.Lefthook -> GitStorage: Mandatory Git Push (origin/main)
