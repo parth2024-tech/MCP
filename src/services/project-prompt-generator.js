@@ -362,7 +362,9 @@ function getConfigTemplate() {
       'Never use purple gradients, pill buttons, fake reviews/metrics/counters, vague hero text, emoji icons, em dashes, crazy scroll/cursor animations, or AI slop photos/copy on websites',
       'Never let an AI grade its own work without independent gate verification',
       'Never leave completed work uncommitted or unpushed to GitHub',
-      'Never run unsolicited background daemons, update pollers, or indexing services on Arch Linux'
+      'Never run unsolicited background daemons, update pollers, or indexing services on Arch Linux',
+      'Never commit or push code without passing gitleaks protect --staged secret audit',
+      'Never rely on fragile regex linters when ast-grep (sg) AST rules can be enforced'
     ],
     preferred_patterns: [
       'Practice extreme token economy: keep responses concise, high-signal, and directly answer user requests without unprompted changelogs or filler',
@@ -372,20 +374,31 @@ function getConfigTemplate() {
       'Use Next.js Image component for all images',
       'Always mandate production web essentials: custom domain, custom favicon suite, remove AI badges, /privacy page, and /terms page',
       'Always follow the 6-step Second Brain closed loop: Load Conventions -> Select Model -> Autonomous Loop -> Validate Output -> Continuous Learning -> Automated Git Push',
-      'Always enforce Arch Linux On-Demand System Governance (run interactive tools on-demand, terminate completely on exit)'
+      'Always enforce Arch Linux On-Demand System Governance (run interactive tools on-demand, terminate completely on exit)',
+      'Use gitleaks (gitleaks protect --staged) for zero secret leakage verification before committing or pushing',
+      'Use ast-grep (sg scan) for structural AST-level syntax rules rather than regex linters',
+      'Use just (justfile) for deterministic project verification and task runs',
+      'Use adr-tools (adr new) and D2 (d2) for all architectural decision records and C4 system diagrams',
+      'Use TypeSpec (tsp compile) for contract-first API development and OpenAPI 3.1 generation',
+      'Use vl-convert (vl-convert vl2svg) and Typst CeTZ for declarative standalone vector charts',
+      'Use Typst (typst compile) exclusively for any research paper or scientific document'
     ],
     agent_skills: {
       directory: '/home/thor/skiils/skills',
       default_skills: [
         'using-agent-skills',
         'context-engineering',
-        'anti-vibe-design'
+        'anti-vibe-design',
+        'secret-guard',
+        'ast-grep-enforcer'
       ],
       mandatory_skills: {
-        api: 'api-and-interface-design',
+        api: 'contract-first-api',
         auth: 'security-and-hardening',
         frontend: 'anti-vibe-design',
-        ui: 'anti-vibe-design'
+        ui: 'anti-vibe-design',
+        architecture: 'adr-architecture',
+        secrets: 'secret-guard'
       },
       session_reporting_preference: true
     }
