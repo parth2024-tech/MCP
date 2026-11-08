@@ -51,6 +51,8 @@ async function validate(projectDir, timeoutMs = 30000) {
     require('../utils/logger').logger.warn('OutputValidator', `Failed to read .ase-project.json: ${err.message}`);
   }
 
+  const effectiveTimeout = (aseConfig && aseConfig.validation_timeout_ms) || (process.env.ASE_VALIDATION_TIMEOUT ? parseInt(process.env.ASE_VALIDATION_TIMEOUT) : timeoutMs);
+
   const steps = await getSteps(detection.type, resolvedDir, pkg, aseConfig);
   const skipped = [];
   let allPassed = true;
