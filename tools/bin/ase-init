@@ -388,6 +388,49 @@ const config = {
 
 fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
 
+// Auto-scaffold Justfile if missing
+const justfilePath = path.join(cwd, 'Justfile');
+if (!fs.existsSync(justfilePath) && !fs.existsSync(path.join(cwd, 'justfile'))) {
+  const justfileContent = `# Justfile — Deterministic Task Runner
+default: verify
+
+# Run all deterministic guardrails
+verify:
+    @echo "==> Running Gitleaks (Secret Gate)..."
+    gitleaks protect --staged
+    @echo "==> Running AST Structural Scan..."
+    sg scan || true
+    @echo "==> Running ASE Output Validation..."
+    ase-init --validate
+
+# Quick secret scan of working tree
+scan-secrets:
+    gitleaks dir . --verbose
+
+# Run AST structural linting
+lint-ast:
+    sg scan
+`;
+  fs.writeFileSync(justfilePath, justfileContent, 'utf8');
+  log(c.green, '✅', `Created ${c.bold}Justfile${c.reset} (run with ${c.cyan}just verify${c.reset})`);
+}
+
+// Auto-scaffold lefthook.yml if missing
+const lefthookPath = path.join(cwd, 'lefthook.yml');
+if (!fs.existsSync(lefthookPath)) {
+  const lefthookContent = `# Lefthook deterministic pre-commit guardrails
+pre-commit:
+  parallel: true
+  commands:
+    gitleaks:
+      run: gitleaks protect --staged
+    ast-grep:
+      run: sg scan
+`;
+  fs.writeFileSync(lefthookPath, lefthookContent, 'utf8');
+  log(c.green, '✅', `Created ${c.bold}lefthook.yml${c.reset} for deterministic pre-commit`);
+}
+
 log(c.green, '✅', `Created ${c.bold}${CONFIG_FILE}${c.reset} — edit it to add your project's conventions.`);
 console.log(`\n${c.gray}Next steps:${c.reset}`);
 console.log(`  ${c.bold}1.${c.reset} Open ${c.cyan}${configPath}${c.reset} and fill in your tech stack, conventions, and never-do rules.`);

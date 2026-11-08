@@ -18,7 +18,7 @@
     "Skill descriptions must strictly follow formula: <third-person capability>. <trigger contexts and keywords>. <explicit exclusions>.",
     "Skill bodies must follow the 9-part structure: Scope -> Preflight -> Procedure (with explicit gates) -> Decisions table -> Output contract -> Verification -> Stop and escalate -> Anti-patterns -> Examples/References",
     "Whenever creating, editing, or auditing presentations, PPT/PPTX decks, or slide diagrams, exclusively use the presentation-designer skill.",
-    "Always start every task response with an explicit estimated completion time (e.g., \u23f1\ufe0f **Estimated Time**: ~X minutes)."
+    "Always start every task response with an explicit estimated completion time (e.g., ⏱️ **Estimated Time**: ~X minutes)."
   ],
   "architecture_patterns": [
     "Server Components for data fetching, Client Components for interactivity only",
@@ -26,15 +26,15 @@
     "Feature-based folder structure under /features"
   ],
   "never_do": [
-    "Never use useEffect for data fetching \u2014 use React Server Components",
+    "Never use useEffect for data fetching — use React Server Components",
     "Never store secrets in environment files committed to git",
-    "Never use inline styles \u2014 always use Tailwind classes",
-    "Never use any TypeScript type \u2014 always type explicitly",
-    "Never instantiate THREE objects (Vector3, Color, Matrix4, etc.) inside requestAnimationFrame or useFrame \u2014 always pre-allocate outside the loop",
-    "Never set renderer.setPixelRatio above 2 \u2014 always cap with Math.min(devicePixelRatio, 2)",
+    "Never use inline styles — always use Tailwind classes",
+    "Never use any TypeScript type — always type explicitly",
+    "Never instantiate THREE objects (Vector3, Color, Matrix4, etc.) inside requestAnimationFrame or useFrame — always pre-allocate outside the loop",
+    "Never set renderer.setPixelRatio above 2 — always cap with Math.min(devicePixelRatio, 2)",
     "Never ship a Three.js scene without calling .dispose() on all geometries, materials, and textures on unmount",
-    "Never use separate meshes for repeated identical objects \u2014 always use THREE.InstancedMesh or THREE.Points",
-    "Never build a 3D scene without checking renderer.info.render.calls \u2014 must stay within draw call budget",
+    "Never use separate meshes for repeated identical objects — always use THREE.InstancedMesh or THREE.Points",
+    "Never build a 3D scene without checking renderer.info.render.calls — must stay within draw call budget",
     "Never configure ioredis with maxRetriesPerRequest: null without also setting connectTimeout, lazyConnect: true, and retryStrategy: () => null. This causes every Redis command to hang indefinitely when Redis is unreachable, permanently freezing the MCP server.",
     "Never call Redis commands (smembers, keys, get, etc.) without first checking isRedisAvailable(). All tools must degrade gracefully to SQLite-only mode when Redis is unreachable.",
     "Never pass --watchAll to vitest in automated validation; always use --run --passWithNoTests",
@@ -43,14 +43,16 @@
     "Never use pill-shaped buttons (rounded-full) for primary landing page buttons or CTAs (use structured rounded-md or rounded-lg)",
     "Never use fake reviews, fabricated testimonials, or AI-generated avatar photos",
     "Never display fake metrics, unsubstantiated statistics, or fabricated customer counter tickers",
-    "Never write vague hero section titles (e.g. 'Empower your workflow with AI synergies') \u2014 always write concrete value propositions explaining the product in sentence one",
-    "Never use emojis as UI icons or bullet icons \u2014 always use vector SVG icons (Lucide, Heroicons, Radix)",
-    "Never use em dashes (\u2014) repeatedly in marketing and website copy",
+    "Never write vague hero section titles (e.g. 'Empower your workflow with AI synergies') — always write concrete value propositions explaining the product in sentence one",
+    "Never use emojis as UI icons or bullet icons — always use vector SVG icons (Lucide, Heroicons, Radix)",
+    "Never use em dashes (—) repeatedly in marketing and website copy",
     "Never use crazy scroll-jacking animations, tumbling card reveals, or custom laggy cursor follower animations",
     "Never use generic 3D glossy clay figures or AI-generated stock photography",
-    "Never generate AI slop marketing filler \u2014 keep copy crisp, concise, and human-written",
+    "Never generate AI slop marketing filler — keep copy crisp, concise, and human-written",
     "Never leave 'Made with AI', 'Built with v0', or default AI platform tags in production web applications",
-    "Never output verbose unsolicited recaps, exhaustive changelogs, or repetitive summaries that waste tokens \u2014 mention ONLY the most critical points unless explicitly asked"
+    "Never output verbose unsolicited recaps, exhaustive changelogs, or repetitive summaries that waste tokens — mention ONLY the most critical points unless explicitly asked",
+    "Never commit or push code without passing gitleaks protect --staged secret audit",
+    "Never rely on fragile regex linters when ast-grep (sg) AST rules can be enforced"
   ],
   "preferred_patterns": [
     "Practice extreme token economy: keep responses concise, high-signal, and directly answer user requests without unprompted changelogs or filler",
@@ -78,7 +80,8 @@
     "Use just (justfile) for deterministic project verification and task runs",
     "Use adr-tools (adr new) and D2 (d2) for all architectural decision records and C4 system diagrams",
     "Use TypeSpec (tsp compile) for contract-first API development and OpenAPI 3.1 generation",
-    "Use vl-convert (vl-convert vl2svg) and Typst CeTZ for declarative standalone vector charts"
+    "Use vl-convert (vl-convert vl2svg) and Typst CeTZ for declarative standalone vector charts",
+    "Use Typst (typst compile) exclusively for any research paper or scientific document"
   ],
   "agent_skills": {
     "directory": "/home/thor/skiils/skills",
