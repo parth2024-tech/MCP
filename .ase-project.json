@@ -17,7 +17,8 @@
     "All agent skills must adhere to the AgentSkills.io open standard: strictly scripts/, examples/, resources/ subdirectories (never evals/ or assets/)",
     "Skill descriptions must strictly follow formula: <third-person capability>. <trigger contexts and keywords>. <explicit exclusions>.",
     "Skill bodies must follow the 9-part structure: Scope -> Preflight -> Procedure (with explicit gates) -> Decisions table -> Output contract -> Verification -> Stop and escalate -> Anti-patterns -> Examples/References",
-    "Whenever creating, editing, or auditing presentations, PPT/PPTX decks, or slide diagrams, exclusively use the presentation-designer skill."
+    "Whenever creating, editing, or auditing presentations, PPT/PPTX decks, or slide diagrams, exclusively use the presentation-designer skill.",
+    "Always start every task response with an explicit estimated completion time (e.g., \u23f1\ufe0f **Estimated Time**: ~X minutes)."
   ],
   "architecture_patterns": [
     "Server Components for data fetching, Client Components for interactivity only",

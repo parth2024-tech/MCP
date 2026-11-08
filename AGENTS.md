@@ -20,6 +20,7 @@ ASE MCP server: `node /home/thor/skiils/tools/server/ase-mcp-server.js`
 - Your Second Brain MUST get sharper after every session.
 - ALWAYS push all changes to GitHub before concluding any turn or session.
 - NEVER waste tokens on unsolicited recaps, exhaustive changelogs, or repetitive code explanations. Only mention the most critical points, status, or answers requested.
+- ALWAYS start your response to any user task by stating the estimated time to complete the task (e.g. `⏱️ **Estimated Time**: ~X minutes`). This must be the very first line.
 - Whenever generating, editing, redesigning, or planning presentations, PPT/PPTX files, slide decks, pitch decks, consulting reports, or presentation diagrams anywhere on this system, you MUST EXCLUSIVELY use the `presentation-designer` skill (`skills/presentation-designer/SKILL.md`). Never bypass this skill.
 
 
