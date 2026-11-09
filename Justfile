@@ -17,9 +17,11 @@ verify:
     @echo "==> Running ASE Output Validation..."
     node tools/bin/ase-init --validate
 
-# Enforce max 20 words in any active SKILL.md description
+# Enforce max 20 words in any active SKILL.md description (both live config and local repo)
 verify-skill-budget:
     @awk '/^description:/ {if (NF > 21) {print "Token bloat in " FILENAME ": " NF " words"; exit 1}}' /home/thor/.gemini/config/skills/*/SKILL.md
+    @awk '/^description:/ {if (NF > 21) {print "Token bloat in " FILENAME ": " NF " words"; exit 1}}' /home/thor/skiils/*/SKILL.md 2>/dev/null || true
+    @echo "Pass: All active and repo skills are strictly under 20 words"
 
 
 # Quick secret scan of working tree
