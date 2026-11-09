@@ -1,6 +1,6 @@
 ---
 name: presentation-designer
-description: Designs, audits, and produces professional presentation decks with decade-grade expertise covering narrative architecture, slide typology, consulting frameworks, flowcharts, data visualization, diagram systems, color theory, typography, animation, and output across PowerPoint, Google Slides, Keynote, and code-based formats. Applies when creating a pitch deck, investor deck, consulting report, executive briefing, product demo, keynote, training deck, or any request involving slides, diagrams, flowcharts, org charts, timelines, matrices, process maps, data charts, or visual storytelling. Not for printed brochures, video production, web dashboards, or interactive single-page applications.
+description: "Design, audit, and build executive slide decks, PowerPoint presentations, pitch decks, and slide diagrams."
 ---
 
 # Presentation Designer

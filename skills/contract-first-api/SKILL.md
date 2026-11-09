@@ -1,6 +1,6 @@
 ---
 name: contract-first-api
-description: "Author and compile contract-first API specifications using TypeSpec (tsp). Generates OpenAPI 3.1, JSON Schemas, and synchronized type-safe client/server definitions with zero manual YAML editing."
+description: "Author and compile contract-first API specifications and OpenAPI 3.1 schemas using TypeSpec."
 category: api
 risk: safe
 date_added: "2026-11-09"

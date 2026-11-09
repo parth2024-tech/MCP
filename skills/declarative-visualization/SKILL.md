@@ -1,6 +1,6 @@
 ---
 name: declarative-visualization
-description: "Compile data-driven charts, technical diagrams, and scientific plots into crisp standalone SVG or PNG using Vega-Lite (vl-convert) and Typst CeTZ. Eliminates fragile canvas scripts and heavy browser rendering."
+description: "Compile standalone SVG charts and technical plots using Vega-Lite (vl-convert) and Typst CeTZ."
 category: visualization
 risk: safe
 date_added: "2026-11-09"

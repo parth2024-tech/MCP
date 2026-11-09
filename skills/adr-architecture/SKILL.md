@@ -1,6 +1,6 @@
 ---
 name: adr-architecture
-description: "Author, number, supersede, and document Architectural Decision Records (ADRs) and C4 software architecture diagrams using adr-tools and D2. Use whenever making architectural changes, choosing frameworks/databases, or generating system architecture diagrams."
+description: "Author, supersede, and document Architectural Decision Records and D2 C4 architecture diagrams."
 category: architecture
 risk: safe
 date_added: "2026-11-09"

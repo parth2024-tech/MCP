@@ -1,6 +1,6 @@
 ---
 name: ast-grep-enforcer
-description: "Enforce AST-level architectural rules, code structural patterns, and pre-commit verification loops using ast-grep (sg), just, and lefthook. Replaces fragile regex linting with syntax-tree checks."
+description: "Enforce AST-level syntax rules, code structural patterns, and pre-commit checks using ast-grep."
 category: quality
 risk: safe
 date_added: "2026-11-09"

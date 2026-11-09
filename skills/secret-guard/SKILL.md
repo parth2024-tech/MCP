@@ -1,6 +1,6 @@
 ---
 name: secret-guard
-description: "Detect, audit, and prevent hardcoded credentials, JWTs, API keys, and sensitive tokens from being committed or pushed using Gitleaks and Lefthook. Mandatory before any git push or public release."
+description: "Detect, audit, and block hardcoded credentials, API keys, and secrets using Gitleaks."
 category: security
 risk: safe
 date_added: "2026-11-09"
