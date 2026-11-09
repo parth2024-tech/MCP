@@ -4,6 +4,8 @@ default: verify
 
 # Run all deterministic guardrails
 verify:
+    @echo "==> Verifying Skill Frontmatter Token Budget..."
+    @awk '/^description:/ {if (NF > 21) {print "Token bloat in " FILENAME ": " NF " words"; exit 1}}' /home/thor/.gemini/config/skills/*/SKILL.md
     @echo "==> Running Gitleaks (Secret Gate)..."
     gitleaks protect --staged --verbose
     @echo "==> Running AST Structural Scan..."
@@ -14,6 +16,11 @@ verify:
     npm test
     @echo "==> Running ASE Output Validation..."
     node tools/bin/ase-init --validate
+
+# Enforce max 20 words in any active SKILL.md description
+verify-skill-budget:
+    @awk '/^description:/ {if (NF > 21) {print "Token bloat in " FILENAME ": " NF " words"; exit 1}}' /home/thor/.gemini/config/skills/*/SKILL.md
+
 
 # Quick secret scan of working tree
 scan-secrets:
