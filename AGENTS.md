@@ -1,33 +1,55 @@
-# ASE Agent Instructions
+# Global Antigravity Skills Engine (ASE) Instructions
 
-## Context
-This project uses the Antigravity Skills Engine (ASE) Second Brain.
-ASE MCP server: `node /home/thor/skiils/tools/server/ase-mcp-server.js`
+These rules apply globally to all projects, whether upcoming or ongoing, across the entire system.
 
-## The 6-Step Second Brain Workflow
-1. **Conventions & Memory Recall**: Call `get_project_prompt` to load project conventions from `.ase-project.json`. Recall prior learned lessons to prevent repeating past bugs.
-2. **Context Budgeting**: Call `query_skills_ranked` with the task description to select top-3 relevant skills.
-3. **Loop Engineering**: For code changes, run with the Doer + Independent Checker + Gate architecture (`run_goal_loop`).
-4. **Output Validation**: Call `validate_output` to verify linting, types, and tests pass with zero errors.
-5. **Continuous Learning & Auto-Write-Back**: Call `record_learned_lesson` and `update_project_rules` to persist verified fixes and heuristics into the Second Brain.
-6. **Automated Git Push to GitHub (Mandatory)**: Always stage all changes, create a descriptive conventional commit (`feat(...)`, `fix(...)`, `docs(...)`), and push to GitHub (`git push origin <branch>`).
+## Project Auto-Initialization
+- Whenever starting a task in any workspace, check if `.ase-project.json` exists in the root.
+- If `.ase-project.json` is missing, you MUST run the `ase-init` shell command immediately to initialize the project and generate the configuration.
+
+## ASE Closed-Loop Second Brain Workflow (Required for every action/code modification)
+1. **Load Conventions & Recall Memory**: 
+   - Call `ase/get_project_prompt` to load project-specific rules, tech stack, and conventions from `.ase-project.json`.
+   - Call `ase/query_skills` (or `query_skills_ranked`) with the task description to load up to 3 relevant skills. Never load more than 3 skills.
+   - Query prior distilled heuristics and lessons from the Second Brain to avoid repeating past bugs.
+2. **Model Selection**: Call `ase/get_model_config` to check the recommended model and temperature for the task type.
+3. **Autonomous Execution (Loop Engineering)**:
+   - For non-trivial tasks, refactors, and bug fixes, execute with the **Doer + Independent Checker + Gate** pattern (`ase/run_goal_loop`).
+   - The Doer generates the solution, the independent Checker validates via AST and rule metrics, and the Gate rejects bad work automatically (hard capped at 8 tries).
+4. **Output Validation**: You MUST call `ase/validate_output` (or run `ase-init --validate` in bash) to verify that all linting, types, and tests pass before presenting the code to the user or declaring a task complete.
+5. **Continuous Learning & Auto-Write-Back (Mandatory)**:
+   - When a bug is solved, an API quirk is resolved, or user guidance is provided, immediately call `ase/record_learned_lesson` and `ase/update_project_rules`.
+   - Distill the verified solution so future sessions on this or other projects recall it automatically.
+   - The Second Brain MUST get sharper after every session.
+6. **Automated Git Push to GitHub (Mandatory after EVERY work)**:
+   - Immediately upon completing and validating any task, you MUST stage all changes (`git add`), create a descriptive conventional commit (`feat(...)`, `fix(...)`, `docs(...)`), and push directly to GitHub (`git push origin <branch>`).
+   - Never leave completed work uncommitted or unpushed. Every session must be synchronized with GitHub.
+7. **Arch Linux On-Demand System Governance (Permanent Law)**:
+   - Strictly obey `SYSTEM_RULEBOOK.md` and the Supreme Law: "Do not run a service just because it exists. Run it only when it is actually needed. If the user opens it, it opens. If the user closes it, all associated processes must terminate completely."
+   - Never configure unsolicited background daemons, update pollers, or indexing services.
+   - Respect single-responsibility subsystems (single firewall `firewalld`, single timekeeper `https-timesync`, single power manager `tlp`).
+   - All interactive applications must terminate child/helper processes cleanly on exit.
 
 ## Strict Rules
-- Never load more than 3 skills per session.
-- Always run validate_output before presenting code.
-- Follow .ase-project.json never_do rules strictly.
-- Never let an AI grade its own work without independent gate checks.
-- Your Second Brain MUST get sharper after every session.
-- ALWAYS push all changes to GitHub before concluding any turn or session.
+- Always run output validation before ending your turn.
+- Strictly adhere to `never_do` rules specified in `.ase-project.json`.
+- Never let an AI grade its own work without independent gate verification.
+- Always write lessons and rule updates back to the Second Brain upon successful task resolution.
+- Always push completed work to GitHub before concluding any session.
+- Always enforce the Arch Linux On-Demand System Rulebook on this machine.
 - NEVER waste tokens on unsolicited recaps, exhaustive changelogs, or repetitive code explanations. Only mention the most critical points, status, or answers requested.
-- ALWAYS start your response to any user task by stating the estimated time to complete the task (e.g. `⏱️ **Estimated Time**: ~X minutes`). This must be the very first line.
-- Whenever generating, editing, redesigning, or planning presentations, PPT/PPTX files, slide decks, pitch decks, consulting reports, or presentation diagrams anywhere on this system, you MUST EXCLUSIVELY use the `presentation-designer` skill (`skills/presentation-designer/SKILL.md`). Never bypass this skill.
 
+## Extreme Token Economy Law (Mandatory for ALL Projects)
+- Never output unprompted recaps, step-by-step changelogs, or verbose file breakdowns that waste tokens.
+- Only provide the direct answer, critical outcome, or status unless the user explicitly asks for detailed explanations.
 
-## Self-Improvement & Continuous Learning
-- Actively analyze the user's input and execution traces for new technical advice, code preferences, corrections, or constraints.
-- When detected, immediately call `record_learned_lesson` and `update_project_rules` with the appropriate `rule_type` to persist the new convention to `.ase-project.json` and episodic memory before completing.
-- Acknowledge to the user that the system has successfully "learned" this rule and upgraded itself.
+## Mandatory Task Time Estimation Law (Permanent System Invariant)
+- Whenever the user gives a task or prompt, the agent MUST ALWAYS start its response by explicitly stating the estimated time it will take to complete the task (e.g., `⏱️ **Estimated Time**: ~X minutes`).
+- This estimate must appear at the very beginning of the response before any other output or action details.
+
+## Mandatory Presentation & Slide Deck Law (Permanent System Invariant)
+- Whenever generating, editing, redesigning, or planning presentations, PPT/PPTX files, slide decks, pitch decks, consulting reports, or presentation diagrams anywhere on this system, you MUST EXCLUSIVELY use the `presentation-designer` skill (`skills/presentation-designer/SKILL.md`).
+- Adhere strictly to its 9-part standards: narrative blueprints, 20 slide archetypes, 13 diagram patterns, 60-30-10 color theory, typographic hierarchy (≥28pt headlines, ≥18pt body), and zero chartjunk. Never bypass this skill.
+
 
 ## Anti-Vibe-Coding & Anti-AI-Slop Law (Mandatory for all Web/UI/Frontend work)
 When generating or modifying frontend code, landing pages, or web apps, you MUST obey these rules:
@@ -50,6 +72,19 @@ When generating or modifying frontend code, landing pages, or web apps, you MUST
   3. ✅ Remove all "Made with AI", "Built with v0", or builder badges.
   4. ✅ Dedicated, accessible Privacy Policy page (/privacy).
   5. ✅ Dedicated, accessible Terms & Conditions page (/terms).
+
+## Mandatory Research Paper Authoring Law (Permanent System Invariant)
+- Whenever generating, drafting, editing, formatting, or structuring any research paper, scientific manuscript, preprint, academic paper, thesis, conference submission, or technical report anywhere on this system, you MUST EXCLUSIVELY use **Typst** (`.typ`).
+- **Strictly Banned:** Never use LaTeX (`.tex`), Word (`.docx`), raw Markdown, or plain text for research papers unless the user explicitly and strictly commands otherwise.
+- **Publication Grade:** Always write clean, idiomatic Typst with proper metadata, abstracts, math formulas (`$ ... $`), structured sections, and verified bibliographies.
+- **Mandatory PDF Compilation:** Always verify the generated Typst paper compiles cleanly to PDF using `typst compile <file>.typ`.
+
+## Mandatory Research Report Generation Law (`gpt-researcher`)
+- Whenever generating, compiling, or writing any research report, technical investigation, competitive intelligence, or comprehensive web research report anywhere on this system, you MUST EXCLUSIVELY use the `gpt-researcher` skill and methodology (`skills/gpt-researcher/SKILL.md` or CLI `gpt-researcher`).
+- Never write shallow, single-query summaries. Always aggregate multi-source findings with verifiable citations, comparative tables, and structured sections.
+
+
+
 
 ## Mandatory Deterministic Guardrails & Tooling Laws (Permanent System Invariants)
 1. **Zero Secret Leakage (`gitleaks`):** Run `gitleaks protect --staged` before pushing to GitHub. Never commit API keys or unencrypted credentials.
