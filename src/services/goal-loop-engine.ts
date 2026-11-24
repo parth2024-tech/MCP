@@ -7,6 +7,8 @@
  * - Self-Correction Reflexion: Generates actionable feedback for failed iterations.
  * - Hard Iteration Cap: Default 8 tries ceiling to prevent runaway loops.
  * - State Checkpointing: Persists loop progress in SQLite orchestration.db.
+ * - Two-Pass Gated Execution: Pass 1 AST structural skeleton -> Pass 2 refinement.
+ * - Anti-Marathon Breaker: Convergence monitor halting stagnating loops early.
  */
 
 import crypto from 'crypto';
@@ -17,6 +19,8 @@ const OrchestrationDB = require('./orchestration-db');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const metrics = require('../utils/metrics');
 
+export type LoopPhase = 'standard' | 'pass1_skeleton' | 'pass2_refine';
+
 export interface GoalLoopOptions {
   goal: string;
   initialContent: string;
@@ -24,10 +28,13 @@ export interface GoalLoopOptions {
   maxTries?: number;
   targetScore?: number; // 1.0 to 10.0 scale (default 8.0)
   neverDoRules?: string[];
+  twoPassMode?: boolean; // When true, runs Pass 1 (skeleton) then Pass 2 (refinement)
+  antiMarathonBreaker?: boolean; // When true, halts early if iterations stagnate without progress
   doerFn?: (
     currentContent: string,
     iteration: number,
-    feedback?: string
+    feedback?: string,
+    phase?: LoopPhase
   ) => Promise<string> | string;
 }
 
@@ -39,17 +46,20 @@ export interface IterationReport {
   feedback?: string;
   content: string;
   durationMs: number;
+  phase?: LoopPhase;
+  stagnationDetected?: boolean;
 }
 
 export interface GoalLoopResult {
   runId: string;
   goal: string;
-  status: 'passed' | 'max_tries_reached';
+  status: 'passed' | 'max_tries_reached' | 'stagnation_halted';
   totalTries: number;
   finalScore: number;
   finalContent: string;
   iterations: IterationReport[];
   durationMs: number;
+  twoPassCompleted?: boolean;
 }
 
 export class GoalLoopEngine {
@@ -115,14 +125,23 @@ export class GoalLoopEngine {
     const targetScore = options.targetScore ?? 8.0;
     const filePath = options.filePath ?? 'index.ts';
     const neverDo = options.neverDoRules ?? [];
+    const twoPass = options.twoPassMode ?? false;
+    const antiMarathon = options.antiMarathonBreaker ?? false;
 
     let currentContent = options.initialContent;
     let feedback: string | undefined;
     const iterationReports: IterationReport[] = [];
 
+    let currentPhase: LoopPhase = twoPass ? 'pass1_skeleton' : 'standard';
+    let skeletonVerified = false;
+    let consecutiveStagnations = 0;
+
     // Default Doer implementation: removes trailing whitespace and fixes common linter errors if no custom doer is given
-    const doer = options.doerFn ?? ((content: string, iteration: number, fb?: string) => {
+    const doer = options.doerFn ?? ((content: string, iteration: number, fb?: string, phase?: LoopPhase) => {
       let refined = content;
+      if (phase === 'pass1_skeleton') {
+        refined = refined.trim();
+      }
       if (fb && fb.includes('never_do rule') && fb.includes('useEffect')) {
         refined = refined.replace(/\buseEffect\s*\([^)]*\);?/g, '/* useEffect removed per never_do rule */');
       }
@@ -131,12 +150,50 @@ export class GoalLoopEngine {
 
     for (let attempt = 1; attempt <= maxTries; attempt++) {
       const iterStart = Date.now();
+      const executedPhase = currentPhase;
 
       // 1. DOER: Synthesizes or refines the content
-      currentContent = await doer(currentContent, attempt, feedback);
+      currentContent = await doer(currentContent, attempt, feedback, executedPhase);
 
-      // 2. CHECKER: Independent validation
-      const check = this.evaluateOutput(currentContent, filePath, neverDo, targetScore);
+      // 2. CHECKER: Validation depending on loop phase
+      let check: { passed: boolean; score: number; violations: string[]; feedback?: string };
+      let stagnationDetected = false;
+
+      if (twoPass && executedPhase === 'pass1_skeleton') {
+        // In Pass 1, evaluate AST structure & syntax
+        const astResult = MetricEvaluator.evaluateAstSafety(currentContent, filePath);
+        const pass1Passed = astResult.passed;
+        check = {
+          passed: pass1Passed,
+          score: pass1Passed ? 8.0 : 4.0,
+          violations: astResult.violations,
+          feedback: pass1Passed
+            ? undefined
+            : `Gate rejected (Pass 1 Skeleton): AST structural failure:\n${astResult.violations.map(v => `- ${v}`).join('\n')}`
+        };
+
+        if (pass1Passed) {
+          skeletonVerified = true;
+          // Set phase for subsequent iteration
+          currentPhase = 'pass2_refine';
+        }
+      } else {
+        // Standard or Pass 2 full gate evaluation
+        check = this.evaluateOutput(currentContent, filePath, neverDo, targetScore);
+      }
+
+      // Check Anti-Marathon Breaker if enabled
+      if (antiMarathon && attempt > 1) {
+        const prevReport = iterationReports[iterationReports.length - 1];
+        if (check.score <= prevReport.score && check.violations.length >= prevReport.violations.length) {
+          consecutiveStagnations++;
+          if (consecutiveStagnations >= 2) {
+            stagnationDetected = true;
+          }
+        } else {
+          consecutiveStagnations = 0;
+        }
+      }
 
       const report: IterationReport = {
         iteration: attempt,
@@ -145,7 +202,9 @@ export class GoalLoopEngine {
         violations: check.violations,
         feedback: check.feedback,
         content: currentContent,
-        durationMs: Date.now() - iterStart
+        durationMs: Date.now() - iterStart,
+        phase: executedPhase,
+        stagnationDetected
       };
       iterationReports.push(report);
 
@@ -162,7 +221,7 @@ export class GoalLoopEngine {
             runId,
             options.goal.substring(0, 32),
             attempt,
-            `LOOP_TRY_${attempt}`,
+            `LOOP_TRY_${attempt}_${executedPhase}`,
             options.initialContent,
             currentContent,
             check.passed ? 'PASSED_GATE' : `VIOLATIONS: ${check.violations.length}`
@@ -175,7 +234,7 @@ export class GoalLoopEngine {
       metrics.increment('goal_loop.iteration');
 
       // 4. THE GATE: Check if the bar is met
-      if (check.passed) {
+      if (check.passed && (!twoPass || executedPhase === 'pass2_refine')) {
         metrics.increment('goal_loop.success');
         return {
           runId,
@@ -185,7 +244,24 @@ export class GoalLoopEngine {
           finalScore: check.score,
           finalContent: currentContent,
           iterations: iterationReports,
-          durationMs: Date.now() - startMs
+          durationMs: Date.now() - startMs,
+          twoPassCompleted: twoPass
+        };
+      }
+
+      // If stagnation detected by Anti-Marathon Breaker, halt early
+      if (stagnationDetected) {
+        metrics.increment('goal_loop.stagnation_halted');
+        return {
+          runId,
+          goal: options.goal,
+          status: 'stagnation_halted',
+          totalTries: attempt,
+          finalScore: check.score,
+          finalContent: currentContent,
+          iterations: iterationReports,
+          durationMs: Date.now() - startMs,
+          twoPassCompleted: false
         };
       }
 
@@ -205,7 +281,8 @@ export class GoalLoopEngine {
       finalScore: lastReport ? lastReport.score : 0,
       finalContent: currentContent,
       iterations: iterationReports,
-      durationMs: Date.now() - startMs
+      durationMs: Date.now() - startMs,
+      twoPassCompleted: false
     };
   }
 }
