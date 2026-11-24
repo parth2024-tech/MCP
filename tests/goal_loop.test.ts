@@ -129,5 +129,59 @@ describe('Loop Engineering Subsystem (GoalLoopEngine)', () => {
       expect(result.iterations.length).toBe(3);
       expect(result.iterations.every(it => !it.passed)).toBe(true);
     });
+
+    it('executes two-pass gated loop: Pass 1 skeleton verification -> Pass 2 refinement', async () => {
+      const engine = new GoalLoopEngine(testDb);
+      const phasesRecorded: string[] = [];
+
+      const twoPassDoer = (content: string, iteration: number, feedback?: string, phase?: string) => {
+        if (phase) phasesRecorded.push(phase);
+        if (phase === 'pass1_skeleton') {
+          // Output valid TypeScript structural skeleton
+          return 'export interface DataModel { id: string; value: number; }\nexport declare function processData(d: DataModel): Promise<number>;';
+        }
+        // Pass 2: implement full logic
+        return 'export interface DataModel { id: string; value: number; }\nexport async function processData(d: DataModel): Promise<number> { return d.value * 2; }';
+      };
+
+      const result = await engine.runLoop({
+        goal: 'Generate typed data processor with two-pass execution',
+        initialContent: 'const invalid = ;;',
+        twoPassMode: true,
+        maxTries: 5,
+        targetScore: 8.0,
+        doerFn: twoPassDoer
+      });
+
+      expect(result.status).toBe('passed');
+      expect(result.twoPassCompleted).toBe(true);
+      expect(result.totalTries).toBe(2);
+      expect(result.iterations[0].phase).toBe('pass1_skeleton');
+      expect(result.iterations[0].passed).toBe(true);
+      expect(result.iterations[1].phase).toBe('pass2_refine');
+      expect(result.iterations[1].passed).toBe(true);
+      expect(phasesRecorded).toEqual(['pass1_skeleton', 'pass2_refine']);
+      expect(result.finalContent).toContain('processData');
+    });
+
+    it('trips Anti-Marathon Breaker when consecutive iterations stagnate without progress', async () => {
+      const engine = new GoalLoopEngine(testDb);
+      const stubbornCode = 'const x = ;;;';
+
+      const result = await engine.runLoop({
+        goal: 'Fix stubborn error with Anti-Marathon guard',
+        initialContent: stubbornCode,
+        antiMarathonBreaker: true,
+        maxTries: 8,
+        targetScore: 8.0,
+        doerFn: (content) => content // never improves
+      });
+
+      // Iteration 1 fails, iteration 2 fails (stagnation 1), iteration 3 fails (stagnation 2 -> halts at try 3 instead of try 8)
+      expect(result.status).toBe('stagnation_halted');
+      expect(result.totalTries).toBe(3);
+      expect(result.iterations.length).toBe(3);
+      expect(result.iterations[2].stagnationDetected).toBe(true);
+    });
   });
 });
