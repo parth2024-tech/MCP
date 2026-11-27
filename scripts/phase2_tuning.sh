@@ -19,7 +19,7 @@ After=network.target
 Type=simple
 User=thor
 Group=thor
-WorkingDirectory=/home/thor/skiils
+WorkingDirectory=${ASE_REPO:-$PWD}
 Environment="NODE_COMPILE_CACHE=/tmp/mcp-server-compile-cache"
 ExecStart=/usr/bin/node --max-semi-space-size=64 --optimize-for-size=false --turbo-instruction-scheduling=true --experimental-vm-modules tools/server/ase-mcp-server.js
 Restart=on-failure

@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 # ase-setup-project — One-shot setup for any existing project
 # Run this once from inside a project directory to wire up ASE fully.
-# Usage: curl-free, no internet needed. Just run: bash /home/thor/skiils/tools/bin/ase-setup-project
+# Usage: curl-free, no internet needed. Just run: bash <repo>/tools/bin/ase-setup-project
 
 set -e
+
+ASE_REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+MCP_COMPRESSOR="${MCP_COMPRESSOR_BIN:-$HOME/.local/bin/mcp-compressor}"
 
 C_RESET='\033[0m'
 C_BOLD='\033[1m'
@@ -23,7 +26,7 @@ banner "ASE Project Setup — $PROJECT_DIR"
 
 # 1. Create .ase-project.json if missing
 if [ ! -f "$PROJECT_DIR/.ase-project.json" ]; then
-  node /home/thor/skiils/tools/bin/ase-init "$PROJECT_DIR" 2>/dev/null || ase-init 2>/dev/null
+  node "$ASE_REPO/tools/bin/ase-init" "$PROJECT_DIR" 2>/dev/null || ase-init 2>/dev/null
   ok ".ase-project.json created (fill it in with your conventions)"
 else
   ok ".ase-project.json already exists"
@@ -47,13 +50,13 @@ fi
 # 3. Create .vscode/mcp.json for VS Code / Windsurf / Cline (project-level)
 mkdir -p "$PROJECT_DIR/.vscode"
 if [ ! -f "$PROJECT_DIR/.vscode/mcp.json" ]; then
-  cat > "$PROJECT_DIR/.vscode/mcp.json" << 'VSCODEMCP'
+  cat > "$PROJECT_DIR/.vscode/mcp.json" << VSCODEMCP
 {
   "servers": {
     "ase": {
       "type": "stdio",
-      "command": "/home/thor/.local/bin/mcp-compressor",
-      "args": ["--compression-level", "medium", "node", "/home/thor/skiils/tools/server/ase-mcp-server.js"]
+      "command": "$MCP_COMPRESSOR",
+      "args": ["--compression-level", "medium", "node", "$ASE_REPO/tools/server/ase-mcp-server.js"]
     },
     "toonify": {
       "type": "stdio",
@@ -70,12 +73,12 @@ fi
 
 # 4. Create AGENTS.md for Codex/OpenAI agents
 if [ ! -f "$PROJECT_DIR/AGENTS.md" ]; then
-  cat > "$PROJECT_DIR/AGENTS.md" << 'AGENTSMD'
+  sed "s|__ASE_REPO__|$ASE_REPO|g" > "$PROJECT_DIR/AGENTS.md" << 'AGENTSMD'
 # ASE Agent Instructions
 
 ## Context
 This project uses the Antigravity Skills Engine (ASE).
-ASE MCP server: `node /home/thor/skiils/tools/server/ase-mcp-server.js`
+ASE MCP server: `node __ASE_REPO__/tools/server/ase-mcp-server.js`
 
 ## Workflow
 1. Call `get_project_prompt` to load project conventions from `.ase-project.json`

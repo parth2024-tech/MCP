@@ -121,12 +121,12 @@ describe('Git Worktree Isolation & Native Transcript Subsystem', () => {
             {
               id: 'call_1',
               name: 'run_command',
-              arguments: { CommandLine: 'git status', Cwd: '/home/thor/project' }
+              arguments: { CommandLine: 'git status', Cwd: '/workspace/project' }
             },
             {
               id: 'call_2',
               name: 'write_to_file',
-              arguments: { TargetFile: '/home/thor/project/src/auth.ts', CodeContent: 'export const auth = true;' }
+              arguments: { TargetFile: '/workspace/project/src/auth.ts', CodeContent: 'export const auth = true;' }
             }
           ]
         }),
@@ -162,7 +162,7 @@ describe('Git Worktree Isolation & Native Transcript Subsystem', () => {
       expect(parsed.metrics.assistantTurns).toBe(1);
       expect(parsed.metrics.toolInvocations['run_command']).toBe(1);
       expect(parsed.metrics.toolInvocations['write_to_file']).toBe(1);
-      expect(parsed.metrics.modifiedFiles).toContain('/home/thor/project/src/auth.ts');
+      expect(parsed.metrics.modifiedFiles).toContain('/workspace/project/src/auth.ts');
     });
 
     it('converts normalized steps into fast-jev compatible message format', async () => {

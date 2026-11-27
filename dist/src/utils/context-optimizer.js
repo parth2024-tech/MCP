@@ -1,0 +1,166 @@
+"use strict";
+/**
+ * context-optimizer.js — Cobb-Douglas Context Budget Engine
+ *
+ * Consolidated module (previously split across utils/context-budget.js and
+ * services/context-budget.js). Single source of truth for:
+ *   - parseFrontmatter()   — YAML frontmatter parser (authoritative implementation)
+ *   - ContextOptimizer     — Cobb-Douglas utility-maximizing budget engine
+ *
+ * The Cobb-Douglas model:
+ *   Utility = A * (Relevance^α) * (Tokens^β) − C * (TotalTokens²)
+ *
+ * Because conversation costs grow quadratically (O(T²)) and reasoning degrades
+ * past the noise threshold ("context rot"), this formula finds the exact cutoff
+ * where adding more retrieved content becomes actively harmful.
+ *
+ * @see src/services/context-budget.js for the TF-IDF scoring layer (unchanged)
+ */
+/**
+ * Parses YAML frontmatter from a markdown string.
+ * Handles both single-line and multi-line description fields.
+ * This is the authoritative implementation — do not duplicate.
+ *
+ * Activepieces-inspired version compatibility fields (piece.ts pattern):
+ *   - min_ase_version: Minimum ASE server version this skill requires.
+ *     Equivalent to Piece.minimumSupportedRelease.
+ *   - max_ase_version: Optional upper bound. Skills above this version
+ *     will be rejected. Equivalent to Piece.maximumSupportedRelease.
+ *   - deprecated: When true, load_skill emits a warning and query_skills
+ *     excludes the skill from results. Equivalent to Piece.deprecated.
+ *
+ * @param {string} content - Raw markdown content
+ * @returns {object|null} Parsed frontmatter as a plain object, or null if absent/malformed
+ */
+function parseFrontmatter(content) {
+    if (!content || !content.startsWith('---'))
+        return null;
+    // Find the closing --- delimiter, starting from index 3 to skip opening
+    const endIdx = content.indexOf('---', 3);
+    if (endIdx === -1)
+        return null;
+    const fm = content.substring(3, endIdx);
+    const result = {};
+    // Single-line key: value (handles optional quotes)
+    const nameMatch = fm.match(/^name:\s*["']?(.+?)["']?\s*$/m);
+    if (nameMatch)
+        result.name = nameMatch[1].trim();
+    const descMatch = fm.match(/^description:\s*["']?(.+?)["']?\s*$/m);
+    if (descMatch) {
+        result.description = descMatch[1].trim();
+    }
+    else {
+        // Multi-line description (indented continuation lines)
+        const multiMatch = fm.match(/^description:\s*["']?([\s\S]*?)["']?\s*(?=^[a-z]|\n---)/m);
+        if (multiMatch)
+            result.description = multiMatch[1].trim().replace(/\n\s*/g, ' ');
+    }
+    const catMatch = fm.match(/^category:\s*["']?(.+?)["']?\s*$/m);
+    if (catMatch)
+        result.category = catMatch[1].trim();
+    const riskMatch = fm.match(/^risk:\s*["']?(.+?)["']?\s*$/m);
+    if (riskMatch)
+        result.risk = riskMatch[1].trim();
+    const versionMatch = fm.match(/^version:\s*["']?(.+?)["']?\s*$/m);
+    if (versionMatch)
+        result.version = versionMatch[1].trim();
+    // ── Activepieces-inspired version compatibility gating ─────────────────
+    const minAseMatch = fm.match(/^min_ase_version:\s*["']?(.+?)["']?\s*$/m);
+    if (minAseMatch)
+        result.min_ase_version = minAseMatch[1].trim();
+    const maxAseMatch = fm.match(/^max_ase_version:\s*["']?(.+?)["']?\s*$/m);
+    if (maxAseMatch)
+        result.max_ase_version = maxAseMatch[1].trim();
+    const deprecatedMatch = fm.match(/^deprecated:\s*(true|false)\s*$/m);
+    if (deprecatedMatch)
+        result.deprecated = deprecatedMatch[1] === 'true';
+    return result;
+}
+/**
+ * ContextOptimizer — Cobb-Douglas production function for context budgeting.
+ *
+ * Determines the optimal subset of retrieved items to include in the prompt
+ * by maximizing marginal utility while penalizing quadratic context growth.
+ */
+class ContextOptimizer {
+    /**
+     * @param {object} opts
+     * @param {number} [opts.alpha=1.2]         — Relevance elasticity (>1 = superlinear reward for relevance)
+     * @param {number} [opts.beta=0.8]          — Token elasticity (<1 = diminishing returns on token count)
+     * @param {number} [opts.penaltyFactor=0.0001] — Quadratic context-rot penalty coefficient (C)
+     * @param {number} [opts.scaling=100]       — Utility scale factor (A)
+     */
+    constructor({ alpha = 1.2, beta = 0.8, penaltyFactor = 0.0001, scaling = 100 } = {}) {
+        this.A = scaling;
+        this.alpha = alpha;
+        this.beta = beta;
+        this.C = penaltyFactor;
+    }
+    /**
+     * Marginal utility of adding one more item at a given token accumulation point.
+     *
+     * Formula: A*(R^α)*(T^β) − [(C*(totalBefore+T)²) − (C*totalBefore²)]
+     *
+     * @param {number} relevance        — Item relevance score (0.0–1.0)
+     * @param {number} tokens           — Token cost of this item
+     * @param {number} totalTokensBefore — Tokens accumulated before this item
+     * @returns {number} Marginal utility (negative = harmful to include)
+     */
+    calculateUtility(relevance, tokens, totalTokensBefore) {
+        if (relevance <= 0 || tokens <= 0)
+            return 0;
+        const rawUtility = this.A * Math.pow(relevance, this.alpha) * Math.pow(tokens, this.beta);
+        const penaltyBefore = this.C * Math.pow(totalTokensBefore, 2);
+        const penaltyAfter = this.C * Math.pow(totalTokensBefore + tokens, 2);
+        const marginalPenalty = penaltyAfter - penaltyBefore;
+        return rawUtility - marginalPenalty;
+    }
+    /**
+     * Selects the optimal subset of items by cutting off where marginal utility < 0.
+     *
+     * @param {Array<{score: number, tokenEstimate: number}>} items
+     * @returns {{ optimized: Array, totalTokens: number, savedTokens: number }}
+     */
+    optimize(items) {
+        // Sort descending by relevance
+        const sorted = [...items].sort((a, b) => (b.score || 0) - (a.score || 0));
+        const optimized = [];
+        let totalTokens = 0;
+        let savedTokens = 0;
+        let cutoffReached = false;
+        for (const item of sorted) {
+            const relevance = item.score || 0.1;
+            const tokens = item.tokenEstimate || 500;
+            if (cutoffReached) {
+                savedTokens += tokens;
+                continue;
+            }
+            const marginalUtility = this.calculateUtility(relevance, tokens, totalTokens);
+            if (marginalUtility < 0) {
+                cutoffReached = true;
+                savedTokens += tokens;
+                continue;
+            }
+            optimized.push(item);
+            totalTokens += tokens;
+        }
+        return { optimized, totalTokens, savedTokens };
+    }
+}
+/**
+ * compactTranscript — decision-based context compaction using fast-jev-compaction.
+ * Prunes stale tool calls/results while preserving verbatim conversation text.
+ */
+async function compactTranscript(messages, options = {}) {
+    const { compact, collectToolCalls, reductionRatio, HybridJevClient } = require('../services/fast-jev/index');
+    const calls = collectToolCalls(messages, options.preserveRecentMessages || 6);
+    const asker = new HybridJevClient(calls, options.apiKey);
+    const result = await compact(messages, asker, options);
+    return {
+        messages: result.messages,
+        reductionRatio: reductionRatio(result),
+        stats: result.stats,
+        decisions: result.decisions
+    };
+}
+module.exports = { parseFrontmatter, ContextOptimizer, compactTranscript };

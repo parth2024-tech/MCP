@@ -14,6 +14,15 @@ const crypto_1 = __importDefault(require("crypto"));
 const http_1 = __importDefault(require("http"));
 const index_js_1 = require("@modelcontextprotocol/sdk/server/index.js");
 const types_js_1 = require("@modelcontextprotocol/sdk/types.js");
+// Pre-load native addons in main thread to ensure clean registration across worker threads
+try {
+    require('sharp');
+}
+catch (_) { }
+try {
+    require('onnxruntime-node');
+}
+catch (_) { }
 const Container_1 = require("./src/core/Container");
 const redis_service_1 = require("./src/services/redis-service");
 const dead_letter_queue_1 = require("./src/services/dead-letter-queue");

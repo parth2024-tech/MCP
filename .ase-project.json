@@ -86,7 +86,7 @@
     "Use GPT Researcher (gpt-researcher) exclusively for any research report, technical investigation, or market study"
   ],
   "agent_skills": {
-    "directory": "/home/thor/skiils/skills",
+    "directory": "./skills",
     "default_skills": [
       "using-agent-skills",
       "context-engineering",

@@ -1,9 +1,10 @@
+const path = require('path');
 const { spawn } = require('child_process');
 const start = Date.now();
 const log = (msg) => console.log(`[T+${Date.now()-start}ms] ${msg}`);
 
 const env = { ...process.env, MCP_VIRTUAL_KEY: 'test-key' }; // Override auth
-const server = spawn('node', ['ase-mcp-server.js'], { cwd: '/home/thor/skiils/tools/server', env });
+const server = spawn('node', ['ase-mcp-server.js'], { cwd: path.resolve(__dirname, '../tools/server'), env });
 let buffer = '';
 
 server.stdout.on('data', (data) => {

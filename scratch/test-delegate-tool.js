@@ -1,7 +1,8 @@
+const path = require('path');
 const { spawn } = require('child_process');
 const start = Date.now();
 const log = (msg) => console.log(`[T+${Date.now()-start}ms] ${msg}`);
-const server = spawn('node', ['ase-mcp-server.js'], { cwd: '/home/thor/skiils/tools/server' });
+const server = spawn('node', ['ase-mcp-server.js'], { cwd: path.resolve(__dirname, '../tools/server') });
 let buffer = '';
 
 server.stdout.on('data', (data) => {

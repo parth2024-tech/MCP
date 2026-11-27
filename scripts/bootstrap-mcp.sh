@@ -15,9 +15,11 @@ echo "================================================================="
 mkdir -p "$TARGET_DIR/.cursor/mcp-profiles"
 mkdir -p "$TARGET_DIR/.vscode"
 
-# Write central server configuration template
-# Using the absolute path to the central server in /home/thor/skiils
-SERVER_PATH="/home/thor/skiils/tools/server/ase-mcp-server.ts"
+# Resolve central repository root dynamically
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+SERVER_PATH="$REPO_ROOT/tools/server/ase-mcp-server.ts"
+MCP_COMPRESSOR="${MCP_COMPRESSOR_BIN:-$HOME/.local/bin/mcp-compressor}"
 
 # 1. Main .cursor/mcp.json
 cat <<EOF > "$TARGET_DIR/.cursor/mcp.json"
@@ -25,7 +27,7 @@ cat <<EOF > "$TARGET_DIR/.cursor/mcp.json"
   "servers": {
     "ase": {
       "type": "stdio",
-      "command": "/home/thor/.local/bin/mcp-compressor",
+      "command": "$MCP_COMPRESSOR",
       "args": [
         "--compression-level",
         "medium",
@@ -38,7 +40,7 @@ cat <<EOF > "$TARGET_DIR/.cursor/mcp.json"
         "NEO4J_USER": "neo4j",
         "NEO4J_PASSWORD": "12345678",
         "NODE_ENV": "production",
-        "ASE_ALLOWED_DIRS": "/home/thor",
+        "ASE_ALLOWED_DIRS": "$HOME",
         "MCP_VIRTUAL_KEY": "master-key"
       }
     },
@@ -60,7 +62,7 @@ cat <<EOF > "$TARGET_DIR/.cursor/mcp-profiles/coding.json"
   "servers": {
     "ase": {
       "type": "stdio",
-      "command": "/home/thor/.local/bin/mcp-compressor",
+      "command": "$MCP_COMPRESSOR",
       "args": ["--compression-level", "medium", "npx", "tsx", "$SERVER_PATH"]
     },
     "toonify": {
@@ -78,7 +80,7 @@ cat <<EOF > "$TARGET_DIR/.cursor/mcp-profiles/fullstack.json"
   "servers": {
     "ase": {
       "type": "stdio",
-      "command": "/home/thor/.local/bin/mcp-compressor",
+      "command": "$MCP_COMPRESSOR",
       "args": ["--compression-level", "medium", "npx", "tsx", "$SERVER_PATH"]
     },
     "postgres-db": {
@@ -106,7 +108,7 @@ cat <<EOF > "$TARGET_DIR/.cursor/mcp-profiles/research.json"
   "servers": {
     "ase": {
       "type": "stdio",
-      "command": "/home/thor/.local/bin/mcp-compressor",
+      "command": "$MCP_COMPRESSOR",
       "args": ["--compression-level", "medium", "npx", "tsx", "$SERVER_PATH"]
     },
     "web-search": {
@@ -129,7 +131,7 @@ cat <<EOF > "$TARGET_DIR/.vscode/mcp.json"
   "servers": {
     "ase": {
       "type": "stdio",
-      "command": "/home/thor/.local/bin/mcp-compressor",
+      "command": "$MCP_COMPRESSOR",
       "args": ["--compression-level", "medium", "npx", "tsx", "$SERVER_PATH"]
     },
     "toonify": {

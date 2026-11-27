@@ -23,7 +23,7 @@ describe('Fast Jev Compaction Subsystem', () => {
         {
           tool_use_id: 'call_1',
           tool: 'ls',
-          input: { path: '/home/thor/project' }
+          input: { path: '/workspace/project' }
         }
       ]
     },

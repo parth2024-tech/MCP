@@ -142,7 +142,7 @@ Register the ASE server in your Antigravity MCP configuration (`~/.gemini/config
       "args": ["/absolute/path/to/MCP/dist/ase-mcp-server.js"],
       "env": {
         "NODE_ENV": "development",
-        "ASE_ALLOWED_DIRS": "/home/thor",
+        "ASE_ALLOWED_DIRS": "$HOME",
         "ASE_AUTH_REQUIRED": "false"
       }
     }

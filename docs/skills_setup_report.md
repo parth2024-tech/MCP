@@ -2,7 +2,7 @@
 ### *Exhaustive Record of System Installations, Configurations, & Optimizations*
 **Date:** May 25, 2026  
 **Agent:** Antigravity (Advanced Agentic Coding Suite)  
-**Workspace:** `/home/thor/skiils`
+**Workspace:** `~/skiils`
 
 This document provides a highly detailed, line-by-line record of all system modifications, directory installations, prompt router additions, and caching configurations performed on your local PC today. No steps have been omitted.
 
@@ -10,8 +10,8 @@ This document provides a highly detailed, line-by-line record of all system modi
 
 ## 📂 1. Core Repository Installation & Git Setup
 We successfully initiated the installation of the **Antigravity Awesome Skills** repository directly into your workspace.
-* **Action:** Executed `npx -y antigravity-awesome-skills --path /home/thor/skiils`
-* **Outcome:** Shallow-cloned the entire skills repository into the local directory `/home/thor/skiils`, deploying all **1,445 specialized Markdown instruction files (SOPs)**.
+* **Action:** Executed `npx -y antigravity-awesome-skills --path ~/skiils`
+* **Outcome:** Shallow-cloned the entire skills repository into the local directory `~/skiils`, deploying all **1,445 specialized Markdown instruction files (SOPs)**.
 * **Verification:** Performed directory listings verifying the creation of subdirectories for all key skills (e.g. `3d-web-experience`, `ab-test-setup`, `agent-evaluation`, etc.) and the deployment of local documentation directories.
 
 ---
@@ -20,12 +20,12 @@ We successfully initiated the installation of the **Antigravity Awesome Skills**
 To ensure the skills are accessible across all active projects (ongoing and upcoming) on your PC without copying files repeatedly, we ran a global deployment targeting all major developer environments.
 * **Action:** Executed `npx -y antigravity-awesome-skills --cursor --claude --gemini --kiro --antigravity`
 * **Outcome:** The installer successfully cloned and updated the entire skills library globally across 5 active environments:
-  1. **Cursor IDE:** Installed to `/home/thor/.cursor/skills/`
-  2. **Claude Code CLI:** Installed to `/home/thor/.claude/skills/`
-  3. **Gemini CLI:** Installed to `/home/thor/.gemini/skills/`
-  4. **Kiro CLI:** Installed to `/home/thor/.kiro/skills/`
-  5. **Antigravity 2.0 / OpenCode:** Installed to `/home/thor/.agents/skills/`
-* **Error Triage:** The `Codex` target encountered an `EACCES` write error due to `/home/thor/.codex` being owned by `root`. We triaged this and successfully proceeded with the other 5 targets, completing a highly robust setup.
+  1. **Cursor IDE:** Installed to `~/.cursor/skills/`
+  2. **Claude Code CLI:** Installed to `~/.claude/skills/`
+  3. **Gemini CLI:** Installed to `~/.gemini/skills/`
+  4. **Kiro CLI:** Installed to `~/.kiro/skills/`
+  5. **Antigravity 2.0 / OpenCode:** Installed to `~/.agents/skills/`
+* **Error Triage:** The `Codex` target encountered an `EACCES` write error due to `~/.codex` being owned by `root`. We triaged this and successfully proceeded with the other 5 targets, completing a highly robust setup.
 
 ---
 
@@ -58,13 +58,13 @@ We created a premium-grade local guide, **[best_skills_playbook.md](best_skills_
 ## 🤖 4. Universal Auto-Router System Implementation
 We developed a global `global_auto_detector.md` system prompt and deployed it universally to all skills directories on your PC.
 
-* **File Created:** `/home/thor/skiils/global_auto_detector.md`
+* **File Created:** `~/skiils/global_auto_detector.md`
 * **Global Deployments:** Copied the auto-router rules to:
-  * `/home/thor/.cursor/skills/global_auto_detector.md`
-  * `/home/thor/.claude/skills/global_auto_detector.md`
-  * `/home/thor/.gemini/skills/global_auto_detector.md`
-  * `/home/thor/.kiro/skills/global_auto_detector.md`
-  * `/home/thor/.agents/skills/global_auto_detector.md`
+  * `~/.cursor/skills/global_auto_detector.md`
+  * `~/.claude/skills/global_auto_detector.md`
+  * `~/.gemini/skills/global_auto_detector.md`
+  * `~/.kiro/skills/global_auto_detector.md`
+  * `~/.agents/skills/global_auto_detector.md`
 * **Outcome:** When any AI assistant scans these global directories, it will ingest the router rules, prompting it to automatically analyze the user's coding context and swap in the optimal `@skill-name` file.
 
 ---
@@ -82,7 +82,7 @@ We integrated strict formatting guidelines in the auto-router to **force cloud A
 
 ## 🔬 6. Quantitative Deep-Repository Audit
 We programmed and ran a custom Python benchmark script to evaluate the actual complexity and token weight of all skills installed on your machine.
-* **Script Programmed:** `/home/thor/skiils/benchmark_skills.py`
+* **Script Programmed:** `~/skiils/benchmark_skills.py`
 * **Command Run:** `python3 benchmark_skills.py`
 * **Global Analytical Outcomes Recorded:**
   * **Total Skills Scanned:** `1,445`
@@ -91,7 +91,7 @@ We programmed and ran a custom Python benchmark script to evaluate the actual co
   * **Total Directives (Enforced Rules):** `7,917 rules`
   * **Deepest Skill:** `computer-use-agents` (`16,831` tokens, 28 rules, 20 code patterns)
   * **Most Lightweight Skill:** `cc-skill-strategic-compact` (`158` tokens, 1 rule)
-* **Report Saved:** `/home/thor/.gemini/antigravity/brain/0d2dd32b-1625-41f9-a1dc-0c85e4b51bc9/global_skills_deep_audit.md`
+* **Report Saved:** `~/.gemini/antigravity/brain/0d2dd32b-1625-41f9-a1dc-0c85e4b51bc9/global_skills_deep_audit.md`
 
 ---
 
@@ -99,7 +99,7 @@ We programmed and ran a custom Python benchmark script to evaluate the actual co
 
 | Deliverable File | Target Path | Purpose |
 | :--- | :--- | :--- |
-| **Workspace Repo** | `/home/thor/skiils` | Local clone containing all 1,445 flat skill folders. |
+| **Workspace Repo** | `~/skiils` | Local clone containing all 1,445 flat skill folders. |
 | **Global Environments** | `~/.cursor`, `~/.claude`, `~/.gemini`, etc. | Universal cross-folder access for all AI tools. |
 | **[Playbook](best_skills_playbook.md)** | `.../best_skills_playbook.md` | Premium analysis of top-performing, security, and audit skills. |
 | **[Auto-Router](global_auto_detector.md)** | `.../global_auto_detector.md` | Instruction set forcing AI to auto-route skills and cache prompts. |

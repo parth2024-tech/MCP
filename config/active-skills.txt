@@ -1,0 +1,10 @@
+3d-animations
+adr-architecture
+ast-grep-enforcer
+cad-engineering
+contract-first-api
+declarative-visualization
+gpt-researcher
+presentation-designer
+secret-guard
+typst-research-paper

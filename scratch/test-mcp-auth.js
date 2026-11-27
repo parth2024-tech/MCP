@@ -1,6 +1,7 @@
+const path = require('path');
 const { spawn } = require('child_process');
 
-const server = spawn('npx', ['tsx', 'ase-mcp-server.ts'], { cwd: '/home/thor/skiils/tools/server' });
+const server = spawn('npx', ['tsx', 'ase-mcp-server.ts'], { cwd: path.resolve(__dirname, '../tools/server') });
 
 server.stdout.on('data', (data) => {
   console.log(`STDOUT: ${data.toString()}`);

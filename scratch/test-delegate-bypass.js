@@ -1,9 +1,10 @@
+const path = require('path');
 const { spawn } = require('child_process');
 const start = Date.now();
 const log = (msg) => console.log(`[T+${Date.now()-start}ms] ${msg}`);
 
 const env = { ...process.env, MCP_VIRTUAL_KEY: 'test-key' };
-const server = spawn('node', ['ase-mcp-server.js'], { cwd: '/home/thor/skiils/tools/server', env });
+const server = spawn('node', ['ase-mcp-server.js'], { cwd: path.resolve(__dirname, '../tools/server'), env });
 let buffer = '';
 
 server.stdout.on('data', (data) => {
@@ -36,7 +37,7 @@ server.stdin.write(JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'initialize',
 
 // Mock auth by overriding the VirtualKeyManager via a dirty hack for test
 const fs = require('fs');
-const authPath = '/home/thor/skiils/tools/server/src/middleware/AuthMiddleware.ts';
+const authPath = path.resolve(__dirname, '../tools/server/src/middleware/AuthMiddleware.ts');
 const origAuth = fs.readFileSync(authPath, 'utf8');
 fs.writeFileSync(authPath, origAuth.replace(/const AUTH_BYPASS = new Set\(\['register_agent'/g, "const AUTH_BYPASS = new Set(['delegate_to_openhands', 'register_agent'"));
 

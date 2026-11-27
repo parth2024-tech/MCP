@@ -2,8 +2,8 @@
   "servers": {
     "ase": {
       "type": "stdio",
-      "command": "/home/thor/.local/bin/mcp-compressor",
-      "args": ["--compression-level", "medium", "npx", "tsx", "/home/thor/skiils/tools/server/ase-mcp-server.ts"]
+      "command": "${userHome}/.local/bin/mcp-compressor",
+      "args": ["--compression-level", "medium", "npx", "tsx", "${workspaceFolder}/tools/server/ase-mcp-server.ts"]
     },
     "toonify": {
       "type": "stdio",

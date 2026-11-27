@@ -1,6 +1,6 @@
 // Bypass ase-mcp-server.js entirely - test the pipeline directly
 const path = require('path');
-process.chdir('/home/thor/skiils/tools/server');
+process.chdir(path.resolve(__dirname, '../tools/server'));
 
 // Stub the heavy services
 const mockContainer = {

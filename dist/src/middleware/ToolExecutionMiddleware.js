@@ -26,24 +26,45 @@ function isTransientError(err) {
     return TRANSIENT_PATTERNS.some(p => msg.includes(p) || code.includes(p));
 }
 /**
- * Race a promise against a hard timeout.
- * Throws a typed TimeoutError (not a plain Error) so ErrorMiddleware and
- * the retry logic can correctly classify it.
+ * Race an async factory against a hard timeout, passing an AbortSignal so the
+ * underlying work can observe cancellation and clean up resources.
+ *
+ * Unlike a bare Promise.race, this ensures the in-flight execution receives an
+ * abort signal when the deadline fires — preventing the "ghost work" problem
+ * where timed-out tasks keep running and consuming CPU/memory/locks after their
+ * semaphore slot has been released.
  */
-function withTimeout(promise, timeoutMs, toolName, reqId) {
-    return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
+async function withTimeout(factory, timeoutMs, toolName, reqId) {
+    const controller = new AbortController();
+    const { signal } = controller;
+    let timeoutHandle;
+    const timeoutPromise = new Promise((_, reject) => {
+        timeoutHandle = setTimeout(() => {
+            controller.abort(); // signal cancellation to the underlying work
             reject(new errors_1.TimeoutError(toolName, timeoutMs, { reqId }));
         }, timeoutMs);
-        promise.then((v) => { clearTimeout(timer); resolve(v); }, (e) => { clearTimeout(timer); reject(e); });
     });
+    try {
+        return await Promise.race([factory(signal), timeoutPromise]);
+    }
+    finally {
+        // Always clear the timer — prevents it from firing after success/error
+        if (timeoutHandle !== undefined)
+            clearTimeout(timeoutHandle);
+        // If we resolved normally, abort the (already-resolved) factory cleanup path
+        if (!signal.aborted)
+            controller.abort();
+    }
 }
 class ToolExecutionMiddleware {
     async handle(context, next) {
         const registry = context.container.resolve('ToolRegistry');
         let loggerInstance = logger;
         try {
-            loggerInstance = context.container.resolve('logger');
+            const resolved = context.container?.resolve?.('logger');
+            if (resolved && typeof resolved.error === 'function') {
+                loggerInstance = resolved;
+            }
         }
         catch (e) {
             // Fallback
@@ -82,17 +103,20 @@ class ToolExecutionMiddleware {
             return;
         }
         // ── Execution with retry + timeout ────────────────────────────────────────
-        const MAX_RETRIES = 3;
+        // Activepieces pattern: retry_on_failure=false disables the retry loop
+        // for this specific call (equivalent to Activepieces retryOnFailure).
+        const retryOnFailure = context.args?.retry_on_failure !== false; // default true
+        const MAX_RETRIES = retryOnFailure ? 3 : 1;
         let lastErr = null;
         for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
             try {
-                const executionPromise = tool.validateAndExecute
+                const rawResult = await withTimeout((signal) => tool.validateAndExecute
                     ? tool.validateAndExecute(context.args, {
                         container: context.container,
                         reqId: context.reqId,
+                        signal,
                     })
-                    : tool.handler(context.args || {}, { reqId: context.reqId });
-                const rawResult = await withTimeout(executionPromise, TOOL_EXECUTION_TIMEOUT_MS, context.name, context.reqId);
+                    : tool.handler(context.args || {}, { reqId: context.reqId, signal }), TOOL_EXECUTION_TIMEOUT_MS, context.name, context.reqId);
                 context.result = { content: [{ type: 'text', text: JSON.stringify(rawResult, null, 2) }] };
                 context.handled = true;
                 // Emit per-tool success metric

@@ -1,8 +1,10 @@
 import os
+import pathlib
 import re
 
-SKILLS_DIR = "/home/thor/skiils"
-OUTPUT_PATH = "/home/thor/.gemini/antigravity/brain/0d2dd32b-1625-41f9-a1dc-0c85e4b51bc9/global_skills_deep_audit.md"
+REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
+SKILLS_DIR = os.environ.get("ASE_SKILLS_DIR", str(REPO_ROOT / "skills"))
+OUTPUT_PATH = os.environ.get("ASE_AUDIT_OUTPUT", str(REPO_ROOT / "docs" / "global_skills_deep_audit.md"))
 
 def find_main_md(skill_path):
     for name in ["SKILL.md", "README.md"]:

@@ -18,7 +18,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Temporary test & cache directories
 /tmp/ase-*/
+.cache/
 # Obsidian knowledge vault output
 vault/
 # Untracked nested clones

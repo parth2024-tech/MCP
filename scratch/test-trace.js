@@ -1,7 +1,8 @@
+const path = require('path');
 const { spawn } = require('child_process');
 
 const env = { ...process.env, NODE_DEBUG: 'net', ASE_MAX_CONCURRENCY: '10' };
-const server = spawn('node', ['ase-mcp-server.js'], { cwd: '/home/thor/skiils/tools/server', env });
+const server = spawn('node', ['ase-mcp-server.js'], { cwd: path.resolve(__dirname, '../tools/server'), env });
 
 let buffer = '';
 const start = Date.now();

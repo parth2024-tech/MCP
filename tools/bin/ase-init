@@ -24,7 +24,8 @@ try {
 } catch (_) {}
 
 // Path to the ASE tools directory
-const ASE_ROOT = '/home/thor/skiils/tools';
+const ASE_ROOT = path.resolve(__dirname, '..');
+const { getRepoRoot } = require(`${ASE_ROOT}/server/src/utils/ase-home`);
 
 function safeExit(code = 0) {
   setTimeout(() => process.exit(code), 60);
@@ -127,9 +128,9 @@ const budgetIdx = args.indexOf('--budget');
 if (budgetIdx !== -1) {
   const request = args[budgetIdx + 1] || '';
   if (!request) { console.error('Usage: ase-init --budget "your request text"'); process.exit(1); }
-  const SKILLS_DIR = '/home/thor/skiils';
+  const SKILLS_DIR = path.join(getRepoRoot(__dirname), 'skills');
   const allSkills = fs.readdirSync(SKILLS_DIR).filter(e => {
-    try { return fs.statSync(path.join(SKILLS_DIR, e)).isDirectory() && !e.startsWith('.') && e !== 'tools' && e !== 'docs'; }
+    try { return fs.statSync(path.join(SKILLS_DIR, e)).isDirectory() && !e.startsWith('.'); }
     catch(_) { return false; }
   });
   const budget = selectTopSkills(allSkills, request, 3);
