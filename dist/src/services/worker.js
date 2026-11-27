@@ -46,7 +46,10 @@ async function getEmbedder() {
             env.cacheDir = customCache;
         }
         const activeCacheDir = env.cacheDir;
-        const onnxPath = path.join(activeCacheDir, ...pin.model_id.split('/'), pin.onnx_file);
+        const rel = pin.revision && pin.revision !== 'main'
+            ? [...pin.model_id.split('/'), pin.revision, pin.onnx_file]
+            : [...pin.model_id.split('/'), pin.onnx_file];
+        const onnxPath = path.join(activeCacheDir, ...rel);
         if (fs.existsSync(onnxPath) && pin.onnx_sha256) {
             const actualHash = sha256File(onnxPath);
             if (actualHash !== pin.onnx_sha256) {
