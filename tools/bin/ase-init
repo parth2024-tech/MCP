@@ -23,18 +23,21 @@ try {
   require('tsx/cjs');
 } catch (_) {}
 
-// Path to the ASE tools directory
+// Path to the ASE tools directory & server source (falls back cleanly to repo root src/ on fresh clones)
 const ASE_ROOT = path.resolve(__dirname, '..');
-const { getRepoRoot } = require(`${ASE_ROOT}/server/src/utils/ase-home`);
+const SERVER_SRC = fs.existsSync(path.join(ASE_ROOT, 'server', 'src', 'utils', 'ase-home.js'))
+  ? path.join(ASE_ROOT, 'server', 'src')
+  : path.resolve(__dirname, '../../src');
+const { getRepoRoot } = require(`${SERVER_SRC}/utils/ase-home`);
 
 function safeExit(code = 0) {
   setTimeout(() => process.exit(code), 60);
 }
 
-const { generateProjectPrompt, getConfigTemplate } = require(`${ASE_ROOT}/server/src/services/project-prompt-generator`);
-const { validate, detectProjectType } = require(`${ASE_ROOT}/server/src/services/output-validator`);
-const { routeModel } = require(`${ASE_ROOT}/server/src/services/model-router`);
-const { selectTopSkills } = require(`${ASE_ROOT}/server/src/services/context-budget`);
+const { generateProjectPrompt, getConfigTemplate } = require(`${SERVER_SRC}/services/project-prompt-generator`);
+const { validate, detectProjectType } = require(`${SERVER_SRC}/services/output-validator`);
+const { routeModel } = require(`${SERVER_SRC}/services/model-router`);
+const { selectTopSkills } = require(`${SERVER_SRC}/services/context-budget`);
 
 const CONFIG_FILE = '.ase-project.json';
 const cwd = process.cwd();
@@ -161,7 +164,7 @@ if (compactIdx !== -1 && !args.includes('--transcript')) {
   try {
     const raw = fs.readFileSync(fullPath, 'utf8');
     const messages = JSON.parse(raw);
-    const { compactTranscript } = require(`${ASE_ROOT}/server/src/utils/context-optimizer`);
+    const { compactTranscript } = require(`${SERVER_SRC}/utils/context-optimizer`);
     log(c.cyan, '⚡', `Compacting conversation transcript with fast-jev-compaction: ${c.bold}${targetFile}${c.reset}`);
     compactTranscript(messages).then(result => {
       log(c.green, '✅', `Compaction completed! Reduction: ${c.bold}${Math.round(result.reductionRatio * 100)}%${c.reset}`);
@@ -184,7 +187,7 @@ if (compactIdx !== -1 && !args.includes('--transcript')) {
 // --export-vault [dir]
 // ──────────────────────────────────────────────────────────
 if (args.includes('--export-vault')) {
-  const { VaultExporter } = require(`${ASE_ROOT}/server/src/services/vault-exporter`);
+  const { VaultExporter } = require(`${SERVER_SRC}/services/vault-exporter`);
   const vIdx = args.indexOf('--export-vault');
   const targetDir = args[vIdx + 1] && !args[vIdx + 1].startsWith('-') ? args[vIdx + 1] : path.join(cwd, 'vault');
   log(c.cyan, '🧠', `Exporting Second Brain knowledge vault to: ${c.bold}${targetDir}${c.reset}`);
@@ -204,7 +207,7 @@ if (args.includes('--export-vault')) {
 // --lessons [query]
 // ──────────────────────────────────────────────────────────
 if (args.includes('--lessons')) {
-  const { EpisodicLearningService } = require(`${ASE_ROOT}/server/src/services/episodic-learning`);
+  const { EpisodicLearningService } = require(`${SERVER_SRC}/services/episodic-learning`);
   const service = new EpisodicLearningService();
   const lIdx = args.indexOf('--lessons');
   const query = args[lIdx + 1] && !args[lIdx + 1].startsWith('-') ? args[lIdx + 1] : '';
@@ -228,7 +231,7 @@ if (args.includes('--lessons')) {
 const wtIdx = args.indexOf('--worktree');
 if (wtIdx !== -1) {
   const subAction = args[wtIdx + 1] || 'list';
-  const { WorktreeManager } = require(`${ASE_ROOT}/server/src/services/worktree-manager`);
+  const { WorktreeManager } = require(`${SERVER_SRC}/services/worktree-manager`);
   (async () => {
     try {
       if (subAction === 'list') {
@@ -286,8 +289,8 @@ const transcriptIdx = args.indexOf('--transcript');
 if (transcriptIdx !== -1) {
   const target = args[transcriptIdx + 1] && !args[transcriptIdx + 1].startsWith('-') ? args[transcriptIdx + 1] : 'latest';
   const shouldCompact = args.includes('--compact');
-  const { TranscriptReader } = require(`${ASE_ROOT}/server/src/services/transcript-reader`);
-  const { compactTranscript } = require(`${ASE_ROOT}/server/src/utils/context-optimizer`);
+  const { TranscriptReader } = require(`${SERVER_SRC}/services/transcript-reader`);
+  const { compactTranscript } = require(`${SERVER_SRC}/utils/context-optimizer`);
   (async () => {
     try {
       let resolved = target;
