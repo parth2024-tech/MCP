@@ -1,0 +1,6679 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-11-27T17:38:59.998Z",
+  "git_sha": "13a317caa1270a8c491e8c134dc9d9e7184e2963",
+  "threshold": 0.35,
+  "corpus_hash": "4196667a6d3cccac14d2297b7177f551f7b01cb5cb03767f65c9fcb9d7fbfffd",
+  "embedded_text": {
+    "totalSkills": 1497,
+    "descriptionOnlyCount": 1497,
+    "fallbackBodyCount": 0,
+    "truncatedFallbacks": 0,
+    "maxTextChars": 485
+  },
+  "pin": {
+    "model_id": "Xenova/all-MiniLM-L6-v2",
+    "revision": "751bff37182d3f1213fa05d7196b954e230abad9",
+    "dimensions": 384,
+    "quantized": true,
+    "dtype": "q8",
+    "onnx_file": "onnx/model_quantized.onnx",
+    "onnx_sha256": "afdb6f1a0e45b715d0bb9b11772f032c399babd23bfc31fed1c170afc848bdb1",
+    "config_sha256": "7135149f7cffa1a573466c6e4d8423ed73b62fd2332c575bf738a0d033f70df7",
+    "tokenizer_sha256": "da0e79933b9ed51798a3ae27893d3c5fa4a201126cef75586296df9b4d2c62a0",
+    "transformers_version": "2.17.2",
+    "onnxruntime_node_version": "1.14.0",
+    "max_position_embeddings": 512,
+    "pooling": "mean",
+    "normalize": true,
+    "embedded_text": {
+      "primary": "frontmatter.description",
+      "fallback": "content.substring(0, 800)",
+      "truncation": "tokenizer truncation=true at model_max_length=512 (MiniLM-L6-v2 pretrain max=256 wordpieces)"
+    }
+  },
+  "parity": {
+    "cases": 210,
+    "hnsw_top1_exact_match": 0.9095,
+    "hnsw_recall_at_3_vs_exact": 0.9127,
+    "hnsw_recall_at_10_vs_exact": 0.8529,
+    "exact_latency_ms_median": 1.218,
+    "exact_latency_ms_p95": 1.61,
+    "hnsw_latency_ms_median": 0.091,
+    "hnsw_latency_ms_p95": 0.119,
+    "top1_mismatches": [
+      {
+        "id": "r-0001",
+        "exactTop1": {
+          "name": "azure-keyvault-keys-ts",
+          "score": 0.5488
+        },
+        "hnswTop1": {
+          "name": "fp-refactor",
+          "score": 0.3607
+        }
+      },
+      {
+        "id": "r-0061",
+        "exactTop1": {
+          "name": "prometheus-configuration",
+          "score": 0.6574
+        },
+        "hnswTop1": {
+          "name": "k8s-security-policies",
+          "score": 0.545
+        }
+      },
+      {
+        "id": "r-0072",
+        "exactTop1": {
+          "name": "defi-protocol-templates",
+          "score": 0.4309
+        },
+        "hnswTop1": {
+          "name": "zeroize-audit",
+          "score": 0.3961
+        }
+      },
+      {
+        "id": "r-0075",
+        "exactTop1": {
+          "name": "unity-ecs-patterns",
+          "score": 0.4502
+        },
+        "hnswTop1": {
+          "name": "agent-orchestration-multi-agent-optimize",
+          "score": 0.4162
+        }
+      },
+      {
+        "id": "r-0122",
+        "exactTop1": {
+          "name": "sleep-analyzer",
+          "score": 0.3532
+        },
+        "hnswTop1": {
+          "name": "claude-ally-health",
+          "score": 0.3332
+        }
+      },
+      {
+        "id": "r-0125",
+        "exactTop1": {
+          "name": "javascript-mastery",
+          "score": 0.2763
+        },
+        "hnswTop1": {
+          "name": "explain-like-socrates",
+          "score": 0.2299
+        }
+      },
+      {
+        "id": "r-0126",
+        "exactTop1": {
+          "name": "recsys-pipeline-architect",
+          "score": 0.324
+        },
+        "hnswTop1": {
+          "name": "leiloeiro-avaliacao",
+          "score": 0.2675
+        }
+      },
+      {
+        "id": "r-0132",
+        "exactTop1": {
+          "name": "swiftui-liquid-glass",
+          "score": 0.2067
+        },
+        "hnswTop1": {
+          "name": "c4-container",
+          "score": 0.1146
+        }
+      },
+      {
+        "id": "r-0133",
+        "exactTop1": {
+          "name": "react-component-performance",
+          "score": 0.1356
+        },
+        "hnswTop1": {
+          "name": "makepad-shaders",
+          "score": 0.1313
+        }
+      },
+      {
+        "id": "r-0134",
+        "exactTop1": {
+          "name": "matplotlib",
+          "score": 0.2211
+        },
+        "hnswTop1": {
+          "name": "last30days",
+          "score": 0.219
+        }
+      },
+      {
+        "id": "r-0137",
+        "exactTop1": {
+          "name": "superpowers-lab",
+          "score": 0.2439
+        },
+        "hnswTop1": {
+          "name": "data-storytelling",
+          "score": 0.233
+        }
+      },
+      {
+        "id": "r-0138",
+        "exactTop1": {
+          "name": "makepad-shaders",
+          "score": 0.2246
+        },
+        "hnswTop1": {
+          "name": "azure-cosmos-java",
+          "score": 0.1835
+        }
+      },
+      {
+        "id": "r-0140",
+        "exactTop1": {
+          "name": "make-automation",
+          "score": 0.225
+        },
+        "hnswTop1": {
+          "name": "expo-ui-swift-ui",
+          "score": 0.1841
+        }
+      },
+      {
+        "id": "r-0147",
+        "exactTop1": {
+          "name": "langgraph",
+          "score": 0.236
+        },
+        "hnswTop1": {
+          "name": "blog-writing-guide",
+          "score": 0.2089
+        }
+      },
+      {
+        "id": "r-0154",
+        "exactTop1": {
+          "name": "embedding-strategies",
+          "score": 0.5064
+        },
+        "hnswTop1": {
+          "name": "audio-transcriber",
+          "score": 0.4275
+        }
+      },
+      {
+        "id": "r-0201",
+        "exactTop1": {
+          "name": "latex-paper-conversion",
+          "score": 0.212
+        },
+        "hnswTop1": {
+          "name": "favicon",
+          "score": 0.1653
+        }
+      },
+      {
+        "id": "r-0202",
+        "exactTop1": {
+          "name": "brooks-lint",
+          "score": 0.268
+        },
+        "hnswTop1": {
+          "name": "rich-elicitation",
+          "score": 0.2234
+        }
+      },
+      {
+        "id": "r-0208",
+        "exactTop1": {
+          "name": "remotion-best-practices",
+          "score": 0.2003
+        },
+        "hnswTop1": {
+          "name": "sales-automator",
+          "score": 0.1839
+        }
+      },
+      {
+        "id": "r-0209",
+        "exactTop1": {
+          "name": "playwright-java",
+          "score": 0.2502
+        },
+        "hnswTop1": {
+          "name": "pypict-skill",
+          "score": 0.2366
+        }
+      }
+    ]
+  },
+  "summary": {
+    "overall": {
+      "total": 210,
+      "positives": 175,
+      "negatives": 35,
+      "hit_at_1": 0.5657,
+      "hit_at_3": 0.7657,
+      "mrr": 0.6629,
+      "false_trigger_rate": 0.0571,
+      "median_margin": 0.0578,
+      "near_ties_lt_0_02": 32,
+      "pos_score_median": 0.5695,
+      "neg_score_max": 0.4338,
+      "neg_score_median": 0.227,
+      "covered_skills": 167,
+      "top_confusions": [
+        {
+          "pair": "kubernetes-architect|kubernetes-deployment -> gitops-workflow",
+          "count": 2
+        },
+        {
+          "pair": "terraform-skill -> terraform-aws-modules",
+          "count": 2
+        },
+        {
+          "pair": "postgres-best-practices|postgresql -> postgresql-optimization",
+          "count": 2
+        },
+        {
+          "pair": "typescript-expert -> typescript-advanced-types",
+          "count": 2
+        },
+        {
+          "pair": "stripe-integration|stripe-automation -> payment-integration",
+          "count": 2
+        },
+        {
+          "pair": "bash-scripting|linux-shell-scripting -> bash-defensive-patterns",
+          "count": 2
+        },
+        {
+          "pair": "azure-servicebus-ts -> azure-servicebus-dotnet",
+          "count": 1
+        },
+        {
+          "pair": "seo-schema -> seo-aeo-schema-generator",
+          "count": 1
+        },
+        {
+          "pair": "seo-sitemap -> site-architecture",
+          "count": 1
+        },
+        {
+          "pair": "seo-images -> seo-image-gen",
+          "count": 1
+        },
+        {
+          "pair": "subject-line-psychologist|headline-psychologist -> cold-email",
+          "count": 1
+        },
+        {
+          "pair": "price-psychology-strategist|loss-aversion-designer -> pricing-strategy",
+          "count": 1
+        },
+        {
+          "pair": "distributed-debugging-debug-trace|observability-monitoring-monitor-setup -> distributed-tracing",
+          "count": 1
+        },
+        {
+          "pair": "error-debugging-error-analysis|error-diagnostics-error-analysis|error-debugging-error-trace -> error-detective",
+          "count": 1
+        },
+        {
+          "pair": "docker-expert -> docker-expert",
+          "count": 1
+        }
+      ]
+    },
+    "dev": {
+      "total": 148,
+      "positives": 124,
+      "negatives": 24,
+      "hit_at_1": 0.5565,
+      "hit_at_3": 0.7742,
+      "mrr": 0.6601,
+      "false_trigger_rate": 0.0417,
+      "median_margin": 0.0571,
+      "near_ties_lt_0_02": 24,
+      "pos_score_median": 0.5706,
+      "neg_score_max": 0.3802,
+      "neg_score_median": 0.226,
+      "covered_skills": 160,
+      "top_confusions": [
+        {
+          "pair": "azure-servicebus-ts -> azure-servicebus-dotnet",
+          "count": 1
+        },
+        {
+          "pair": "seo-schema -> seo-aeo-schema-generator",
+          "count": 1
+        },
+        {
+          "pair": "seo-sitemap -> site-architecture",
+          "count": 1
+        },
+        {
+          "pair": "seo-images -> seo-image-gen",
+          "count": 1
+        },
+        {
+          "pair": "subject-line-psychologist|headline-psychologist -> cold-email",
+          "count": 1
+        },
+        {
+          "pair": "price-psychology-strategist|loss-aversion-designer -> pricing-strategy",
+          "count": 1
+        },
+        {
+          "pair": "distributed-debugging-debug-trace|observability-monitoring-monitor-setup -> distributed-tracing",
+          "count": 1
+        },
+        {
+          "pair": "error-debugging-error-analysis|error-diagnostics-error-analysis|error-debugging-error-trace -> error-detective",
+          "count": 1
+        },
+        {
+          "pair": "docker-expert -> docker-expert",
+          "count": 1
+        },
+        {
+          "pair": "kubernetes-architect|kubernetes-deployment -> gitops-workflow",
+          "count": 1
+        },
+        {
+          "pair": "terraform-skill -> terraform-aws-modules",
+          "count": 1
+        },
+        {
+          "pair": "postgres-best-practices|postgresql -> postgresql-optimization",
+          "count": 1
+        },
+        {
+          "pair": "typescript-expert -> typescript-advanced-types",
+          "count": 1
+        },
+        {
+          "pair": "fastapi-pro -> python-fastapi-development",
+          "count": 1
+        },
+        {
+          "pair": "golang-pro -> go-concurrency-patterns",
+          "count": 1
+        }
+      ]
+    },
+    "test": {
+      "total": 62,
+      "positives": 51,
+      "negatives": 11,
+      "hit_at_1": 0.5882,
+      "hit_at_3": 0.7451,
+      "mrr": 0.67,
+      "false_trigger_rate": 0.0909,
+      "median_margin": 0.0642,
+      "near_ties_lt_0_02": 8,
+      "pos_score_median": 0.5672,
+      "neg_score_max": 0.4338,
+      "neg_score_median": 0.2502,
+      "covered_skills": 80,
+      "top_confusions": [
+        {
+          "pair": "gpt-researcher|deep-research -> embedding-strategies",
+          "count": 1
+        },
+        {
+          "pair": "seo-page|seo-content -> fixing-metadata",
+          "count": 1
+        },
+        {
+          "pair": "seo-plan|seo-content -> seo-content-planner",
+          "count": 1
+        },
+        {
+          "pair": "objection-preemptor|ux-persuasion-engineer -> churn-prevention",
+          "count": 1
+        },
+        {
+          "pair": "error-debugging-error-trace|error-diagnostics-error-trace|distributed-debugging-debug-trace -> azure-monitor-opentelemetry-ts",
+          "count": 1
+        },
+        {
+          "pair": "docker-expert -> devops-deploy",
+          "count": 1
+        },
+        {
+          "pair": "kubernetes-architect|kubernetes-deployment -> gitops-workflow",
+          "count": 1
+        },
+        {
+          "pair": "terraform-skill -> terraform-aws-modules",
+          "count": 1
+        },
+        {
+          "pair": "postgres-best-practices|postgresql -> postgresql-optimization",
+          "count": 1
+        },
+        {
+          "pair": "typescript-expert -> typescript-advanced-types",
+          "count": 1
+        },
+        {
+          "pair": "playwright-skill|e2e-testing-patterns -> e2e-testing",
+          "count": 1
+        },
+        {
+          "pair": "broken-authentication|auth-implementation-patterns|security-auditor -> security-audit",
+          "count": 1
+        },
+        {
+          "pair": "git-advanced-workflows -> git-pr-review",
+          "count": 1
+        },
+        {
+          "pair": "rag-engineer -> azure-search-documents-ts",
+          "count": 1
+        },
+        {
+          "pair": "makepad-layout|makepad-basics -> makepad-skills",
+          "count": 1
+        }
+      ]
+    }
+  },
+  "clusters_summary": {
+    "clusterCount": 80,
+    "clusteredSkills": 278,
+    "topDenseClusters": [
+      {
+        "size": 27,
+        "avgEdgeSim": 0.8238,
+        "members": [
+          "azure-appconfiguration-py",
+          "azure-containerregistry-py",
+          "azure-identity-dotnet",
+          "azure-identity-py",
+          "azure-identity-rust",
+          "azure-keyvault-certificates-rust",
+          "azure-keyvault-keys-rust",
+          "azure-keyvault-keys-ts",
+          "azure-keyvault-py",
+          "azure-keyvault-secrets-rust",
+          "azure-keyvault-secrets-ts",
+          "azure-mgmt-apicenter-dotnet",
+          "azure-mgmt-apicenter-py",
+          "azure-mgmt-apimanagement-dotnet",
+          "azure-mgmt-apimanagement-py",
+          "azure-mgmt-botservice-dotnet",
+          "azure-mgmt-botservice-py",
+          "azure-mgmt-fabric-dotnet",
+          "azure-mgmt-fabric-py",
+          "azure-resource-manager-cosmosdb-dotnet",
+          "azure-resource-manager-durabletask-dotnet",
+          "azure-resource-manager-mysql-dotnet",
+          "azure-resource-manager-postgresql-dotnet",
+          "azure-resource-manager-sql-dotnet",
+          "azure-security-keyvault-keys-dotnet",
+          "azure-security-keyvault-keys-java",
+          "azure-security-keyvault-secrets-java"
+        ]
+      },
+      {
+        "size": 18,
+        "avgEdgeSim": 0.8306,
+        "members": [
+          "brand-perception-psychologist",
+          "copywriting-psychologist",
+          "customer-psychographic-profiler",
+          "emotional-arc-designer",
+          "headline-psychologist",
+          "identity-mirror",
+          "jobs-to-be-done-analyst",
+          "loss-aversion-designer",
+          "objection-preemptor",
+          "onboarding-psychologist",
+          "pitch-psychologist",
+          "price-psychology-strategist",
+          "scarcity-urgency-psychologist",
+          "sequence-psychologist",
+          "social-proof-architect",
+          "subject-line-psychologist",
+          "ux-persuasion-engineer",
+          "visual-emotion-engineer"
+        ]
+      },
+      {
+        "size": 18,
+        "avgEdgeSim": 0.8242,
+        "members": [
+          "azure-cosmos-db-py",
+          "azure-cosmos-java",
+          "azure-cosmos-py",
+          "azure-cosmos-rust",
+          "azure-cosmos-ts",
+          "azure-data-tables-py",
+          "azure-messaging-webpubsubservice-py",
+          "azure-servicebus-dotnet",
+          "azure-servicebus-py",
+          "azure-servicebus-ts",
+          "azure-storage-blob-py",
+          "azure-storage-blob-rust",
+          "azure-storage-blob-ts",
+          "azure-storage-file-datalake-py",
+          "azure-storage-file-share-py",
+          "azure-storage-file-share-ts",
+          "azure-storage-queue-py",
+          "azure-storage-queue-ts"
+        ]
+      },
+      {
+        "size": 8,
+        "avgEdgeSim": 0.8459,
+        "members": [
+          "makepad-animation",
+          "makepad-basics",
+          "makepad-deployment",
+          "makepad-event-action",
+          "makepad-font",
+          "makepad-layout",
+          "makepad-platform",
+          "makepad-splash"
+        ]
+      },
+      {
+        "size": 7,
+        "avgEdgeSim": 0.8623,
+        "members": [
+          "seo-competitor-pages",
+          "seo-content",
+          "seo-images",
+          "seo-page",
+          "seo-plan",
+          "seo-schema",
+          "seo-sitemap"
+        ]
+      },
+      {
+        "size": 7,
+        "avgEdgeSim": 0.84,
+        "members": [
+          "agent-framework-azure-ai-py",
+          "azure-ai-agents-persistent-dotnet",
+          "azure-ai-agents-persistent-java",
+          "azure-ai-projects-dotnet",
+          "azure-ai-projects-java",
+          "azure-ai-projects-py",
+          "azure-ai-projects-ts"
+        ]
+      },
+      {
+        "size": 7,
+        "avgEdgeSim": 0.7996,
+        "members": [
+          "azure-eventgrid-dotnet",
+          "azure-eventgrid-java",
+          "azure-eventgrid-py",
+          "azure-eventhub-java",
+          "azure-eventhub-py",
+          "azure-eventhub-rust",
+          "azure-eventhub-ts"
+        ]
+      },
+      {
+        "size": 6,
+        "avgEdgeSim": 0.8473,
+        "members": [
+          "distributed-debugging-debug-trace",
+          "error-debugging-error-analysis",
+          "error-debugging-error-trace",
+          "error-diagnostics-error-analysis",
+          "error-diagnostics-error-trace",
+          "observability-monitoring-monitor-setup"
+        ]
+      },
+      {
+        "size": 6,
+        "avgEdgeSim": 0.8307,
+        "members": [
+          "api-documentation",
+          "api-documentation-generator",
+          "api-documenter",
+          "code-documentation-doc-generate",
+          "docs-architect",
+          "documentation-generation-doc-generate"
+        ]
+      },
+      {
+        "size": 6,
+        "avgEdgeSim": 0.8296,
+        "members": [
+          "fitness-analyzer",
+          "mental-health-analyzer",
+          "nutrition-analyzer",
+          "occupational-health-analyzer",
+          "oral-health-analyzer",
+          "sleep-analyzer"
+        ]
+      },
+      {
+        "size": 5,
+        "avgEdgeSim": 0.8379,
+        "members": [
+          "azure-monitor-ingestion-py",
+          "azure-monitor-opentelemetry-exporter-java",
+          "azure-monitor-opentelemetry-exporter-py",
+          "azure-monitor-opentelemetry-py",
+          "azure-monitor-query-py"
+        ]
+      },
+      {
+        "size": 5,
+        "avgEdgeSim": 0.8276,
+        "members": [
+          "hig-components-content",
+          "hig-components-layout",
+          "hig-foundations",
+          "hig-patterns",
+          "hig-platforms"
+        ]
+      }
+    ],
+    "topClosePairs": [
+      {
+        "a": "manim-composer",
+        "b": "manimce-best-practices",
+        "sim": 1
+      },
+      {
+        "a": "manim-composer",
+        "b": "manimgl-best-practices",
+        "sim": 1
+      },
+      {
+        "a": "manimce-best-practices",
+        "b": "manimgl-best-practices",
+        "sim": 1
+      },
+      {
+        "a": "code-review-ai-ai-review",
+        "b": "performance-testing-review-ai-review",
+        "sim": 0.9848
+      },
+      {
+        "a": "error-debugging-error-analysis",
+        "b": "error-diagnostics-error-analysis",
+        "sim": 0.984
+      },
+      {
+        "a": "code-documentation-doc-generate",
+        "b": "documentation-generation-doc-generate",
+        "sim": 0.9821
+      },
+      {
+        "a": "code-refactoring-refactor-clean",
+        "b": "codebase-cleanup-refactor-clean",
+        "sim": 0.9778
+      },
+      {
+        "a": "brand-guidelines-anthropic",
+        "b": "brand-guidelines-community",
+        "sim": 0.9663
+      },
+      {
+        "a": "agents-v2-py",
+        "b": "hosted-agents-v2-py",
+        "sim": 0.9655
+      },
+      {
+        "a": "code-refactoring-tech-debt",
+        "b": "codebase-cleanup-tech-debt",
+        "sim": 0.9655
+      },
+      {
+        "a": "error-debugging-error-trace",
+        "b": "error-diagnostics-error-trace",
+        "sim": 0.9633
+      },
+      {
+        "a": "codebase-cleanup-deps-audit",
+        "b": "dependency-management-deps-audit",
+        "sim": 0.96
+      },
+      {
+        "a": "fp-react",
+        "b": "fp-ts-react",
+        "sim": 0.9594
+      },
+      {
+        "a": "makepad-basics",
+        "b": "makepad-platform",
+        "sim": 0.9515
+      },
+      {
+        "a": "hig-components-controls",
+        "b": "hig-components-menus",
+        "sim": 0.943
+      }
+    ]
+  },
+  "cases": {
+    "r-0001": {
+      "id": "r-0001",
+      "split": "dev",
+      "expected": [
+        "azure-keyvault-keys-ts",
+        "azure-keyvault-secrets-ts"
+      ],
+      "got": "azure-keyvault-keys-ts",
+      "score1": 0.5488,
+      "margin": 0.0167,
+      "top3": [
+        {
+          "name": "azure-keyvault-keys-ts",
+          "score": 0.5488
+        },
+        {
+          "name": "azure-keyvault-secrets-ts",
+          "score": 0.5321
+        },
+        {
+          "name": "azure-security-keyvault-keys-java",
+          "score": 0.4704
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0002": {
+      "id": "r-0002",
+      "split": "dev",
+      "expected": [
+        "azure-keyvault-py",
+        "azure-identity-py"
+      ],
+      "got": "azure-keyvault-py",
+      "score1": 0.6419,
+      "margin": 0.0659,
+      "top3": [
+        {
+          "name": "azure-keyvault-py",
+          "score": 0.6419
+        },
+        {
+          "name": "azure-keyvault-secrets-ts",
+          "score": 0.576
+        },
+        {
+          "name": "azure-security-keyvault-secrets-java",
+          "score": 0.573
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0003": {
+      "id": "r-0003",
+      "split": "dev",
+      "expected": [
+        "azure-keyvault-certificates-rust",
+        "azure-keyvault-secrets-rust"
+      ],
+      "got": "azure-keyvault-certificates-rust",
+      "score1": 0.7104,
+      "margin": 0.0555,
+      "top3": [
+        {
+          "name": "azure-keyvault-certificates-rust",
+          "score": 0.7104
+        },
+        {
+          "name": "azure-keyvault-keys-rust",
+          "score": 0.6548
+        },
+        {
+          "name": "azure-keyvault-secrets-rust",
+          "score": 0.6312
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0004": {
+      "id": "r-0004",
+      "split": "dev",
+      "expected": [
+        "azure-resource-manager-cosmosdb-dotnet",
+        "azure-cosmos-db-py"
+      ],
+      "got": "azure-resource-manager-cosmosdb-dotnet",
+      "score1": 0.6803,
+      "margin": 0.0662,
+      "top3": [
+        {
+          "name": "azure-resource-manager-cosmosdb-dotnet",
+          "score": 0.6803
+        },
+        {
+          "name": "azure-cosmos-java",
+          "score": 0.6141
+        },
+        {
+          "name": "azure-cosmos-db-py",
+          "score": 0.5878
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0005": {
+      "id": "r-0005",
+      "split": "dev",
+      "expected": [
+        "azure-storage-blob-py"
+      ],
+      "got": "azure-storage-blob-py",
+      "score1": 0.6225,
+      "margin": 0.0502,
+      "top3": [
+        {
+          "name": "azure-storage-blob-py",
+          "score": 0.6225
+        },
+        {
+          "name": "azure-storage-file-datalake-py",
+          "score": 0.5723
+        },
+        {
+          "name": "azure-storage-blob-java",
+          "score": 0.5381
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0006": {
+      "id": "r-0006",
+      "split": "dev",
+      "expected": [
+        "azure-servicebus-ts"
+      ],
+      "got": "azure-servicebus-dotnet",
+      "score1": 0.6718,
+      "margin": 0.0037,
+      "top3": [
+        {
+          "name": "azure-servicebus-dotnet",
+          "score": 0.6718
+        },
+        {
+          "name": "azure-storage-queue-ts",
+          "score": 0.6682
+        },
+        {
+          "name": "azure-servicebus-ts",
+          "score": 0.6464
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.3333,
+      "pass": false
+    },
+    "r-0007": {
+      "id": "r-0007",
+      "split": "dev",
+      "expected": [
+        "3d-animations",
+        "3d-web-experience",
+        "threejs-shaders"
+      ],
+      "got": "3d-web-experience",
+      "score1": 0.6562,
+      "margin": 0.0058,
+      "top3": [
+        {
+          "name": "3d-web-experience",
+          "score": 0.6562
+        },
+        {
+          "name": "threejs-shaders",
+          "score": 0.6505
+        },
+        {
+          "name": "3d-animations",
+          "score": 0.6269
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0008": {
+      "id": "r-0008",
+      "split": "dev",
+      "expected": [
+        "adr-architecture",
+        "architecture-decision-records",
+        "c4-architecture-c4-architecture"
+      ],
+      "got": "adr-architecture",
+      "score1": 0.6853,
+      "margin": 0.2114,
+      "top3": [
+        {
+          "name": "adr-architecture",
+          "score": 0.6853
+        },
+        {
+          "name": "c4-architecture-c4-architecture",
+          "score": 0.474
+        },
+        {
+          "name": "c4-container",
+          "score": 0.4648
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0009": {
+      "id": "r-0009",
+      "split": "dev",
+      "expected": [
+        "ast-grep-enforcer"
+      ],
+      "got": "ast-grep-enforcer",
+      "score1": 0.5747,
+      "margin": 0.092,
+      "top3": [
+        {
+          "name": "ast-grep-enforcer",
+          "score": 0.5747
+        },
+        {
+          "name": "typescript-pro",
+          "score": 0.4827
+        },
+        {
+          "name": "typescript-advanced-types",
+          "score": 0.4764
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0010": {
+      "id": "r-0010",
+      "split": "dev",
+      "expected": [
+        "cad-engineering"
+      ],
+      "got": "cad-engineering",
+      "score1": 0.5173,
+      "margin": 0.2009,
+      "top3": [
+        {
+          "name": "cad-engineering",
+          "score": 0.5173
+        },
+        {
+          "name": "pydantic-models-py",
+          "score": 0.3165
+        },
+        {
+          "name": "python-packaging",
+          "score": 0.3139
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0011": {
+      "id": "r-0011",
+      "split": "dev",
+      "expected": [
+        "contract-first-api",
+        "openapi-spec-generation"
+      ],
+      "got": "contract-first-api",
+      "score1": 0.6694,
+      "margin": 0.0778,
+      "top3": [
+        {
+          "name": "contract-first-api",
+          "score": 0.6694
+        },
+        {
+          "name": "openapi-spec-generation",
+          "score": 0.5916
+        },
+        {
+          "name": "api-documentation",
+          "score": 0.4896
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0012": {
+      "id": "r-0012",
+      "split": "dev",
+      "expected": [
+        "declarative-visualization"
+      ],
+      "got": "declarative-visualization",
+      "score1": 0.7258,
+      "margin": 0.2792,
+      "top3": [
+        {
+          "name": "declarative-visualization",
+          "score": 0.7258
+        },
+        {
+          "name": "draw",
+          "score": 0.4466
+        },
+        {
+          "name": "plotly",
+          "score": 0.4257
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0013": {
+      "id": "r-0013",
+      "split": "dev",
+      "expected": [
+        "gpt-researcher",
+        "deep-research"
+      ],
+      "got": "gpt-researcher",
+      "score1": 0.4932,
+      "margin": 0.004,
+      "top3": [
+        {
+          "name": "gpt-researcher",
+          "score": 0.4932
+        },
+        {
+          "name": "competitor-alternatives",
+          "score": 0.4892
+        },
+        {
+          "name": "ai-seo",
+          "score": 0.4815
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0014": {
+      "id": "r-0014",
+      "split": "dev",
+      "expected": [
+        "presentation-designer",
+        "python-pptx-generator"
+      ],
+      "got": "presentation-designer",
+      "score1": 0.6822,
+      "margin": 0.2241,
+      "top3": [
+        {
+          "name": "presentation-designer",
+          "score": 0.6822
+        },
+        {
+          "name": "python-pptx-generator",
+          "score": 0.458
+        },
+        {
+          "name": "sales-enablement",
+          "score": 0.409
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0015": {
+      "id": "r-0015",
+      "split": "dev",
+      "expected": [
+        "secret-guard"
+      ],
+      "got": "secret-guard",
+      "score1": 0.5701,
+      "margin": 0.1143,
+      "top3": [
+        {
+          "name": "secret-guard",
+          "score": 0.5701
+        },
+        {
+          "name": "codebase-audit-pre-push",
+          "score": 0.4558
+        },
+        {
+          "name": "git-pr-review",
+          "score": 0.4536
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0016": {
+      "id": "r-0016",
+      "split": "dev",
+      "expected": [
+        "typst-research-paper"
+      ],
+      "got": "typst-research-paper",
+      "score1": 0.5109,
+      "margin": 0.1108,
+      "top3": [
+        {
+          "name": "typst-research-paper",
+          "score": 0.5109
+        },
+        {
+          "name": "latex-paper-conversion",
+          "score": 0.4001
+        },
+        {
+          "name": "pdf-conversion-router",
+          "score": 0.3788
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0017": {
+      "id": "r-0017",
+      "split": "dev",
+      "expected": [
+        "seo-schema"
+      ],
+      "got": "seo-aeo-schema-generator",
+      "score1": 0.6304,
+      "margin": 0.0879,
+      "top3": [
+        {
+          "name": "seo-aeo-schema-generator",
+          "score": 0.6304
+        },
+        {
+          "name": "schema-markup",
+          "score": 0.5425
+        },
+        {
+          "name": "adhx",
+          "score": 0.431
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0018": {
+      "id": "r-0018",
+      "split": "dev",
+      "expected": [
+        "seo-sitemap"
+      ],
+      "got": "site-architecture",
+      "score1": 0.3732,
+      "margin": 0.0347,
+      "top3": [
+        {
+          "name": "site-architecture",
+          "score": 0.3732
+        },
+        {
+          "name": "seo-hreflang",
+          "score": 0.3385
+        },
+        {
+          "name": "seo-sitemap",
+          "score": 0.3378
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0019": {
+      "id": "r-0019",
+      "split": "dev",
+      "expected": [
+        "seo-images"
+      ],
+      "got": "seo-image-gen",
+      "score1": 0.4759,
+      "margin": 0.05,
+      "top3": [
+        {
+          "name": "seo-image-gen",
+          "score": 0.4759
+        },
+        {
+          "name": "stability-ai",
+          "score": 0.4258
+        },
+        {
+          "name": "fal-upscale",
+          "score": 0.3665
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0.2,
+      "pass": false
+    },
+    "r-0020": {
+      "id": "r-0020",
+      "split": "dev",
+      "expected": [
+        "subject-line-psychologist",
+        "headline-psychologist"
+      ],
+      "got": "cold-email",
+      "score1": 0.4953,
+      "margin": 0.021,
+      "top3": [
+        {
+          "name": "cold-email",
+          "score": 0.4953
+        },
+        {
+          "name": "sales-automator",
+          "score": 0.4743
+        },
+        {
+          "name": "launch-strategy",
+          "score": 0.4192
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0021": {
+      "id": "r-0021",
+      "split": "dev",
+      "expected": [
+        "price-psychology-strategist",
+        "loss-aversion-designer"
+      ],
+      "got": "pricing-strategy",
+      "score1": 0.4306,
+      "margin": 0.0563,
+      "top3": [
+        {
+          "name": "pricing-strategy",
+          "score": 0.4306
+        },
+        {
+          "name": "redesign-existing-projects",
+          "score": 0.3743
+        },
+        {
+          "name": "paywall-upgrade-cro",
+          "score": 0.3546
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0022": {
+      "id": "r-0022",
+      "split": "dev",
+      "expected": [
+        "distributed-debugging-debug-trace",
+        "observability-monitoring-monitor-setup"
+      ],
+      "got": "distributed-tracing",
+      "score1": 0.555,
+      "margin": 0.2179,
+      "top3": [
+        {
+          "name": "distributed-tracing",
+          "score": 0.555
+        },
+        {
+          "name": "microservices-patterns",
+          "score": 0.3371
+        },
+        {
+          "name": "azure-monitor-opentelemetry-ts",
+          "score": 0.3343
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0023": {
+      "id": "r-0023",
+      "split": "dev",
+      "expected": [
+        "error-debugging-error-analysis",
+        "error-diagnostics-error-analysis",
+        "error-debugging-error-trace"
+      ],
+      "got": "error-detective",
+      "score1": 0.503,
+      "margin": 0.0511,
+      "top3": [
+        {
+          "name": "error-detective",
+          "score": 0.503
+        },
+        {
+          "name": "bug-hunter",
+          "score": 0.4519
+        },
+        {
+          "name": "fp-async",
+          "score": 0.4345
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0.2,
+      "pass": false
+    },
+    "r-0024": {
+      "id": "r-0024",
+      "split": "dev",
+      "expected": [
+        "docker-expert"
+      ],
+      "got": "docker-expert",
+      "score1": 0.3395,
+      "margin": 0.0274,
+      "top3": [
+        {
+          "name": "docker-expert",
+          "score": 0.3395
+        },
+        {
+          "name": "azd-deployment",
+          "score": 0.3121
+        },
+        {
+          "name": "kubernetes-architect",
+          "score": 0.3028
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0025": {
+      "id": "r-0025",
+      "split": "dev",
+      "expected": [
+        "kubernetes-architect",
+        "kubernetes-deployment"
+      ],
+      "got": "gitops-workflow",
+      "score1": 0.6834,
+      "margin": 0.0807,
+      "top3": [
+        {
+          "name": "gitops-workflow",
+          "score": 0.6834
+        },
+        {
+          "name": "kubernetes-architect",
+          "score": 0.6027
+        },
+        {
+          "name": "kubestellar-console",
+          "score": 0.5718
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.5,
+      "pass": false
+    },
+    "r-0026": {
+      "id": "r-0026",
+      "split": "dev",
+      "expected": [
+        "helm-chart-scaffolding"
+      ],
+      "got": "helm-chart-scaffolding",
+      "score1": 0.6318,
+      "margin": 0.1623,
+      "top3": [
+        {
+          "name": "helm-chart-scaffolding",
+          "score": 0.6318
+        },
+        {
+          "name": "kubernetes-deployment",
+          "score": 0.4695
+        },
+        {
+          "name": "linkerd-patterns",
+          "score": 0.3814
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0027": {
+      "id": "r-0027",
+      "split": "dev",
+      "expected": [
+        "k8s-security-policies"
+      ],
+      "got": "k8s-security-policies",
+      "score1": 0.7198,
+      "margin": 0.219,
+      "top3": [
+        {
+          "name": "k8s-security-policies",
+          "score": 0.7198
+        },
+        {
+          "name": "linkerd-patterns",
+          "score": 0.5008
+        },
+        {
+          "name": "k8s-manifest-generator",
+          "score": 0.4828
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0028": {
+      "id": "r-0028",
+      "split": "dev",
+      "expected": [
+        "terraform-skill"
+      ],
+      "got": "terraform-aws-modules",
+      "score1": 0.6795,
+      "margin": 0.0485,
+      "top3": [
+        {
+          "name": "terraform-aws-modules",
+          "score": 0.6795
+        },
+        {
+          "name": "terraform-skill",
+          "score": 0.631
+        },
+        {
+          "name": "terraform-module-library",
+          "score": 0.6124
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.5,
+      "pass": false
+    },
+    "r-0029": {
+      "id": "r-0029",
+      "split": "dev",
+      "expected": [
+        "github-actions-templates"
+      ],
+      "got": "github-actions-templates",
+      "score1": 0.593,
+      "margin": 0.0183,
+      "top3": [
+        {
+          "name": "github-actions-templates",
+          "score": 0.593
+        },
+        {
+          "name": "github",
+          "score": 0.5747
+        },
+        {
+          "name": "gha-security-review",
+          "score": 0.5163
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0030": {
+      "id": "r-0030",
+      "split": "dev",
+      "expected": [
+        "postgres-best-practices",
+        "postgresql"
+      ],
+      "got": "postgresql-optimization",
+      "score1": 0.4636,
+      "margin": 0.0307,
+      "top3": [
+        {
+          "name": "postgresql-optimization",
+          "score": 0.4636
+        },
+        {
+          "name": "sql-optimization-patterns",
+          "score": 0.433
+        },
+        {
+          "name": "projection-patterns",
+          "score": 0.3892
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0.25,
+      "pass": false
+    },
+    "r-0031": {
+      "id": "r-0031",
+      "split": "dev",
+      "expected": [
+        "prisma-expert"
+      ],
+      "got": "prisma-expert",
+      "score1": 0.5357,
+      "margin": 0.0198,
+      "top3": [
+        {
+          "name": "prisma-expert",
+          "score": 0.5357
+        },
+        {
+          "name": "database-migration",
+          "score": 0.5159
+        },
+        {
+          "name": "drizzle-orm-expert",
+          "score": 0.4195
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0032": {
+      "id": "r-0032",
+      "split": "dev",
+      "expected": [
+        "neon-postgres"
+      ],
+      "got": "neon-postgres",
+      "score1": 0.5089,
+      "margin": 0.0891,
+      "top3": [
+        {
+          "name": "neon-postgres",
+          "score": 0.5089
+        },
+        {
+          "name": "using-neon",
+          "score": 0.4198
+        },
+        {
+          "name": "tailwind-design-system",
+          "score": 0.3866
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0033": {
+      "id": "r-0033",
+      "split": "dev",
+      "expected": [
+        "database-migrations-sql-migrations"
+      ],
+      "got": "database-migrations-sql-migrations",
+      "score1": 0.4558,
+      "margin": 0.1447,
+      "top3": [
+        {
+          "name": "database-migrations-sql-migrations",
+          "score": 0.4558
+        },
+        {
+          "name": "dbos-golang",
+          "score": 0.3111
+        },
+        {
+          "name": "database-migrations-migration-observability",
+          "score": 0.293
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0034": {
+      "id": "r-0034",
+      "split": "dev",
+      "expected": [
+        "react-best-practices",
+        "nextjs-app-router-patterns"
+      ],
+      "got": "react-best-practices",
+      "score1": 0.4337,
+      "margin": 0.0016,
+      "top3": [
+        {
+          "name": "react-best-practices",
+          "score": 0.4337
+        },
+        {
+          "name": "landing-page-generator",
+          "score": 0.4321
+        },
+        {
+          "name": "nextjs-app-router-patterns",
+          "score": 0.4244
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0035": {
+      "id": "r-0035",
+      "split": "dev",
+      "expected": [
+        "nextjs-app-router-patterns",
+        "react-best-practices"
+      ],
+      "got": "nextjs-app-router-patterns",
+      "score1": 0.7651,
+      "margin": 0.0712,
+      "top3": [
+        {
+          "name": "nextjs-app-router-patterns",
+          "score": 0.7651
+        },
+        {
+          "name": "nextjs-best-practices",
+          "score": 0.6939
+        },
+        {
+          "name": "react-nextjs-development",
+          "score": 0.6735
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0036": {
+      "id": "r-0036",
+      "split": "dev",
+      "expected": [
+        "tailwind-patterns"
+      ],
+      "got": "tailwind-patterns",
+      "score1": 0.6591,
+      "margin": 0.1166,
+      "top3": [
+        {
+          "name": "tailwind-patterns",
+          "score": 0.6591
+        },
+        {
+          "name": "tailwind-design-system",
+          "score": 0.5425
+        },
+        {
+          "name": "expo-tailwind-setup",
+          "score": 0.5214
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0037": {
+      "id": "r-0037",
+      "split": "dev",
+      "expected": [
+        "typescript-expert"
+      ],
+      "got": "typescript-advanced-types",
+      "score1": 0.6295,
+      "margin": 0.0682,
+      "top3": [
+        {
+          "name": "typescript-advanced-types",
+          "score": 0.6295
+        },
+        {
+          "name": "typescript-pro",
+          "score": 0.5613
+        },
+        {
+          "name": "fp-ts-pragmatic",
+          "score": 0.4585
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0.1429,
+      "pass": false
+    },
+    "r-0038": {
+      "id": "r-0038",
+      "split": "dev",
+      "expected": [
+        "python-packaging"
+      ],
+      "got": "python-packaging",
+      "score1": 0.505,
+      "margin": 0.1761,
+      "top3": [
+        {
+          "name": "python-packaging",
+          "score": 0.505
+        },
+        {
+          "name": "mise-configurator",
+          "score": 0.3289
+        },
+        {
+          "name": "odoo-module-developer",
+          "score": 0.2945
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0039": {
+      "id": "r-0039",
+      "split": "dev",
+      "expected": [
+        "fastapi-pro"
+      ],
+      "got": "python-fastapi-development",
+      "score1": 0.6367,
+      "margin": 0.0297,
+      "top3": [
+        {
+          "name": "python-fastapi-development",
+          "score": 0.6367
+        },
+        {
+          "name": "fastapi-templates",
+          "score": 0.607
+        },
+        {
+          "name": "fastapi-pro",
+          "score": 0.5739
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.3333,
+      "pass": false
+    },
+    "r-0040": {
+      "id": "r-0040",
+      "split": "dev",
+      "expected": [
+        "rust-async-patterns"
+      ],
+      "got": "rust-async-patterns",
+      "score1": 0.5167,
+      "margin": 0.0711,
+      "top3": [
+        {
+          "name": "rust-async-patterns",
+          "score": 0.5167
+        },
+        {
+          "name": "rust-pro",
+          "score": 0.4456
+        },
+        {
+          "name": "zeroize-audit",
+          "score": 0.3341
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0041": {
+      "id": "r-0041",
+      "split": "dev",
+      "expected": [
+        "golang-pro"
+      ],
+      "got": "go-concurrency-patterns",
+      "score1": 0.58,
+      "margin": 0.1135,
+      "top3": [
+        {
+          "name": "go-concurrency-patterns",
+          "score": 0.58
+        },
+        {
+          "name": "dbos-golang",
+          "score": 0.4664
+        },
+        {
+          "name": "golang-pro",
+          "score": 0.4467
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.3333,
+      "pass": false
+    },
+    "r-0042": {
+      "id": "r-0042",
+      "split": "dev",
+      "expected": [
+        "playwright-skill",
+        "e2e-testing-patterns"
+      ],
+      "got": "playwright-java",
+      "score1": 0.6534,
+      "margin": 0.0901,
+      "top3": [
+        {
+          "name": "playwright-java",
+          "score": 0.6534
+        },
+        {
+          "name": "e2e-testing",
+          "score": 0.5633
+        },
+        {
+          "name": "e2e-testing-patterns",
+          "score": 0.5183
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.3333,
+      "pass": false
+    },
+    "r-0043": {
+      "id": "r-0043",
+      "split": "dev",
+      "expected": [
+        "test-driven-development",
+        "tdd-workflow"
+      ],
+      "got": "tdd-workflow",
+      "score1": 0.4609,
+      "margin": 0.0249,
+      "top3": [
+        {
+          "name": "tdd-workflow",
+          "score": 0.4609
+        },
+        {
+          "name": "orchestrate-batch-refactor",
+          "score": 0.436
+        },
+        {
+          "name": "code-refactoring-context-restore",
+          "score": 0.3922
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0044": {
+      "id": "r-0044",
+      "split": "dev",
+      "expected": [
+        "security-auditor",
+        "api-security-best-practices",
+        "broken-authentication"
+      ],
+      "got": "security-audit",
+      "score1": 0.4872,
+      "margin": 0.0009,
+      "top3": [
+        {
+          "name": "security-audit",
+          "score": 0.4872
+        },
+        {
+          "name": "broken-authentication",
+          "score": 0.4863
+        },
+        {
+          "name": "xss-html-injection",
+          "score": 0.4582
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.5,
+      "pass": false
+    },
+    "r-0045": {
+      "id": "r-0045",
+      "split": "dev",
+      "expected": [
+        "sql-injection-testing"
+      ],
+      "got": "sql-injection-testing",
+      "score1": 0.6146,
+      "margin": 0.0274,
+      "top3": [
+        {
+          "name": "sql-injection-testing",
+          "score": 0.6146
+        },
+        {
+          "name": "sqlmap-database-pentesting",
+          "score": 0.5872
+        },
+        {
+          "name": "api-fuzzing-bug-bounty",
+          "score": 0.4951
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0046": {
+      "id": "r-0046",
+      "split": "dev",
+      "expected": [
+        "xss-html-injection"
+      ],
+      "got": "defuddle",
+      "score1": 0.4918,
+      "margin": 0.0613,
+      "top3": [
+        {
+          "name": "defuddle",
+          "score": 0.4918
+        },
+        {
+          "name": "xss-html-injection",
+          "score": 0.4305
+        },
+        {
+          "name": "frontend-mobile-security-xss-scan",
+          "score": 0.416
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.5,
+      "pass": false
+    },
+    "r-0047": {
+      "id": "r-0047",
+      "split": "dev",
+      "expected": [
+        "git-advanced-workflows"
+      ],
+      "got": "github-issue-creator",
+      "score1": 0.388,
+      "margin": 0.0017,
+      "top3": [
+        {
+          "name": "github-issue-creator",
+          "score": 0.388
+        },
+        {
+          "name": "bitbucket-automation",
+          "score": 0.3864
+        },
+        {
+          "name": "openclaw-github-repo-commander",
+          "score": 0.3862
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0.25,
+      "pass": false
+    },
+    "r-0048": {
+      "id": "r-0048",
+      "split": "dev",
+      "expected": [
+        "commit"
+      ],
+      "got": "ast-grep-enforcer",
+      "score1": 0.5036,
+      "margin": 0.0182,
+      "top3": [
+        {
+          "name": "ast-grep-enforcer",
+          "score": 0.5036
+        },
+        {
+          "name": "commit",
+          "score": 0.4854
+        },
+        {
+          "name": "differential-review",
+          "score": 0.4512
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.5,
+      "pass": false
+    },
+    "r-0049": {
+      "id": "r-0049",
+      "split": "dev",
+      "expected": [
+        "monorepo-management"
+      ],
+      "got": "turborepo-caching",
+      "score1": 0.6474,
+      "margin": 0.2332,
+      "top3": [
+        {
+          "name": "turborepo-caching",
+          "score": 0.6474
+        },
+        {
+          "name": "nx-workspace-patterns",
+          "score": 0.4143
+        },
+        {
+          "name": "monorepo-management",
+          "score": 0.3814
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.3333,
+      "pass": false
+    },
+    "r-0050": {
+      "id": "r-0050",
+      "split": "dev",
+      "expected": [
+        "graphql-architect",
+        "graphql"
+      ],
+      "got": "graphql-architect",
+      "score1": 0.5742,
+      "margin": 0.0332,
+      "top3": [
+        {
+          "name": "graphql-architect",
+          "score": 0.5742
+        },
+        {
+          "name": "graphql",
+          "score": 0.541
+        },
+        {
+          "name": "api-design-principles",
+          "score": 0.403
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0051": {
+      "id": "r-0051",
+      "split": "dev",
+      "expected": [
+        "stripe-integration",
+        "stripe-automation"
+      ],
+      "got": "payment-integration",
+      "score1": 0.4928,
+      "margin": 0.007,
+      "top3": [
+        {
+          "name": "payment-integration",
+          "score": 0.4928
+        },
+        {
+          "name": "stripe-integration",
+          "score": 0.4858
+        },
+        {
+          "name": "stripe-automation",
+          "score": 0.4753
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.5,
+      "pass": false
+    },
+    "r-0052": {
+      "id": "r-0052",
+      "split": "dev",
+      "expected": [
+        "auth-implementation-patterns",
+        "clerk-auth"
+      ],
+      "got": "aws-secrets-rotation",
+      "score1": 0.4348,
+      "margin": 0.0293,
+      "top3": [
+        {
+          "name": "aws-secrets-rotation",
+          "score": 0.4348
+        },
+        {
+          "name": "hubspot-integration",
+          "score": 0.4055
+        },
+        {
+          "name": "clerk-auth",
+          "score": 0.3895
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.3333,
+      "pass": false
+    },
+    "r-0053": {
+      "id": "r-0053",
+      "split": "dev",
+      "expected": [
+        "clerk-auth"
+      ],
+      "got": "nextjs-supabase-auth",
+      "score1": 0.5126,
+      "margin": 0.0106,
+      "top3": [
+        {
+          "name": "nextjs-supabase-auth",
+          "score": 0.5126
+        },
+        {
+          "name": "trpc-fullstack",
+          "score": 0.5021
+        },
+        {
+          "name": "clerk-auth",
+          "score": 0.4977
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.3333,
+      "pass": false
+    },
+    "r-0054": {
+      "id": "r-0054",
+      "split": "dev",
+      "expected": [
+        "rag-engineer"
+      ],
+      "got": "rag-implementation",
+      "score1": 0.5184,
+      "margin": 0.0656,
+      "top3": [
+        {
+          "name": "rag-implementation",
+          "score": 0.5184
+        },
+        {
+          "name": "ai-seo",
+          "score": 0.4528
+        },
+        {
+          "name": "gpt-researcher",
+          "score": 0.4384
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0055": {
+      "id": "r-0055",
+      "split": "dev",
+      "expected": [
+        "llm-evaluation"
+      ],
+      "got": "advanced-evaluation",
+      "score1": 0.4994,
+      "margin": 0.0405,
+      "top3": [
+        {
+          "name": "advanced-evaluation",
+          "score": 0.4994
+        },
+        {
+          "name": "agent-evaluation",
+          "score": 0.4589
+        },
+        {
+          "name": "seo-geo",
+          "score": 0.4549
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0.1111,
+      "pass": false
+    },
+    "r-0056": {
+      "id": "r-0056",
+      "split": "dev",
+      "expected": [
+        "mcp-builder",
+        "mcp-tool-developer"
+      ],
+      "got": "mcp-tool-developer",
+      "score1": 0.5145,
+      "margin": 0.0625,
+      "top3": [
+        {
+          "name": "mcp-tool-developer",
+          "score": 0.5145
+        },
+        {
+          "name": "protocol-reverse-engineering",
+          "score": 0.452
+        },
+        {
+          "name": "zod-validation-expert",
+          "score": 0.4326
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0057": {
+      "id": "r-0057",
+      "split": "dev",
+      "expected": [
+        "makepad-animation",
+        "makepad-layout",
+        "makepad-basics"
+      ],
+      "got": "makepad-skills",
+      "score1": 0.4766,
+      "margin": 0.0294,
+      "top3": [
+        {
+          "name": "makepad-skills",
+          "score": 0.4766
+        },
+        {
+          "name": "ui-component",
+          "score": 0.4473
+        },
+        {
+          "name": "makepad-animation",
+          "score": 0.3708
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.3333,
+      "pass": false
+    },
+    "r-0058": {
+      "id": "r-0058",
+      "split": "dev",
+      "expected": [
+        "hig-inputs",
+        "hig-components-controls"
+      ],
+      "got": "hig-components-layout",
+      "score1": 0.5266,
+      "margin": 0.0116,
+      "top3": [
+        {
+          "name": "hig-components-layout",
+          "score": 0.5266
+        },
+        {
+          "name": "hig-platforms",
+          "score": 0.515
+        },
+        {
+          "name": "hig-foundations",
+          "score": 0.5098
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0.1111,
+      "pass": false
+    },
+    "r-0059": {
+      "id": "r-0059",
+      "split": "dev",
+      "expected": [
+        "manim-video"
+      ],
+      "got": "manim-video",
+      "score1": 0.4686,
+      "margin": 0.0045,
+      "top3": [
+        {
+          "name": "manim-video",
+          "score": 0.4686
+        },
+        {
+          "name": "sympy",
+          "score": 0.464
+        },
+        {
+          "name": "matplotlib",
+          "score": 0.4094
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0060": {
+      "id": "r-0060",
+      "split": "dev",
+      "expected": [
+        "remotion-best-practices"
+      ],
+      "got": "remotion-best-practices",
+      "score1": 0.6027,
+      "margin": 0.1188,
+      "top3": [
+        {
+          "name": "remotion-best-practices",
+          "score": 0.6027
+        },
+        {
+          "name": "remotion",
+          "score": 0.484
+        },
+        {
+          "name": "spline-3d-integration",
+          "score": 0.4437
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0061": {
+      "id": "r-0061",
+      "split": "dev",
+      "expected": [
+        "prometheus-configuration"
+      ],
+      "got": "prometheus-configuration",
+      "score1": 0.6574,
+      "margin": 0.1125,
+      "top3": [
+        {
+          "name": "prometheus-configuration",
+          "score": 0.6574
+        },
+        {
+          "name": "k8s-security-policies",
+          "score": 0.545
+        },
+        {
+          "name": "k8s-manifest-generator",
+          "score": 0.5346
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0062": {
+      "id": "r-0062",
+      "split": "dev",
+      "expected": [
+        "grafana-dashboards"
+      ],
+      "got": "grafana-dashboards",
+      "score1": 0.6036,
+      "margin": 0.2646,
+      "top3": [
+        {
+          "name": "grafana-dashboards",
+          "score": 0.6036
+        },
+        {
+          "name": "gemini-api-integration",
+          "score": 0.339
+        },
+        {
+          "name": "fastapi-templates",
+          "score": 0.3368
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0063": {
+      "id": "r-0063",
+      "split": "dev",
+      "expected": [
+        "bash-scripting",
+        "linux-shell-scripting"
+      ],
+      "got": "bash-defensive-patterns",
+      "score1": 0.55,
+      "margin": 0.0017,
+      "top3": [
+        {
+          "name": "bash-defensive-patterns",
+          "score": 0.55
+        },
+        {
+          "name": "bash-scripting",
+          "score": 0.5483
+        },
+        {
+          "name": "shellcheck-configuration",
+          "score": 0.5054
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.5,
+      "pass": false
+    },
+    "r-0064": {
+      "id": "r-0064",
+      "split": "dev",
+      "expected": [
+        "cloudflare-workers-expert"
+      ],
+      "got": "cloudflare-workers-expert",
+      "score1": 0.5994,
+      "margin": 0.0709,
+      "top3": [
+        {
+          "name": "cloudflare-workers-expert",
+          "score": 0.5994
+        },
+        {
+          "name": "hono",
+          "score": 0.5285
+        },
+        {
+          "name": "linkerd-patterns",
+          "score": 0.4675
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0065": {
+      "id": "r-0065",
+      "split": "dev",
+      "expected": [
+        "vercel-deployment",
+        "vercel-automation",
+        "vercel-ai-sdk-expert"
+      ],
+      "got": "vercel-deployment",
+      "score1": 0.7329,
+      "margin": 0.2519,
+      "top3": [
+        {
+          "name": "vercel-deployment",
+          "score": 0.7329
+        },
+        {
+          "name": "vercel-automation",
+          "score": 0.481
+        },
+        {
+          "name": "react-best-practices",
+          "score": 0.4719
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0066": {
+      "id": "r-0066",
+      "split": "dev",
+      "expected": [
+        "dbt-transformation-patterns"
+      ],
+      "got": "dbt-transformation-patterns",
+      "score1": 0.5495,
+      "margin": 0.0384,
+      "top3": [
+        {
+          "name": "dbt-transformation-patterns",
+          "score": 0.5495
+        },
+        {
+          "name": "snowflake-development",
+          "score": 0.511
+        },
+        {
+          "name": "monte-carlo-push-ingestion",
+          "score": 0.5006
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0067": {
+      "id": "r-0067",
+      "split": "dev",
+      "expected": [
+        "airflow-dag-patterns"
+      ],
+      "got": "airflow-dag-patterns",
+      "score1": 0.5919,
+      "margin": 0.1367,
+      "top3": [
+        {
+          "name": "airflow-dag-patterns",
+          "score": 0.5919
+        },
+        {
+          "name": "observability-monitoring-monitor-setup",
+          "score": 0.4552
+        },
+        {
+          "name": "observability-engineer",
+          "score": 0.4481
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0068": {
+      "id": "r-0068",
+      "split": "dev",
+      "expected": [
+        "spark-optimization"
+      ],
+      "got": "spark-optimization",
+      "score1": 0.596,
+      "margin": 0.2491,
+      "top3": [
+        {
+          "name": "spark-optimization",
+          "score": 0.596
+        },
+        {
+          "name": "data-engineer",
+          "score": 0.3469
+        },
+        {
+          "name": "polars",
+          "score": 0.2863
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0069": {
+      "id": "r-0069",
+      "split": "dev",
+      "expected": [
+        "swiftui-expert-skill"
+      ],
+      "got": "swiftui-liquid-glass",
+      "score1": 0.7222,
+      "margin": 0.0377,
+      "top3": [
+        {
+          "name": "swiftui-liquid-glass",
+          "score": 0.7222
+        },
+        {
+          "name": "swiftui-expert-skill",
+          "score": 0.6845
+        },
+        {
+          "name": "swiftui-ui-patterns",
+          "score": 0.656
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.5,
+      "pass": false
+    },
+    "r-0070": {
+      "id": "r-0070",
+      "split": "dev",
+      "expected": [
+        "android-jetpack-compose-expert"
+      ],
+      "got": "expo-ui-jetpack-compose",
+      "score1": 0.4668,
+      "margin": 0.0089,
+      "top3": [
+        {
+          "name": "expo-ui-jetpack-compose",
+          "score": 0.4668
+        },
+        {
+          "name": "android-jetpack-compose-expert",
+          "score": 0.4579
+        },
+        {
+          "name": "python-development-python-scaffold",
+          "score": 0.3582
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.5,
+      "pass": false
+    },
+    "r-0071": {
+      "id": "r-0071",
+      "split": "dev",
+      "expected": [
+        "react-native-architecture"
+      ],
+      "got": "react-native-architecture",
+      "score1": 0.5972,
+      "margin": 0.0572,
+      "top3": [
+        {
+          "name": "react-native-architecture",
+          "score": 0.5972
+        },
+        {
+          "name": "building-native-ui",
+          "score": 0.54
+        },
+        {
+          "name": "expo-dev-client",
+          "score": 0.5344
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0072": {
+      "id": "r-0072",
+      "split": "dev",
+      "expected": [
+        "solidity-security"
+      ],
+      "got": "defi-protocol-templates",
+      "score1": 0.4309,
+      "margin": 0.0348,
+      "top3": [
+        {
+          "name": "defi-protocol-templates",
+          "score": 0.4309
+        },
+        {
+          "name": "zeroize-audit",
+          "score": 0.3961
+        },
+        {
+          "name": "spec-to-code-compliance",
+          "score": 0.3751
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0073": {
+      "id": "r-0073",
+      "split": "dev",
+      "expected": [
+        "web3-testing"
+      ],
+      "got": "semgrep-rule-creator",
+      "score1": 0.4337,
+      "margin": 0.0345,
+      "top3": [
+        {
+          "name": "semgrep-rule-creator",
+          "score": 0.4337
+        },
+        {
+          "name": "shellcheck-configuration",
+          "score": 0.3992
+        },
+        {
+          "name": "web3-testing",
+          "score": 0.3975
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.3333,
+      "pass": false
+    },
+    "r-0074": {
+      "id": "r-0074",
+      "split": "dev",
+      "expected": [
+        "godot-gdscript-patterns"
+      ],
+      "got": "godot-gdscript-patterns",
+      "score1": 0.6076,
+      "margin": 0.1802,
+      "top3": [
+        {
+          "name": "godot-gdscript-patterns",
+          "score": 0.6076
+        },
+        {
+          "name": "godot-4-migration",
+          "score": 0.4274
+        },
+        {
+          "name": "fp-react",
+          "score": 0.3208
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0075": {
+      "id": "r-0075",
+      "split": "dev",
+      "expected": [
+        "unity-ecs-patterns"
+      ],
+      "got": "unity-ecs-patterns",
+      "score1": 0.4502,
+      "margin": 0.034,
+      "top3": [
+        {
+          "name": "unity-ecs-patterns",
+          "score": 0.4502
+        },
+        {
+          "name": "agent-orchestration-multi-agent-optimize",
+          "score": 0.4162
+        },
+        {
+          "name": "multi-agent-patterns",
+          "score": 0.3809
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0076": {
+      "id": "r-0076",
+      "split": "dev",
+      "expected": [
+        "xlsx-official"
+      ],
+      "got": "bilig-workpaper",
+      "score1": 0.3728,
+      "margin": 0.0004,
+      "top3": [
+        {
+          "name": "bilig-workpaper",
+          "score": 0.3728
+        },
+        {
+          "name": "calc",
+          "score": 0.3724
+        },
+        {
+          "name": "xlsx-official",
+          "score": 0.3643
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.3333,
+      "pass": false
+    },
+    "r-0077": {
+      "id": "r-0077",
+      "split": "dev",
+      "expected": [
+        "pdf-official"
+      ],
+      "got": "pdf-official",
+      "score1": 0.4141,
+      "margin": 0.0431,
+      "top3": [
+        {
+          "name": "pdf-official",
+          "score": 0.4141
+        },
+        {
+          "name": "pdf-conversion-router",
+          "score": 0.371
+        },
+        {
+          "name": "googlesheets-automation",
+          "score": 0.3407
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0078": {
+      "id": "r-0078",
+      "split": "dev",
+      "expected": [
+        "docx-official"
+      ],
+      "got": "docx-official",
+      "score1": 0.5049,
+      "margin": 0.1399,
+      "top3": [
+        {
+          "name": "docx-official",
+          "score": 0.5049
+        },
+        {
+          "name": "docusign-automation",
+          "score": 0.365
+        },
+        {
+          "name": "changelog-automation",
+          "score": 0.3557
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0079": {
+      "id": "r-0079",
+      "split": "dev",
+      "expected": [
+        "pitch-psychologist",
+        "copywriting-psychologist"
+      ],
+      "got": "marketing-ideas",
+      "score1": 0.4681,
+      "margin": 0.0346,
+      "top3": [
+        {
+          "name": "marketing-ideas",
+          "score": 0.4681
+        },
+        {
+          "name": "micro-saas-launcher",
+          "score": 0.4334
+        },
+        {
+          "name": "launch-strategy",
+          "score": 0.4291
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0080": {
+      "id": "r-0080",
+      "split": "dev",
+      "expected": [
+        "scientific-writing"
+      ],
+      "got": "typst-research-paper",
+      "score1": 0.4505,
+      "margin": 0.0146,
+      "top3": [
+        {
+          "name": "typst-research-paper",
+          "score": 0.4505
+        },
+        {
+          "name": "gpt-researcher",
+          "score": 0.4358
+        },
+        {
+          "name": "citation-management",
+          "score": 0.4066
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0081": {
+      "id": "r-0081",
+      "split": "dev",
+      "expected": [
+        "latex-paper-conversion",
+        "typst-research-paper"
+      ],
+      "got": "typst-research-paper",
+      "score1": 0.4672,
+      "margin": 0.0981,
+      "top3": [
+        {
+          "name": "typst-research-paper",
+          "score": 0.4672
+        },
+        {
+          "name": "obsidian-markdown",
+          "score": 0.3691
+        },
+        {
+          "name": "latex-paper-conversion",
+          "score": 0.3527
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0082": {
+      "id": "r-0082",
+      "split": "dev",
+      "expected": [
+        "python-pptx-generator",
+        "presentation-designer"
+      ],
+      "got": "python-pptx-generator",
+      "score1": 0.8466,
+      "margin": 0.3867,
+      "top3": [
+        {
+          "name": "python-pptx-generator",
+          "score": 0.8466
+        },
+        {
+          "name": "presentation-designer",
+          "score": 0.46
+        },
+        {
+          "name": "impress",
+          "score": 0.4321
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0083": {
+      "id": "r-0083",
+      "split": "dev",
+      "expected": [
+        "matplotlib"
+      ],
+      "got": "matplotlib",
+      "score1": 0.5344,
+      "margin": 0.0757,
+      "top3": [
+        {
+          "name": "matplotlib",
+          "score": 0.5344
+        },
+        {
+          "name": "seaborn",
+          "score": 0.4587
+        },
+        {
+          "name": "astropy",
+          "score": 0.3672
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0084": {
+      "id": "r-0084",
+      "split": "dev",
+      "expected": [
+        "plotly"
+      ],
+      "got": "matplotlib",
+      "score1": 0.6018,
+      "margin": 0.1092,
+      "top3": [
+        {
+          "name": "matplotlib",
+          "score": 0.6018
+        },
+        {
+          "name": "seaborn",
+          "score": 0.4925
+        },
+        {
+          "name": "plotly",
+          "score": 0.4798
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.3333,
+      "pass": false
+    },
+    "r-0085": {
+      "id": "r-0085",
+      "split": "dev",
+      "expected": [
+        "docs-architect",
+        "api-documentation",
+        "api-documenter"
+      ],
+      "got": "wiki-onboarding",
+      "score1": 0.5392,
+      "margin": 0.0782,
+      "top3": [
+        {
+          "name": "wiki-onboarding",
+          "score": 0.5392
+        },
+        {
+          "name": "environment-setup-guide",
+          "score": 0.461
+        },
+        {
+          "name": "data-structure-protocol",
+          "score": 0.4322
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0086": {
+      "id": "r-0086",
+      "split": "dev",
+      "expected": [
+        "django-pro"
+      ],
+      "got": "django-pro",
+      "score1": 0.498,
+      "margin": 0.0324,
+      "top3": [
+        {
+          "name": "django-pro",
+          "score": 0.498
+        },
+        {
+          "name": "django-access-review",
+          "score": 0.4656
+        },
+        {
+          "name": "django-perf-review",
+          "score": 0.4248
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0087": {
+      "id": "r-0087",
+      "split": "dev",
+      "expected": [
+        "gcp-cloud-run"
+      ],
+      "got": "gcp-cloud-run",
+      "score1": 0.5313,
+      "margin": 0.0438,
+      "top3": [
+        {
+          "name": "gcp-cloud-run",
+          "score": 0.5313
+        },
+        {
+          "name": "cost-optimization",
+          "score": 0.4876
+        },
+        {
+          "name": "azd-deployment",
+          "score": 0.4468
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0088": {
+      "id": "r-0088",
+      "split": "dev",
+      "expected": [
+        "aws-serverless"
+      ],
+      "got": "event-sourcing-architect",
+      "score1": 0.4797,
+      "margin": 0.0235,
+      "top3": [
+        {
+          "name": "event-sourcing-architect",
+          "score": 0.4797
+        },
+        {
+          "name": "azure-servicebus-ts",
+          "score": 0.4561
+        },
+        {
+          "name": "saas-mvp-launcher",
+          "score": 0.4498
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0089": {
+      "id": "r-0089",
+      "split": "dev",
+      "expected": [
+        "agent-memory-mcp",
+        "mcp-builder"
+      ],
+      "got": "memory-systems",
+      "score1": 0.6287,
+      "margin": 0.118,
+      "top3": [
+        {
+          "name": "memory-systems",
+          "score": 0.6287
+        },
+        {
+          "name": "agent-memory-mcp",
+          "score": 0.5107
+        },
+        {
+          "name": "global-chat-agent-discovery",
+          "score": 0.5095
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.5,
+      "pass": false
+    },
+    "r-0090": {
+      "id": "r-0090",
+      "split": "dev",
+      "expected": [
+        "ml-pipeline-workflow",
+        "machine-learning-ops-ml-pipeline",
+        "ml-engineer"
+      ],
+      "got": "mlops-engineer",
+      "score1": 0.7703,
+      "margin": 0.1045,
+      "top3": [
+        {
+          "name": "mlops-engineer",
+          "score": 0.7703
+        },
+        {
+          "name": "ml-pipeline-workflow",
+          "score": 0.6657
+        },
+        {
+          "name": "ml-engineer",
+          "score": 0.5764
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.5,
+      "pass": false
+    },
+    "r-0091": {
+      "id": "r-0091",
+      "split": "dev",
+      "expected": [
+        "prompt-engineering"
+      ],
+      "got": "llm-prompt-optimizer",
+      "score1": 0.5026,
+      "margin": 0.0391,
+      "top3": [
+        {
+          "name": "llm-prompt-optimizer",
+          "score": 0.5026
+        },
+        {
+          "name": "llm-structured-output",
+          "score": 0.4636
+        },
+        {
+          "name": "local-llm-expert",
+          "score": 0.4399
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0092": {
+      "id": "r-0092",
+      "split": "dev",
+      "expected": [
+        "azure-ai-projects-py",
+        "agent-framework-azure-ai-py"
+      ],
+      "got": "azure-ai-projects-py",
+      "score1": 0.7675,
+      "margin": 0.0146,
+      "top3": [
+        {
+          "name": "azure-ai-projects-py",
+          "score": 0.7675
+        },
+        {
+          "name": "agent-framework-azure-ai-py",
+          "score": 0.7529
+        },
+        {
+          "name": "azure-ai-projects-ts",
+          "score": 0.7035
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0093": {
+      "id": "r-0093",
+      "split": "dev",
+      "expected": [
+        "azure-cosmos-py",
+        "azure-cosmos-db-py"
+      ],
+      "got": "azure-keyvault-py",
+      "score1": 0.6468,
+      "margin": 0.0495,
+      "top3": [
+        {
+          "name": "azure-keyvault-py",
+          "score": 0.6468
+        },
+        {
+          "name": "azure-cosmos-db-py",
+          "score": 0.5973
+        },
+        {
+          "name": "azure-cosmos-py",
+          "score": 0.583
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.5,
+      "pass": false
+    },
+    "r-0094": {
+      "id": "r-0094",
+      "split": "dev",
+      "expected": [
+        "internal-comms-anthropic",
+        "internal-comms-community"
+      ],
+      "got": "internal-comms",
+      "score1": 0.5965,
+      "margin": 0.1713,
+      "top3": [
+        {
+          "name": "internal-comms",
+          "score": 0.5965
+        },
+        {
+          "name": "sales-automator",
+          "score": 0.4252
+        },
+        {
+          "name": "monday-automation",
+          "score": 0.3962
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0095": {
+      "id": "r-0095",
+      "split": "dev",
+      "expected": [
+        "flutter-expert"
+      ],
+      "got": "flutter-expert",
+      "score1": 0.7012,
+      "margin": 0.2518,
+      "top3": [
+        {
+          "name": "flutter-expert",
+          "score": 0.7012
+        },
+        {
+          "name": "mobile-developer",
+          "score": 0.4494
+        },
+        {
+          "name": "makepad-widgets",
+          "score": 0.3796
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0096": {
+      "id": "r-0096",
+      "split": "dev",
+      "expected": [
+        "nextjs-supabase-auth"
+      ],
+      "got": "nextjs-supabase-auth",
+      "score1": 0.696,
+      "margin": 0.2856,
+      "top3": [
+        {
+          "name": "nextjs-supabase-auth",
+          "score": 0.696
+        },
+        {
+          "name": "saas-multi-tenant",
+          "score": 0.4104
+        },
+        {
+          "name": "nextjs-best-practices",
+          "score": 0.3417
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0097": {
+      "id": "r-0097",
+      "split": "dev",
+      "expected": [
+        "seo-content",
+        "seo-page",
+        "seo-plan"
+      ],
+      "got": "seo-content-planner",
+      "score1": 0.5466,
+      "margin": 0.0192,
+      "top3": [
+        {
+          "name": "seo-content-planner",
+          "score": 0.5466
+        },
+        {
+          "name": "seo-fundamentals",
+          "score": 0.5274
+        },
+        {
+          "name": "seo-keyword-strategist",
+          "score": 0.5257
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0098": {
+      "id": "r-0098",
+      "split": "dev",
+      "expected": [
+        "seo-competitor-pages"
+      ],
+      "got": "competitor-alternatives",
+      "score1": 0.6171,
+      "margin": 0.1997,
+      "top3": [
+        {
+          "name": "competitor-alternatives",
+          "score": 0.6171
+        },
+        {
+          "name": "seo-cannibalization-detector",
+          "score": 0.4174
+        },
+        {
+          "name": "seo-competitor-pages",
+          "score": 0.4139
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.3333,
+      "pass": false
+    },
+    "r-0099": {
+      "id": "r-0099",
+      "split": "dev",
+      "expected": [
+        "threejs-shaders",
+        "3d-animations",
+        "3d-web-experience"
+      ],
+      "got": "shader-programming-glsl",
+      "score1": 0.5831,
+      "margin": 0.1129,
+      "top3": [
+        {
+          "name": "shader-programming-glsl",
+          "score": 0.5831
+        },
+        {
+          "name": "threejs-shaders",
+          "score": 0.4702
+        },
+        {
+          "name": "3d-web-experience",
+          "score": 0.4408
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.5,
+      "pass": false
+    },
+    "r-0100": {
+      "id": "r-0100",
+      "split": "dev",
+      "expected": [
+        "k8s-security-policies",
+        "kubernetes-architect",
+        "security-auditor"
+      ],
+      "got": "k8s-security-policies",
+      "score1": 0.571,
+      "margin": 0.0006,
+      "top3": [
+        {
+          "name": "k8s-security-policies",
+          "score": 0.571
+        },
+        {
+          "name": "kubernetes-deployment",
+          "score": 0.5704
+        },
+        {
+          "name": "kubernetes-architect",
+          "score": 0.5249
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0101": {
+      "id": "r-0101",
+      "split": "dev",
+      "expected": [
+        "k8s-manifest-generator",
+        "kubernetes-deployment",
+        "kubernetes-architect"
+      ],
+      "got": "k8s-manifest-generator",
+      "score1": 0.788,
+      "margin": 0.1446,
+      "top3": [
+        {
+          "name": "k8s-manifest-generator",
+          "score": 0.788
+        },
+        {
+          "name": "kubernetes-deployment",
+          "score": 0.6435
+        },
+        {
+          "name": "linkerd-patterns",
+          "score": 0.6123
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0102": {
+      "id": "r-0102",
+      "split": "dev",
+      "expected": [
+        "video-use",
+        "seek-and-analyze-video"
+      ],
+      "got": "youtube-summarizer",
+      "score1": 0.4931,
+      "margin": 0.025,
+      "top3": [
+        {
+          "name": "youtube-summarizer",
+          "score": 0.4931
+        },
+        {
+          "name": "videodb",
+          "score": 0.4682
+        },
+        {
+          "name": "ingest-youtube",
+          "score": 0.4088
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0.25,
+      "pass": false
+    },
+    "r-0103": {
+      "id": "r-0103",
+      "split": "dev",
+      "expected": [
+        "vercel-ai-sdk-expert"
+      ],
+      "got": "vercel-ai-sdk-expert",
+      "score1": 0.6607,
+      "margin": 0.1279,
+      "top3": [
+        {
+          "name": "vercel-ai-sdk-expert",
+          "score": 0.6607
+        },
+        {
+          "name": "llm-application-dev-ai-assistant",
+          "score": 0.5328
+        },
+        {
+          "name": "azure-ai-voicelive-java",
+          "score": 0.5243
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0104": {
+      "id": "r-0104",
+      "split": "dev",
+      "expected": [
+        "firebase"
+      ],
+      "got": "firebase",
+      "score1": 0.4714,
+      "margin": 0.0848,
+      "top3": [
+        {
+          "name": "firebase",
+          "score": 0.4714
+        },
+        {
+          "name": "nextjs-supabase-auth",
+          "score": 0.3866
+        },
+        {
+          "name": "expo-api-routes",
+          "score": 0.3005
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0105": {
+      "id": "r-0105",
+      "split": "dev",
+      "expected": [
+        "api-security-best-practices",
+        "security-auditor"
+      ],
+      "got": "api-security-testing",
+      "score1": 0.5851,
+      "margin": 0.0257,
+      "top3": [
+        {
+          "name": "api-security-testing",
+          "score": 0.5851
+        },
+        {
+          "name": "api-security-best-practices",
+          "score": 0.5594
+        },
+        {
+          "name": "api-endpoint-builder",
+          "score": 0.502
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.5,
+      "pass": false
+    },
+    "r-0106": {
+      "id": "r-0106",
+      "split": "dev",
+      "expected": [
+        "nosql-expert"
+      ],
+      "got": "nosql-expert",
+      "score1": 0.5775,
+      "margin": 0.1581,
+      "top3": [
+        {
+          "name": "nosql-expert",
+          "score": 0.5775
+        },
+        {
+          "name": "postgresql",
+          "score": 0.4194
+        },
+        {
+          "name": "graphql-architect",
+          "score": 0.3975
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0107": {
+      "id": "r-0107",
+      "split": "dev",
+      "expected": [
+        "makepad-font",
+        "makepad-basics"
+      ],
+      "got": "makepad-font",
+      "score1": 0.4041,
+      "margin": 0.0645,
+      "top3": [
+        {
+          "name": "makepad-font",
+          "score": 0.4041
+        },
+        {
+          "name": "makepad-shaders",
+          "score": 0.3396
+        },
+        {
+          "name": "stability-ai",
+          "score": 0.3375
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0108": {
+      "id": "r-0108",
+      "split": "dev",
+      "expected": [
+        "onboarding-psychologist",
+        "ux-persuasion-engineer",
+        "social-proof-architect"
+      ],
+      "got": "signup-flow-cro",
+      "score1": 0.3793,
+      "margin": 0.0163,
+      "top3": [
+        {
+          "name": "signup-flow-cro",
+          "score": 0.3793
+        },
+        {
+          "name": "churn-prevention",
+          "score": 0.363
+        },
+        {
+          "name": "paywall-upgrade-cro",
+          "score": 0.3298
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0109": {
+      "id": "r-0109",
+      "split": "dev",
+      "expected": [
+        "git-hooks-automation"
+      ],
+      "got": "git-hooks-automation",
+      "score1": 0.7633,
+      "margin": 0.1634,
+      "top3": [
+        {
+          "name": "git-hooks-automation",
+          "score": 0.7633
+        },
+        {
+          "name": "ast-grep-enforcer",
+          "score": 0.5999
+        },
+        {
+          "name": "git-pr-review",
+          "score": 0.5993
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0110": {
+      "id": "r-0110",
+      "split": "dev",
+      "expected": [
+        "differential-review"
+      ],
+      "got": "differential-review",
+      "score1": 0.5415,
+      "margin": 0.0607,
+      "top3": [
+        {
+          "name": "differential-review",
+          "score": 0.5415
+        },
+        {
+          "name": "security-audit",
+          "score": 0.4808
+        },
+        {
+          "name": "vulnerability-scanner",
+          "score": 0.4498
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0111": {
+      "id": "r-0111",
+      "split": "dev",
+      "expected": [
+        "stripe-automation",
+        "stripe-integration"
+      ],
+      "got": "stripe-automation",
+      "score1": 0.5942,
+      "margin": 0.0342,
+      "top3": [
+        {
+          "name": "stripe-automation",
+          "score": 0.5942
+        },
+        {
+          "name": "payment-integration",
+          "score": 0.5601
+        },
+        {
+          "name": "stripe-integration",
+          "score": 0.5053
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0112": {
+      "id": "r-0112",
+      "split": "dev",
+      "expected": [
+        "c4-architecture-c4-architecture",
+        "adr-architecture"
+      ],
+      "got": "adr-architecture",
+      "score1": 0.5903,
+      "margin": 0.0578,
+      "top3": [
+        {
+          "name": "adr-architecture",
+          "score": 0.5903
+        },
+        {
+          "name": "c4-architecture-c4-architecture",
+          "score": 0.5326
+        },
+        {
+          "name": "c4-context",
+          "score": 0.5323
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0113": {
+      "id": "r-0113",
+      "split": "dev",
+      "expected": [
+        "linux-shell-scripting",
+        "bash-scripting"
+      ],
+      "got": "linux-shell-scripting",
+      "score1": 0.4569,
+      "margin": 0.0601,
+      "top3": [
+        {
+          "name": "linux-shell-scripting",
+          "score": 0.4569
+        },
+        {
+          "name": "datadog-automation",
+          "score": 0.3968
+        },
+        {
+          "name": "linux-troubleshooting",
+          "score": 0.3822
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0114": {
+      "id": "r-0114",
+      "split": "dev",
+      "expected": [
+        "azure-eventhub-rust",
+        "azure-eventhub-py"
+      ],
+      "got": "azure-eventhub-rust",
+      "score1": 0.6961,
+      "margin": 0.057,
+      "top3": [
+        {
+          "name": "azure-eventhub-rust",
+          "score": 0.6961
+        },
+        {
+          "name": "azure-eventhub-ts",
+          "score": 0.6391
+        },
+        {
+          "name": "azure-eventhub-py",
+          "score": 0.6179
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0115": {
+      "id": "r-0115",
+      "split": "dev",
+      "expected": [
+        "api-documentation",
+        "api-documenter",
+        "openapi-spec-generation"
+      ],
+      "got": "api-documentation",
+      "score1": 0.733,
+      "margin": 0.0342,
+      "top3": [
+        {
+          "name": "api-documentation",
+          "score": 0.733
+        },
+        {
+          "name": "api-documenter",
+          "score": 0.6988
+        },
+        {
+          "name": "openapi-spec-generation",
+          "score": 0.6183
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0116": {
+      "id": "r-0116",
+      "split": "dev",
+      "expected": [
+        "tdd-workflow",
+        "test-driven-development"
+      ],
+      "got": "javascript-testing-patterns",
+      "score1": 0.5444,
+      "margin": 0.0786,
+      "top3": [
+        {
+          "name": "javascript-testing-patterns",
+          "score": 0.5444
+        },
+        {
+          "name": "web3-testing",
+          "score": 0.4658
+        },
+        {
+          "name": "fp-ts-errors",
+          "score": 0.4568
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0117": {
+      "id": "r-0117",
+      "split": "dev",
+      "expected": [
+        "azure-monitor-ingestion-py",
+        "azure-monitor-query-py"
+      ],
+      "got": "azure-monitor-query-java",
+      "score1": 0.7251,
+      "margin": 0.0232,
+      "top3": [
+        {
+          "name": "azure-monitor-query-java",
+          "score": 0.7251
+        },
+        {
+          "name": "azure-monitor-ingestion-java",
+          "score": 0.7019
+        },
+        {
+          "name": "azure-monitor-ingestion-py",
+          "score": 0.6573
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.3333,
+      "pass": false
+    },
+    "r-0118": {
+      "id": "r-0118",
+      "split": "dev",
+      "expected": [
+        "headline-psychologist",
+        "copywriting-psychologist"
+      ],
+      "got": "gpt-taste",
+      "score1": 0.403,
+      "margin": 0.0178,
+      "top3": [
+        {
+          "name": "gpt-taste",
+          "score": 0.403
+        },
+        {
+          "name": "page-cro",
+          "score": 0.3853
+        },
+        {
+          "name": "mock-hunter",
+          "score": 0.3663
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0119": {
+      "id": "r-0119",
+      "split": "dev",
+      "expected": [
+        "gha-security-review"
+      ],
+      "got": "gha-security-review",
+      "score1": 0.6359,
+      "margin": 0.0123,
+      "top3": [
+        {
+          "name": "gha-security-review",
+          "score": 0.6359
+        },
+        {
+          "name": "codebase-audit-pre-push",
+          "score": 0.6236
+        },
+        {
+          "name": "github",
+          "score": 0.5799
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0120": {
+      "id": "r-0120",
+      "split": "dev",
+      "expected": [
+        "cc-skill-strategic-compact",
+        "cc-skill-continuous-learning"
+      ],
+      "got": "context-compression",
+      "score1": 0.6411,
+      "margin": 0.0598,
+      "top3": [
+        {
+          "name": "context-compression",
+          "score": 0.6411
+        },
+        {
+          "name": "lambda-lang",
+          "score": 0.5813
+        },
+        {
+          "name": "recursive-context-pruning-token-budgeting",
+          "score": 0.5749
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0121": {
+      "id": "r-0121",
+      "split": "dev",
+      "expected": [
+        "mcp-tool-developer",
+        "mcp-builder"
+      ],
+      "got": "mcp-tool-developer",
+      "score1": 0.548,
+      "margin": 0.0352,
+      "top3": [
+        {
+          "name": "mcp-tool-developer",
+          "score": 0.548
+        },
+        {
+          "name": "seo-aeo-schema-generator",
+          "score": 0.5128
+        },
+        {
+          "name": "contract-first-api",
+          "score": 0.488
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0122": {
+      "id": "r-0122",
+      "split": "dev",
+      "expected": [
+        "fitness-analyzer",
+        "nutrition-analyzer",
+        "mental-health-analyzer",
+        "occupational-health-analyzer"
+      ],
+      "got": "sleep-analyzer",
+      "score1": 0.3532,
+      "margin": 0.02,
+      "top3": [
+        {
+          "name": "sleep-analyzer",
+          "score": 0.3532
+        },
+        {
+          "name": "claude-ally-health",
+          "score": 0.3332
+        },
+        {
+          "name": "hugging-face-trackio",
+          "score": 0.311
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0123": {
+      "id": "r-0123",
+      "split": "dev",
+      "expected": [
+        "vizcom"
+      ],
+      "got": "vizcom",
+      "score1": 0.6907,
+      "margin": 0.2418,
+      "top3": [
+        {
+          "name": "vizcom",
+          "score": 0.6907
+        },
+        {
+          "name": "render-automation",
+          "score": 0.4489
+        },
+        {
+          "name": "product-design",
+          "score": 0.4481
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0124": {
+      "id": "r-0124",
+      "split": "dev",
+      "expected": null,
+      "got": "daily",
+      "score1": 0.2038,
+      "margin": 0.0235,
+      "top3": [
+        {
+          "name": "daily",
+          "score": 0.2038
+        },
+        {
+          "name": "production-code-audit",
+          "score": 0.1803
+        },
+        {
+          "name": "notebooklm",
+          "score": 0.1708
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0125": {
+      "id": "r-0125",
+      "split": "dev",
+      "expected": null,
+      "got": "javascript-mastery",
+      "score1": 0.2763,
+      "margin": 0.0464,
+      "top3": [
+        {
+          "name": "javascript-mastery",
+          "score": 0.2763
+        },
+        {
+          "name": "explain-like-socrates",
+          "score": 0.2299
+        },
+        {
+          "name": "avoid-ai-writing",
+          "score": 0.2128
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0126": {
+      "id": "r-0126",
+      "split": "dev",
+      "expected": null,
+      "got": "recsys-pipeline-architect",
+      "score1": 0.324,
+      "margin": 0.0566,
+      "top3": [
+        {
+          "name": "recsys-pipeline-architect",
+          "score": 0.324
+        },
+        {
+          "name": "leiloeiro-avaliacao",
+          "score": 0.2675
+        },
+        {
+          "name": "bun-development",
+          "score": 0.2561
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0127": {
+      "id": "r-0127",
+      "split": "dev",
+      "expected": null,
+      "got": "bun-development",
+      "score1": 0.1936,
+      "margin": 0.0051,
+      "top3": [
+        {
+          "name": "bun-development",
+          "score": 0.1936
+        },
+        {
+          "name": "apify-market-research",
+          "score": 0.1885
+        },
+        {
+          "name": "frontend-developer",
+          "score": 0.1877
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0128": {
+      "id": "r-0128",
+      "split": "dev",
+      "expected": null,
+      "got": "sql-optimization-patterns",
+      "score1": 0.227,
+      "margin": 0.0237,
+      "top3": [
+        {
+          "name": "sql-optimization-patterns",
+          "score": 0.227
+        },
+        {
+          "name": "expo-deployment",
+          "score": 0.2032
+        },
+        {
+          "name": "gitops-workflow",
+          "score": 0.1961
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0129": {
+      "id": "r-0129",
+      "split": "dev",
+      "expected": null,
+      "got": "close-automation",
+      "score1": 0.1563,
+      "margin": 0.0071,
+      "top3": [
+        {
+          "name": "close-automation",
+          "score": 0.1563
+        },
+        {
+          "name": "junta-leiloeiros",
+          "score": 0.1492
+        },
+        {
+          "name": "faf-wizard",
+          "score": 0.1486
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0130": {
+      "id": "r-0130",
+      "split": "dev",
+      "expected": null,
+      "got": "leiloeiro-avaliacao",
+      "score1": 0.3402,
+      "margin": 0.0217,
+      "top3": [
+        {
+          "name": "leiloeiro-avaliacao",
+          "score": 0.3402
+        },
+        {
+          "name": "advogado-especialista",
+          "score": 0.3185
+        },
+        {
+          "name": "social-orchestrator",
+          "score": 0.3054
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0131": {
+      "id": "r-0131",
+      "split": "dev",
+      "expected": null,
+      "got": "beautiful-prose",
+      "score1": 0.2481,
+      "margin": 0.0326,
+      "top3": [
+        {
+          "name": "beautiful-prose",
+          "score": 0.2481
+        },
+        {
+          "name": "langgraph",
+          "score": 0.2154
+        },
+        {
+          "name": "tokenwise",
+          "score": 0.2048
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0132": {
+      "id": "r-0132",
+      "split": "dev",
+      "expected": null,
+      "got": "swiftui-liquid-glass",
+      "score1": 0.2067,
+      "margin": 0.0227,
+      "top3": [
+        {
+          "name": "swiftui-liquid-glass",
+          "score": 0.2067
+        },
+        {
+          "name": "leiloeiro-avaliacao",
+          "score": 0.184
+        },
+        {
+          "name": "c4-container",
+          "score": 0.1146
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0133": {
+      "id": "r-0133",
+      "split": "dev",
+      "expected": null,
+      "got": "react-component-performance",
+      "score1": 0.1356,
+      "margin": 0.0043,
+      "top3": [
+        {
+          "name": "react-component-performance",
+          "score": 0.1356
+        },
+        {
+          "name": "makepad-shaders",
+          "score": 0.1313
+        },
+        {
+          "name": "speckit-updater",
+          "score": 0.1163
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0134": {
+      "id": "r-0134",
+      "split": "dev",
+      "expected": null,
+      "got": "matplotlib",
+      "score1": 0.2211,
+      "margin": 0.0021,
+      "top3": [
+        {
+          "name": "matplotlib",
+          "score": 0.2211
+        },
+        {
+          "name": "last30days",
+          "score": 0.219
+        },
+        {
+          "name": "bun-development",
+          "score": 0.2091
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0135": {
+      "id": "r-0135",
+      "split": "dev",
+      "expected": null,
+      "got": "junta-leiloeiros",
+      "score1": 0.2947,
+      "margin": 0.0055,
+      "top3": [
+        {
+          "name": "junta-leiloeiros",
+          "score": 0.2947
+        },
+        {
+          "name": "leiloeiro-avaliacao",
+          "score": 0.2892
+        },
+        {
+          "name": "ilya-sutskever",
+          "score": 0.2799
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0136": {
+      "id": "r-0136",
+      "split": "dev",
+      "expected": null,
+      "got": "code-review-checklist",
+      "score1": 0.3802,
+      "margin": 0.0189,
+      "top3": [
+        {
+          "name": "code-review-checklist",
+          "score": 0.3802
+        },
+        {
+          "name": "customs-trade-compliance",
+          "score": 0.3612
+        },
+        {
+          "name": "pentest-checklist",
+          "score": 0.3319
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0137": {
+      "id": "r-0137",
+      "split": "dev",
+      "expected": null,
+      "got": "superpowers-lab",
+      "score1": 0.2439,
+      "margin": 0.0109,
+      "top3": [
+        {
+          "name": "superpowers-lab",
+          "score": 0.2439
+        },
+        {
+          "name": "data-storytelling",
+          "score": 0.233
+        },
+        {
+          "name": "bulletmind",
+          "score": 0.2319
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0138": {
+      "id": "r-0138",
+      "split": "dev",
+      "expected": null,
+      "got": "makepad-shaders",
+      "score1": 0.2246,
+      "margin": 0.0411,
+      "top3": [
+        {
+          "name": "makepad-shaders",
+          "score": 0.2246
+        },
+        {
+          "name": "azure-cosmos-java",
+          "score": 0.1835
+        },
+        {
+          "name": "frontend-ui-dark-ts",
+          "score": 0.1827
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0139": {
+      "id": "r-0139",
+      "split": "dev",
+      "expected": null,
+      "got": "hugging-face-community-evals",
+      "score1": 0.2226,
+      "margin": 0.004,
+      "top3": [
+        {
+          "name": "hugging-face-community-evals",
+          "score": 0.2226
+        },
+        {
+          "name": "hugging-face-vision-trainer",
+          "score": 0.2186
+        },
+        {
+          "name": "hugging-face-papers",
+          "score": 0.2115
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0140": {
+      "id": "r-0140",
+      "split": "dev",
+      "expected": null,
+      "got": "make-automation",
+      "score1": 0.225,
+      "margin": 0.0409,
+      "top3": [
+        {
+          "name": "make-automation",
+          "score": 0.225
+        },
+        {
+          "name": "expo-ui-swift-ui",
+          "score": 0.1841
+        },
+        {
+          "name": "react-native-architecture",
+          "score": 0.1783
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0141": {
+      "id": "r-0141",
+      "split": "dev",
+      "expected": null,
+      "got": "playwright-skill",
+      "score1": 0.1871,
+      "margin": 0.0151,
+      "top3": [
+        {
+          "name": "playwright-skill",
+          "score": 0.1871
+        },
+        {
+          "name": "advanced-evaluation",
+          "score": 0.172
+        },
+        {
+          "name": "sharp-edges",
+          "score": 0.1689
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0142": {
+      "id": "r-0142",
+      "split": "dev",
+      "expected": null,
+      "got": "explain-like-socrates",
+      "score1": 0.2974,
+      "margin": 0.0303,
+      "top3": [
+        {
+          "name": "explain-like-socrates",
+          "score": 0.2974
+        },
+        {
+          "name": "tutorial-engineer",
+          "score": 0.2671
+        },
+        {
+          "name": "code-documentation-code-explain",
+          "score": 0.2639
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0143": {
+      "id": "r-0143",
+      "split": "dev",
+      "expected": null,
+      "got": "food-database-query",
+      "score1": 0.3474,
+      "margin": 0.1054,
+      "top3": [
+        {
+          "name": "food-database-query",
+          "score": 0.3474
+        },
+        {
+          "name": "jira-automation",
+          "score": 0.2421
+        },
+        {
+          "name": "monday-automation",
+          "score": 0.2382
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0144": {
+      "id": "r-0144",
+      "split": "dev",
+      "expected": null,
+      "got": "claude-in-chrome-troubleshooting",
+      "score1": 0.274,
+      "margin": 0.0035,
+      "top3": [
+        {
+          "name": "claude-in-chrome-troubleshooting",
+          "score": 0.274
+        },
+        {
+          "name": "manifest",
+          "score": 0.2705
+        },
+        {
+          "name": "upgrading-expo",
+          "score": 0.2431
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0145": {
+      "id": "r-0145",
+      "split": "dev",
+      "expected": null,
+      "got": "recallmax",
+      "score1": 0.1811,
+      "margin": 0.0108,
+      "top3": [
+        {
+          "name": "recallmax",
+          "score": 0.1811
+        },
+        {
+          "name": "options-flow-analyzer",
+          "score": 0.1704
+        },
+        {
+          "name": "llm-structured-output",
+          "score": 0.1621
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0146": {
+      "id": "r-0146",
+      "split": "dev",
+      "expected": null,
+      "got": "threejs-textures",
+      "score1": 0.1798,
+      "margin": 0.01,
+      "top3": [
+        {
+          "name": "threejs-textures",
+          "score": 0.1798
+        },
+        {
+          "name": "claude-d3js-skill",
+          "score": 0.1698
+        },
+        {
+          "name": "uv-package-manager",
+          "score": 0.1512
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0147": {
+      "id": "r-0147",
+      "split": "dev",
+      "expected": null,
+      "got": "langgraph",
+      "score1": 0.236,
+      "margin": 0.0014,
+      "top3": [
+        {
+          "name": "langgraph",
+          "score": 0.236
+        },
+        {
+          "name": "environment-setup-guide",
+          "score": 0.2346
+        },
+        {
+          "name": "systematic-debugging",
+          "score": 0.2145
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0148": {
+      "id": "r-0148",
+      "split": "test",
+      "expected": [
+        "cad-engineering"
+      ],
+      "got": "cad-engineering",
+      "score1": 0.5334,
+      "margin": 0.2218,
+      "top3": [
+        {
+          "name": "cad-engineering",
+          "score": 0.5334
+        },
+        {
+          "name": "rag-engineer",
+          "score": 0.3117
+        },
+        {
+          "name": "vizcom",
+          "score": 0.3107
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0149": {
+      "id": "r-0149",
+      "split": "test",
+      "expected": [
+        "3d-animations",
+        "3d-web-experience",
+        "threejs-shaders"
+      ],
+      "got": "3d-animations",
+      "score1": 0.5533,
+      "margin": 0.0188,
+      "top3": [
+        {
+          "name": "3d-animations",
+          "score": 0.5533
+        },
+        {
+          "name": "3d-web-experience",
+          "score": 0.5345
+        },
+        {
+          "name": "threejs-shaders",
+          "score": 0.4698
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0150": {
+      "id": "r-0150",
+      "split": "test",
+      "expected": [
+        "adr-architecture",
+        "architecture-decision-records",
+        "c4-architecture-c4-architecture"
+      ],
+      "got": "adr-architecture",
+      "score1": 0.6058,
+      "margin": 0.117,
+      "top3": [
+        {
+          "name": "adr-architecture",
+          "score": 0.6058
+        },
+        {
+          "name": "documentation-and-adrs",
+          "score": 0.4888
+        },
+        {
+          "name": "architecture-decision-records",
+          "score": 0.4624
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0151": {
+      "id": "r-0151",
+      "split": "test",
+      "expected": [
+        "ast-grep-enforcer"
+      ],
+      "got": "ast-grep-enforcer",
+      "score1": 0.4847,
+      "margin": 0.0557,
+      "top3": [
+        {
+          "name": "ast-grep-enforcer",
+          "score": 0.4847
+        },
+        {
+          "name": "fp-refactor",
+          "score": 0.429
+        },
+        {
+          "name": "fp-ts-errors",
+          "score": 0.4065
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0152": {
+      "id": "r-0152",
+      "split": "test",
+      "expected": [
+        "contract-first-api",
+        "openapi-spec-generation"
+      ],
+      "got": "contract-first-api",
+      "score1": 0.6779,
+      "margin": 0.1275,
+      "top3": [
+        {
+          "name": "contract-first-api",
+          "score": 0.6779
+        },
+        {
+          "name": "openapi-spec-generation",
+          "score": 0.5504
+        },
+        {
+          "name": "api-documentation",
+          "score": 0.5137
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0153": {
+      "id": "r-0153",
+      "split": "test",
+      "expected": [
+        "declarative-visualization"
+      ],
+      "got": "declarative-visualization",
+      "score1": 0.7656,
+      "margin": 0.379,
+      "top3": [
+        {
+          "name": "declarative-visualization",
+          "score": 0.7656
+        },
+        {
+          "name": "draw",
+          "score": 0.3866
+        },
+        {
+          "name": "json-canvas",
+          "score": 0.3304
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0154": {
+      "id": "r-0154",
+      "split": "test",
+      "expected": [
+        "gpt-researcher",
+        "deep-research"
+      ],
+      "got": "embedding-strategies",
+      "score1": 0.5064,
+      "margin": 0.0687,
+      "top3": [
+        {
+          "name": "embedding-strategies",
+          "score": 0.5064
+        },
+        {
+          "name": "vector-database-engineer",
+          "score": 0.4377
+        },
+        {
+          "name": "audio-transcriber",
+          "score": 0.4275
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0.125,
+      "pass": false
+    },
+    "r-0155": {
+      "id": "r-0155",
+      "split": "test",
+      "expected": [
+        "presentation-designer",
+        "python-pptx-generator"
+      ],
+      "got": "presentation-designer",
+      "score1": 0.614,
+      "margin": 0.2377,
+      "top3": [
+        {
+          "name": "presentation-designer",
+          "score": 0.614
+        },
+        {
+          "name": "tailwind-design-system",
+          "score": 0.3763
+        },
+        {
+          "name": "ux-flow",
+          "score": 0.3645
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0156": {
+      "id": "r-0156",
+      "split": "test",
+      "expected": [
+        "secret-guard"
+      ],
+      "got": "secret-guard",
+      "score1": 0.6697,
+      "margin": 0.2146,
+      "top3": [
+        {
+          "name": "secret-guard",
+          "score": 0.6697
+        },
+        {
+          "name": "git-pr-review",
+          "score": 0.4551
+        },
+        {
+          "name": "gha-security-review",
+          "score": 0.422
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0157": {
+      "id": "r-0157",
+      "split": "test",
+      "expected": [
+        "typst-research-paper"
+      ],
+      "got": "typst-research-paper",
+      "score1": 0.4454,
+      "margin": 0.105,
+      "top3": [
+        {
+          "name": "typst-research-paper",
+          "score": 0.4454
+        },
+        {
+          "name": "contract-first-api",
+          "score": 0.3404
+        },
+        {
+          "name": "fp-ts-pragmatic",
+          "score": 0.3102
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0158": {
+      "id": "r-0158",
+      "split": "test",
+      "expected": [
+        "azure-keyvault-keys-rust",
+        "azure-keyvault-secrets-rust"
+      ],
+      "got": "azure-keyvault-keys-rust",
+      "score1": 0.725,
+      "margin": 0.0349,
+      "top3": [
+        {
+          "name": "azure-keyvault-keys-rust",
+          "score": 0.725
+        },
+        {
+          "name": "azure-keyvault-certificates-rust",
+          "score": 0.6901
+        },
+        {
+          "name": "azure-keyvault-secrets-rust",
+          "score": 0.689
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0159": {
+      "id": "r-0159",
+      "split": "test",
+      "expected": [
+        "azure-security-keyvault-secrets-java",
+        "azure-security-keyvault-keys-java"
+      ],
+      "got": "azure-security-keyvault-secrets-java",
+      "score1": 0.8153,
+      "margin": 0.0216,
+      "top3": [
+        {
+          "name": "azure-security-keyvault-secrets-java",
+          "score": 0.8153
+        },
+        {
+          "name": "azure-security-keyvault-keys-java",
+          "score": 0.7937
+        },
+        {
+          "name": "azure-keyvault-secrets-ts",
+          "score": 0.7601
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0160": {
+      "id": "r-0160",
+      "split": "test",
+      "expected": [
+        "azure-storage-file-datalake-py",
+        "azure-storage-blob-py"
+      ],
+      "got": "azure-storage-file-datalake-py",
+      "score1": 0.723,
+      "margin": 0.0743,
+      "top3": [
+        {
+          "name": "azure-storage-file-datalake-py",
+          "score": 0.723
+        },
+        {
+          "name": "azure-storage-blob-py",
+          "score": 0.6487
+        },
+        {
+          "name": "azure-storage-blob-java",
+          "score": 0.5729
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0161": {
+      "id": "r-0161",
+      "split": "test",
+      "expected": [
+        "seo-page",
+        "seo-content"
+      ],
+      "got": "fixing-metadata",
+      "score1": 0.6071,
+      "margin": 0.0131,
+      "top3": [
+        {
+          "name": "fixing-metadata",
+          "score": 0.6071
+        },
+        {
+          "name": "seo-audit",
+          "score": 0.5939
+        },
+        {
+          "name": "seo-programmatic",
+          "score": 0.5808
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0162": {
+      "id": "r-0162",
+      "split": "test",
+      "expected": [
+        "seo-plan",
+        "seo-content"
+      ],
+      "got": "seo-content-planner",
+      "score1": 0.6487,
+      "margin": 0.0642,
+      "top3": [
+        {
+          "name": "seo-content-planner",
+          "score": 0.6487
+        },
+        {
+          "name": "seo-aeo-content-cluster",
+          "score": 0.5845
+        },
+        {
+          "name": "seo-keyword-strategist",
+          "score": 0.5491
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0163": {
+      "id": "r-0163",
+      "split": "test",
+      "expected": [
+        "objection-preemptor",
+        "ux-persuasion-engineer"
+      ],
+      "got": "churn-prevention",
+      "score1": 0.4057,
+      "margin": 0.0546,
+      "top3": [
+        {
+          "name": "churn-prevention",
+          "score": 0.4057
+        },
+        {
+          "name": "pricing-strategy",
+          "score": 0.3512
+        },
+        {
+          "name": "billing-automation",
+          "score": 0.3235
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0164": {
+      "id": "r-0164",
+      "split": "test",
+      "expected": [
+        "error-debugging-error-trace",
+        "error-diagnostics-error-trace",
+        "distributed-debugging-debug-trace"
+      ],
+      "got": "azure-monitor-opentelemetry-ts",
+      "score1": 0.4563,
+      "margin": 0.0577,
+      "top3": [
+        {
+          "name": "azure-monitor-opentelemetry-ts",
+          "score": 0.4563
+        },
+        {
+          "name": "production-audit",
+          "score": 0.3986
+        },
+        {
+          "name": "distributed-tracing",
+          "score": 0.3721
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0165": {
+      "id": "r-0165",
+      "split": "test",
+      "expected": [
+        "docker-expert"
+      ],
+      "got": "devops-deploy",
+      "score1": 0.4017,
+      "margin": 0.0383,
+      "top3": [
+        {
+          "name": "devops-deploy",
+          "score": 0.4017
+        },
+        {
+          "name": "odoo-docker-deployment",
+          "score": 0.3633
+        },
+        {
+          "name": "k8s-manifest-generator",
+          "score": 0.3562
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0166": {
+      "id": "r-0166",
+      "split": "test",
+      "expected": [
+        "kubernetes-architect",
+        "kubernetes-deployment"
+      ],
+      "got": "gitops-workflow",
+      "score1": 0.6454,
+      "margin": 0.1732,
+      "top3": [
+        {
+          "name": "gitops-workflow",
+          "score": 0.6454
+        },
+        {
+          "name": "kubernetes-architect",
+          "score": 0.4722
+        },
+        {
+          "name": "istio-traffic-management",
+          "score": 0.4711
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.5,
+      "pass": false
+    },
+    "r-0167": {
+      "id": "r-0167",
+      "split": "test",
+      "expected": [
+        "terraform-skill"
+      ],
+      "got": "terraform-aws-modules",
+      "score1": 0.6429,
+      "margin": 0.0247,
+      "top3": [
+        {
+          "name": "terraform-aws-modules",
+          "score": 0.6429
+        },
+        {
+          "name": "terraform-skill",
+          "score": 0.6182
+        },
+        {
+          "name": "terraform-module-library",
+          "score": 0.6165
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.5,
+      "pass": false
+    },
+    "r-0168": {
+      "id": "r-0168",
+      "split": "test",
+      "expected": [
+        "postgres-best-practices",
+        "postgresql"
+      ],
+      "got": "postgresql-optimization",
+      "score1": 0.5336,
+      "margin": 0.0919,
+      "top3": [
+        {
+          "name": "postgresql-optimization",
+          "score": 0.5336
+        },
+        {
+          "name": "sql-optimization-patterns",
+          "score": 0.4417
+        },
+        {
+          "name": "postgresql",
+          "score": 0.3753
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.3333,
+      "pass": false
+    },
+    "r-0169": {
+      "id": "r-0169",
+      "split": "test",
+      "expected": [
+        "react-best-practices",
+        "nextjs-app-router-patterns"
+      ],
+      "got": "react-best-practices",
+      "score1": 0.6523,
+      "margin": 0.036,
+      "top3": [
+        {
+          "name": "react-best-practices",
+          "score": 0.6523
+        },
+        {
+          "name": "nextjs-app-router-patterns",
+          "score": 0.6162
+        },
+        {
+          "name": "frontend-developer",
+          "score": 0.6053
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0170": {
+      "id": "r-0170",
+      "split": "test",
+      "expected": [
+        "typescript-expert"
+      ],
+      "got": "typescript-advanced-types",
+      "score1": 0.5366,
+      "margin": 0.0695,
+      "top3": [
+        {
+          "name": "typescript-advanced-types",
+          "score": 0.5366
+        },
+        {
+          "name": "typescript-pro",
+          "score": 0.4671
+        },
+        {
+          "name": "fp-ts-errors",
+          "score": 0.4619
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0.2,
+      "pass": false
+    },
+    "r-0171": {
+      "id": "r-0171",
+      "split": "dev",
+      "expected": [
+        "fastapi-pro"
+      ],
+      "got": "fastapi-pro",
+      "score1": 0.6446,
+      "margin": 0.0304,
+      "top3": [
+        {
+          "name": "fastapi-pro",
+          "score": 0.6446
+        },
+        {
+          "name": "python-fastapi-development",
+          "score": 0.6143
+        },
+        {
+          "name": "fastapi-router-py",
+          "score": 0.4581
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0172": {
+      "id": "r-0172",
+      "split": "test",
+      "expected": [
+        "playwright-skill",
+        "e2e-testing-patterns"
+      ],
+      "got": "e2e-testing",
+      "score1": 0.5588,
+      "margin": 0.0887,
+      "top3": [
+        {
+          "name": "e2e-testing",
+          "score": 0.5588
+        },
+        {
+          "name": "go-playwright",
+          "score": 0.47
+        },
+        {
+          "name": "azure-microsoft-playwright-testing-ts",
+          "score": 0.4271
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0173": {
+      "id": "r-0173",
+      "split": "test",
+      "expected": [
+        "broken-authentication",
+        "auth-implementation-patterns",
+        "security-auditor"
+      ],
+      "got": "security-audit",
+      "score1": 0.4855,
+      "margin": 0.0421,
+      "top3": [
+        {
+          "name": "security-audit",
+          "score": 0.4855
+        },
+        {
+          "name": "reference-security-checklist",
+          "score": 0.4434
+        },
+        {
+          "name": "broken-authentication",
+          "score": 0.4234
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.3333,
+      "pass": false
+    },
+    "r-0174": {
+      "id": "r-0174",
+      "split": "test",
+      "expected": [
+        "sql-injection-testing"
+      ],
+      "got": "sql-injection-testing",
+      "score1": 0.7497,
+      "margin": 0.1042,
+      "top3": [
+        {
+          "name": "sql-injection-testing",
+          "score": 0.7497
+        },
+        {
+          "name": "sqlmap-database-pentesting",
+          "score": 0.6455
+        },
+        {
+          "name": "xss-html-injection",
+          "score": 0.5235
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0175": {
+      "id": "r-0175",
+      "split": "test",
+      "expected": [
+        "git-advanced-workflows"
+      ],
+      "got": "git-pr-review",
+      "score1": 0.59,
+      "margin": 0.0721,
+      "top3": [
+        {
+          "name": "git-pr-review",
+          "score": 0.59
+        },
+        {
+          "name": "git-advanced-workflows",
+          "score": 0.5178
+        },
+        {
+          "name": "wiki-changelog",
+          "score": 0.4898
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.5,
+      "pass": false
+    },
+    "r-0176": {
+      "id": "r-0176",
+      "split": "test",
+      "expected": [
+        "llm-evaluation",
+        "rag-engineer"
+      ],
+      "got": "llm-evaluation",
+      "score1": 0.4144,
+      "margin": 0.0046,
+      "top3": [
+        {
+          "name": "llm-evaluation",
+          "score": 0.4144
+        },
+        {
+          "name": "customer-psychographic-profiler",
+          "score": 0.4099
+        },
+        {
+          "name": "advanced-evaluation",
+          "score": 0.4067
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0177": {
+      "id": "r-0177",
+      "split": "test",
+      "expected": [
+        "rag-engineer"
+      ],
+      "got": "azure-search-documents-ts",
+      "score1": 0.5614,
+      "margin": 0.0233,
+      "top3": [
+        {
+          "name": "azure-search-documents-ts",
+          "score": 0.5614
+        },
+        {
+          "name": "vexor",
+          "score": 0.5382
+        },
+        {
+          "name": "hybrid-search-implementation",
+          "score": 0.5287
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0178": {
+      "id": "r-0178",
+      "split": "test",
+      "expected": [
+        "mcp-builder",
+        "mcp-tool-developer"
+      ],
+      "got": "mcp-tool-developer",
+      "score1": 0.4873,
+      "margin": 0.0421,
+      "top3": [
+        {
+          "name": "mcp-tool-developer",
+          "score": 0.4873
+        },
+        {
+          "name": "javascript-typescript-typescript-scaffold",
+          "score": 0.4453
+        },
+        {
+          "name": "confluence-automation",
+          "score": 0.4329
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0179": {
+      "id": "r-0179",
+      "split": "test",
+      "expected": [
+        "makepad-layout",
+        "makepad-basics"
+      ],
+      "got": "makepad-skills",
+      "score1": 0.4778,
+      "margin": 0.1186,
+      "top3": [
+        {
+          "name": "makepad-skills",
+          "score": 0.4778
+        },
+        {
+          "name": "makepad-dsl",
+          "score": 0.3593
+        },
+        {
+          "name": "makepad-widgets",
+          "score": 0.3586
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0.2,
+      "pass": false
+    },
+    "r-0180": {
+      "id": "r-0180",
+      "split": "test",
+      "expected": [
+        "manim-video"
+      ],
+      "got": "manim-video",
+      "score1": 0.5145,
+      "margin": 0.0823,
+      "top3": [
+        {
+          "name": "manim-video",
+          "score": 0.5145
+        },
+        {
+          "name": "animejs-animation",
+          "score": 0.4322
+        },
+        {
+          "name": "frontend-slides",
+          "score": 0.4199
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0181": {
+      "id": "r-0181",
+      "split": "test",
+      "expected": [
+        "remotion-best-practices"
+      ],
+      "got": "remotion-best-practices",
+      "score1": 0.6679,
+      "margin": 0.1645,
+      "top3": [
+        {
+          "name": "remotion-best-practices",
+          "score": 0.6679
+        },
+        {
+          "name": "spline-3d-integration",
+          "score": 0.5034
+        },
+        {
+          "name": "frontend-developer",
+          "score": 0.4945
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0182": {
+      "id": "r-0182",
+      "split": "test",
+      "expected": [
+        "prometheus-configuration",
+        "grafana-dashboards"
+      ],
+      "got": "prometheus-configuration",
+      "score1": 0.5721,
+      "margin": 0.0595,
+      "top3": [
+        {
+          "name": "prometheus-configuration",
+          "score": 0.5721
+        },
+        {
+          "name": "k8s-security-policies",
+          "score": 0.5126
+        },
+        {
+          "name": "kubestellar-console",
+          "score": 0.4979
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0183": {
+      "id": "r-0183",
+      "split": "test",
+      "expected": [
+        "bash-scripting",
+        "linux-shell-scripting"
+      ],
+      "got": "bash-defensive-patterns",
+      "score1": 0.7273,
+      "margin": 0.0986,
+      "top3": [
+        {
+          "name": "bash-defensive-patterns",
+          "score": 0.7273
+        },
+        {
+          "name": "bash-scripting",
+          "score": 0.6287
+        },
+        {
+          "name": "bash-pro",
+          "score": 0.5678
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.5,
+      "pass": false
+    },
+    "r-0184": {
+      "id": "r-0184",
+      "split": "test",
+      "expected": [
+        "cloudflare-workers-expert"
+      ],
+      "got": "cloudflare-workers-expert",
+      "score1": 0.5695,
+      "margin": 0.0527,
+      "top3": [
+        {
+          "name": "cloudflare-workers-expert",
+          "score": 0.5695
+        },
+        {
+          "name": "hono",
+          "score": 0.5167
+        },
+        {
+          "name": "spark-optimization",
+          "score": 0.508
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0185": {
+      "id": "r-0185",
+      "split": "test",
+      "expected": [
+        "dbt-transformation-patterns"
+      ],
+      "got": "dbt-transformation-patterns",
+      "score1": 0.5312,
+      "margin": 0.0136,
+      "top3": [
+        {
+          "name": "dbt-transformation-patterns",
+          "score": 0.5312
+        },
+        {
+          "name": "monte-carlo-validation-notebook",
+          "score": 0.5176
+        },
+        {
+          "name": "data-quality-frameworks",
+          "score": 0.4842
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0186": {
+      "id": "r-0186",
+      "split": "test",
+      "expected": [
+        "spark-optimization"
+      ],
+      "got": "spark-optimization",
+      "score1": 0.7353,
+      "margin": 0.246,
+      "top3": [
+        {
+          "name": "spark-optimization",
+          "score": 0.7353
+        },
+        {
+          "name": "data-engineer",
+          "score": 0.4893
+        },
+        {
+          "name": "postgresql-optimization",
+          "score": 0.4473
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0187": {
+      "id": "r-0187",
+      "split": "test",
+      "expected": [
+        "swiftui-expert-skill"
+      ],
+      "got": "swiftui-ui-patterns",
+      "score1": 0.6014,
+      "margin": 0.0124,
+      "top3": [
+        {
+          "name": "swiftui-ui-patterns",
+          "score": 0.6014
+        },
+        {
+          "name": "swiftui-view-refactor",
+          "score": 0.5891
+        },
+        {
+          "name": "swiftui-expert-skill",
+          "score": 0.5122
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.3333,
+      "pass": false
+    },
+    "r-0188": {
+      "id": "r-0188",
+      "split": "test",
+      "expected": [
+        "solidity-security"
+      ],
+      "got": "production-audit",
+      "score1": 0.4352,
+      "margin": 0.0757,
+      "top3": [
+        {
+          "name": "production-audit",
+          "score": 0.4352
+        },
+        {
+          "name": "fix-review",
+          "score": 0.3595
+        },
+        {
+          "name": "tool-use-guardian",
+          "score": 0.3564
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0189": {
+      "id": "r-0189",
+      "split": "test",
+      "expected": [
+        "unity-ecs-patterns"
+      ],
+      "got": "unity-ecs-patterns",
+      "score1": 0.5237,
+      "margin": 0.0858,
+      "top3": [
+        {
+          "name": "unity-ecs-patterns",
+          "score": 0.5237
+        },
+        {
+          "name": "bevy-ecs-expert",
+          "score": 0.4378
+        },
+        {
+          "name": "freshservice-automation",
+          "score": 0.3642
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0190": {
+      "id": "r-0190",
+      "split": "test",
+      "expected": [
+        "xlsx-official"
+      ],
+      "got": "googlesheets-automation",
+      "score1": 0.4885,
+      "margin": 0.0236,
+      "top3": [
+        {
+          "name": "googlesheets-automation",
+          "score": 0.4885
+        },
+        {
+          "name": "bilig-workpaper",
+          "score": 0.4648
+        },
+        {
+          "name": "startup-business-analyst-financial-projections",
+          "score": 0.4394
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0191": {
+      "id": "r-0191",
+      "split": "test",
+      "expected": [
+        "pdf-official"
+      ],
+      "got": "pdf-official",
+      "score1": 0.5476,
+      "margin": 0.0827,
+      "top3": [
+        {
+          "name": "pdf-official",
+          "score": 0.5476
+        },
+        {
+          "name": "pdf-conversion-router",
+          "score": 0.4649
+        },
+        {
+          "name": "writer",
+          "score": 0.3576
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0192": {
+      "id": "r-0192",
+      "split": "test",
+      "expected": [
+        "tailwind-patterns"
+      ],
+      "got": "tailwind-patterns",
+      "score1": 0.6494,
+      "margin": 0.009,
+      "top3": [
+        {
+          "name": "tailwind-patterns",
+          "score": 0.6494
+        },
+        {
+          "name": "tailwind-design-system",
+          "score": 0.6404
+        },
+        {
+          "name": "frontend-ui-dark-ts",
+          "score": 0.5176
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0193": {
+      "id": "r-0193",
+      "split": "test",
+      "expected": [
+        "rust-async-patterns"
+      ],
+      "got": "rust-async-patterns",
+      "score1": 0.6243,
+      "margin": 0.1023,
+      "top3": [
+        {
+          "name": "rust-async-patterns",
+          "score": 0.6243
+        },
+        {
+          "name": "rust-pro",
+          "score": 0.5219
+        },
+        {
+          "name": "swift-concurrency-expert",
+          "score": 0.4442
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0194": {
+      "id": "r-0194",
+      "split": "test",
+      "expected": [
+        "graphql",
+        "graphql-architect"
+      ],
+      "got": "graphql-architect",
+      "score1": 0.5455,
+      "margin": 0.0109,
+      "top3": [
+        {
+          "name": "graphql-architect",
+          "score": 0.5455
+        },
+        {
+          "name": "graphql",
+          "score": 0.5346
+        },
+        {
+          "name": "api-design-principles",
+          "score": 0.4905
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0195": {
+      "id": "r-0195",
+      "split": "test",
+      "expected": [
+        "stripe-integration",
+        "stripe-automation"
+      ],
+      "got": "payment-integration",
+      "score1": 0.5672,
+      "margin": 0.0302,
+      "top3": [
+        {
+          "name": "payment-integration",
+          "score": 0.5672
+        },
+        {
+          "name": "stripe-integration",
+          "score": 0.537
+        },
+        {
+          "name": "stripe-automation",
+          "score": 0.4942
+        }
+      ],
+      "hit1": false,
+      "hit3": true,
+      "rr": 0.5,
+      "pass": false
+    },
+    "r-0196": {
+      "id": "r-0196",
+      "split": "test",
+      "expected": [
+        "vercel-deployment",
+        "vercel-automation"
+      ],
+      "got": "vercel-deployment",
+      "score1": 0.3978,
+      "margin": 0.0439,
+      "top3": [
+        {
+          "name": "vercel-deployment",
+          "score": 0.3978
+        },
+        {
+          "name": "vercel-automation",
+          "score": 0.3539
+        },
+        {
+          "name": "turborepo-caching",
+          "score": 0.3533
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0197": {
+      "id": "r-0197",
+      "split": "test",
+      "expected": [
+        "hig-technologies",
+        "hig-components-controls"
+      ],
+      "got": "hig-foundations",
+      "score1": 0.5918,
+      "margin": 0.0361,
+      "top3": [
+        {
+          "name": "hig-foundations",
+          "score": 0.5918
+        },
+        {
+          "name": "hig-patterns",
+          "score": 0.5557
+        },
+        {
+          "name": "hig-platforms",
+          "score": 0.5414
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0.1429,
+      "pass": false
+    },
+    "r-0198": {
+      "id": "r-0198",
+      "split": "test",
+      "expected": [
+        "python-packaging"
+      ],
+      "got": "python-packaging",
+      "score1": 0.6442,
+      "margin": 0.2307,
+      "top3": [
+        {
+          "name": "python-packaging",
+          "score": 0.6442
+        },
+        {
+          "name": "python-development-python-scaffold",
+          "score": 0.4135
+        },
+        {
+          "name": "python-pptx-generator",
+          "score": 0.4008
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0199": {
+      "id": "r-0199",
+      "split": "test",
+      "expected": [
+        "github-actions-templates",
+        "gha-security-review"
+      ],
+      "got": "github-actions-templates",
+      "score1": 0.43,
+      "margin": 0.0063,
+      "top3": [
+        {
+          "name": "github-actions-templates",
+          "score": 0.43
+        },
+        {
+          "name": "aws-secrets-rotation",
+          "score": 0.4237
+        },
+        {
+          "name": "secret-guard",
+          "score": 0.415
+        }
+      ],
+      "hit1": true,
+      "hit3": true,
+      "rr": 1,
+      "pass": true
+    },
+    "r-0200": {
+      "id": "r-0200",
+      "split": "test",
+      "expected": null,
+      "got": "make-automation",
+      "score1": 0.1857,
+      "margin": 0.0122,
+      "top3": [
+        {
+          "name": "make-automation",
+          "score": 0.1857
+        },
+        {
+          "name": "drizzle-orm-expert",
+          "score": 0.1735
+        },
+        {
+          "name": "daily",
+          "score": 0.1706
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0201": {
+      "id": "r-0201",
+      "split": "test",
+      "expected": null,
+      "got": "latex-paper-conversion",
+      "score1": 0.212,
+      "margin": 0.0034,
+      "top3": [
+        {
+          "name": "latex-paper-conversion",
+          "score": 0.212
+        },
+        {
+          "name": "convertkit-automation",
+          "score": 0.2086
+        },
+        {
+          "name": "favicon",
+          "score": 0.1653
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0202": {
+      "id": "r-0202",
+      "split": "test",
+      "expected": null,
+      "got": "brooks-lint",
+      "score1": 0.268,
+      "margin": 0.0445,
+      "top3": [
+        {
+          "name": "brooks-lint",
+          "score": 0.268
+        },
+        {
+          "name": "rich-elicitation",
+          "score": 0.2234
+        },
+        {
+          "name": "tokenwise",
+          "score": 0.2006
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0203": {
+      "id": "r-0203",
+      "split": "test",
+      "expected": null,
+      "got": "recsys-pipeline-architect",
+      "score1": 0.2106,
+      "margin": 0.0438,
+      "top3": [
+        {
+          "name": "recsys-pipeline-architect",
+          "score": 0.2106
+        },
+        {
+          "name": "azure-microsoft-playwright-testing-ts",
+          "score": 0.1667
+        },
+        {
+          "name": "moodle-external-api-development",
+          "score": 0.1658
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0204": {
+      "id": "r-0204",
+      "split": "test",
+      "expected": null,
+      "got": "prometheus-configuration",
+      "score1": 0.1668,
+      "margin": 0.0146,
+      "top3": [
+        {
+          "name": "prometheus-configuration",
+          "score": 0.1668
+        },
+        {
+          "name": "astropy",
+          "score": 0.1522
+        },
+        {
+          "name": "earllm-build",
+          "score": 0.1498
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0205": {
+      "id": "r-0205",
+      "split": "test",
+      "expected": null,
+      "got": "cold-email",
+      "score1": 0.4338,
+      "margin": 0.0986,
+      "top3": [
+        {
+          "name": "cold-email",
+          "score": 0.4338
+        },
+        {
+          "name": "onboarding-cro",
+          "score": 0.3352
+        },
+        {
+          "name": "sales-automator",
+          "score": 0.3109
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": false
+    },
+    "r-0206": {
+      "id": "r-0206",
+      "split": "test",
+      "expected": null,
+      "got": "startup-metrics-framework",
+      "score1": 0.3125,
+      "margin": 0.014,
+      "top3": [
+        {
+          "name": "startup-metrics-framework",
+          "score": 0.3125
+        },
+        {
+          "name": "startup-business-analyst-business-case",
+          "score": 0.2985
+        },
+        {
+          "name": "startup-financial-modeling",
+          "score": 0.2858
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0207": {
+      "id": "r-0207",
+      "split": "test",
+      "expected": null,
+      "got": "astropy",
+      "score1": 0.2649,
+      "margin": 0.0461,
+      "top3": [
+        {
+          "name": "astropy",
+          "score": 0.2649
+        },
+        {
+          "name": "azure-cosmos-py",
+          "score": 0.2188
+        },
+        {
+          "name": "azure-cosmos-java",
+          "score": 0.2119
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0208": {
+      "id": "r-0208",
+      "split": "test",
+      "expected": null,
+      "got": "remotion-best-practices",
+      "score1": 0.2003,
+      "margin": 0.0018,
+      "top3": [
+        {
+          "name": "remotion-best-practices",
+          "score": 0.2003
+        },
+        {
+          "name": "nx-workspace-patterns",
+          "score": 0.1985
+        },
+        {
+          "name": "react-state-management",
+          "score": 0.1885
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0209": {
+      "id": "r-0209",
+      "split": "test",
+      "expected": null,
+      "got": "playwright-java",
+      "score1": 0.2502,
+      "margin": 0.0136,
+      "top3": [
+        {
+          "name": "playwright-java",
+          "score": 0.2502
+        },
+        {
+          "name": "pypict-skill",
+          "score": 0.2366
+        },
+        {
+          "name": "ux-audit",
+          "score": 0.2296
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    },
+    "r-0210": {
+      "id": "r-0210",
+      "split": "test",
+      "expected": null,
+      "got": "daily-gift",
+      "score1": 0.2867,
+      "margin": 0.0586,
+      "top3": [
+        {
+          "name": "daily-gift",
+          "score": 0.2867
+        },
+        {
+          "name": "seo-meta-optimizer",
+          "score": 0.2282
+        },
+        {
+          "name": "frontend-slides",
+          "score": 0.228
+        }
+      ],
+      "hit1": false,
+      "hit3": false,
+      "rr": 0,
+      "pass": true
+    }
+  }
+}
