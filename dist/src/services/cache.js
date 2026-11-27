@@ -5,7 +5,7 @@ const { LRUCache } = require('lru-cache');
 const { logAccess, warn } = require('../utils/logger');
 const { findMainMd } = require('../utils/fs-utils');
 const metrics = require('../utils/metrics');
-const getSkillsDir = () => process.env.ASE_ROOT || path.resolve(__dirname, __dirname.includes('tools/server') ? '../../../../' : '../../');
+const getSkillsDir = () => process.env.ASE_ROOT || path.resolve(__dirname, '../..');
 class SkillCache {
     constructor() {
         this.cache = new LRUCache({

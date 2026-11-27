@@ -404,30 +404,37 @@ class EmbeddingService {
         // dimension used to build the stored embeddings. Must run before any
         // skill is read from or written to the index.
         await this._validateModelMetadataAsync();
-        let files;
-        try {
-            files = await fs.readdir(this.skillsDir);
-        }
-        catch (err) {
-            warn('EmbeddingService', `Cannot read SKILLS_DIR: ${err.message}`, { path: this.skillsDir });
-            return;
-        }
         const tasks = [];
-        for (const entry of files) {
-            if (entry.startsWith('.') || entry === 'tools' || entry === 'docs')
-                continue;
-            let stat;
+        const seen = new Set();
+        const walkSkills = async (dir, depth = 0) => {
+            let entries;
             try {
-                stat = await fs.stat(path.join(this.skillsDir, entry));
+                entries = await fs.readdir(dir, { withFileTypes: true });
             }
             catch (err) {
-                warn('EmbeddingService', `stat failed for entry "${entry}": ${err.message}`);
-                continue;
+                if (depth === 0)
+                    warn('EmbeddingService', `Cannot read SKILLS_DIR: ${err.message}`, { path: this.skillsDir });
+                return;
             }
-            if (!stat.isDirectory())
-                continue;
-            tasks.push({ entry, skillPath: path.join(this.skillsDir, entry) });
-        }
+            for (const entry of entries) {
+                if (entry.name.startsWith('.'))
+                    continue;
+                if (depth === 0 && (entry.name === 'tools' || entry.name === 'docs'))
+                    continue;
+                const full = path.join(dir, entry.name);
+                if (entry.isDirectory()) {
+                    await walkSkills(full, depth + 1);
+                }
+                else if (entry.name === 'SKILL.md' && depth >= 1) {
+                    const relName = path.relative(this.skillsDir, dir).split(path.sep).join('/');
+                    if (!seen.has(relName)) {
+                        seen.add(relName);
+                        tasks.push({ entry: relName, skillPath: dir, mdFile: full });
+                    }
+                }
+            }
+        };
+        await walkSkills(this.skillsDir, 0);
         const CONCURRENCY_LIMIT = 5;
         const stmt = this.db.prepare(`
       INSERT INTO skills (name, description, embedding, tokenEstimate, hash)
@@ -445,14 +452,16 @@ class EmbeddingService {
         for (let i = 0; i < tasks.length; i += CONCURRENCY_LIMIT) {
             const chunk = tasks.slice(i, i + CONCURRENCY_LIMIT);
             const updatesToExecute = [];
-            await Promise.all(chunk.map(async ({ entry, skillPath }) => {
-                let mdFile;
-                try {
-                    mdFile = await findMainMd(skillPath);
-                }
-                catch (err) {
-                    warn('EmbeddingService', `findMainMd failed for "${entry}": ${err.message}`);
-                    return;
+            await Promise.all(chunk.map(async ({ entry, skillPath, mdFile: preMdFile }) => {
+                let mdFile = preMdFile;
+                if (!mdFile) {
+                    try {
+                        mdFile = await findMainMd(skillPath);
+                    }
+                    catch (err) {
+                        warn('EmbeddingService', `findMainMd failed for "${entry}": ${err.message}`);
+                        return;
+                    }
                 }
                 if (!mdFile)
                     return;
@@ -534,7 +543,7 @@ class EmbeddingService {
             return [];
         }
         const searchLimit = Math.min(limit, this._nextId);
-        const mode = options.mode === 'exact' ? 'exact' : 'hnsw';
+        const mode = options.mode === 'hnsw' ? 'hnsw' : 'exact';
         let scored;
         if (mode === 'exact') {
             scored = this._exactSearch(queryEmbedding, searchLimit);

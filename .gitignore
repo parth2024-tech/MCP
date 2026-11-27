@@ -25,6 +25,8 @@ __pycache__/
 vault/
 # Untracked nested clones
 OpenHands/
+tools/server/
+tmp-agent-skills/
 
 # AI agent local settings & secret caches
 .claude/settings.local.json

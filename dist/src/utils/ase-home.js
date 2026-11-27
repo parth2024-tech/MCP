@@ -18,7 +18,6 @@ function getAseLogsDir() {
     return path.join(getAseHome(), 'logs');
 }
 function getRepoRoot(startDir = __dirname) {
-    const normalized = startDir.split(path.sep).join('/');
-    return path.resolve(startDir, normalized.includes('/tools/server') ? '../../../..' : '../..');
+    return path.resolve(startDir, '../..');
 }
 module.exports = { getAseHome, getAseLogsDir, getRepoRoot };

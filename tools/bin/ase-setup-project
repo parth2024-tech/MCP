@@ -56,7 +56,7 @@ if [ ! -f "$PROJECT_DIR/.vscode/mcp.json" ]; then
     "ase": {
       "type": "stdio",
       "command": "$MCP_COMPRESSOR",
-      "args": ["--compression-level", "medium", "node", "$ASE_REPO/tools/server/ase-mcp-server.js"]
+      "args": ["--compression-level", "medium", "node", "$ASE_REPO/ase-mcp-server.js"]
     },
     "toonify": {
       "type": "stdio",
@@ -78,7 +78,7 @@ if [ ! -f "$PROJECT_DIR/AGENTS.md" ]; then
 
 ## Context
 This project uses the Antigravity Skills Engine (ASE).
-ASE MCP server: `node __ASE_REPO__/tools/server/ase-mcp-server.js`
+ASE MCP server: `node __ASE_REPO__/ase-mcp-server.js`
 
 ## Workflow
 1. Call `get_project_prompt` to load project conventions from `.ase-project.json`

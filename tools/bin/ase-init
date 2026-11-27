@@ -23,11 +23,9 @@ try {
   require('tsx/cjs');
 } catch (_) {}
 
-// Path to the ASE tools directory & server source (falls back cleanly to repo root src/ on fresh clones)
+// Path to the ASE tools directory & canonical root src/
 const ASE_ROOT = path.resolve(__dirname, '..');
-const SERVER_SRC = fs.existsSync(path.join(ASE_ROOT, 'server', 'src', 'utils', 'ase-home.js'))
-  ? path.join(ASE_ROOT, 'server', 'src')
-  : path.resolve(__dirname, '../../src');
+const SERVER_SRC = path.resolve(__dirname, '../../src');
 const { getRepoRoot } = require(`${SERVER_SRC}/utils/ase-home`);
 
 function safeExit(code = 0) {

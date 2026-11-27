@@ -17,17 +17,43 @@ function sha256(input) {
   return crypto.createHash('sha256').update(input).digest('hex');
 }
 
-function scanCorpus(skillsDir = path.join(REPO_ROOT, 'skills')) {
-  const entries = fs.readdirSync(skillsDir)
-    .filter((name) => {
-      if (name.startsWith('.') || name === 'tools' || name === 'docs') return false;
-      try {
-        return fs.statSync(path.join(skillsDir, name)).isDirectory();
-      } catch {
-        return false;
+function parseTags(content) {
+  if (!content || !content.startsWith('---')) return [];
+  const endIdx = content.indexOf('---', 3);
+  if (endIdx === -1) return [];
+  const fm = content.substring(3, endIdx);
+  const inline = fm.match(/^tags:\s*\[([^\]]*)\]/m);
+  if (inline) {
+    return inline[1].split(',').map((t) => t.trim().replace(/^["']|["']$/g, '')).filter(Boolean);
+  }
+  return [];
+}
+
+function collectSkillFiles(skillsDir) {
+  const found = [];
+  function walk(dir) {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (entry.name.startsWith('.')) continue;
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        if (dir === skillsDir && (entry.name === 'tools' || entry.name === 'docs')) continue;
+        walk(full);
+      } else if (entry.name === 'SKILL.md') {
+        const relDir = path.relative(skillsDir, dir).split(path.sep).join('/');
+        if (relDir && relDir !== '.') {
+          found.push({ name: relDir, mdFile: full });
+        }
       }
-    })
-    .sort((a, b) => a.localeCompare(b));
+    }
+  }
+  walk(skillsDir);
+  found.sort((a, b) => a.name.localeCompare(b.name));
+  return found;
+}
+
+function scanCorpus(skillsDir = path.join(REPO_ROOT, 'skills'), embedTextMode = 'desc') {
+  const skillFiles = collectSkillFiles(skillsDir);
 
   const records = [];
   let descriptionOnlyCount = 0;
@@ -35,14 +61,21 @@ function scanCorpus(skillsDir = path.join(REPO_ROOT, 'skills')) {
   let maxTextChars = 0;
   let truncatedFallbacks = 0;
 
-  for (const name of entries) {
-    const mdFile = findMainMdSync(path.join(skillsDir, name));
-    if (!mdFile) continue;
+  for (const { name, mdFile } of skillFiles) {
     const content = fs.readFileSync(mdFile, 'utf8');
     const fm = parseFrontmatter(content);
     const desc = fm && fm.description ? fm.description.trim() : '';
+    const category = (fm && fm.category) || '';
+    const tags = parseTags(content);
     const usedFallback = desc.length === 0;
-    const textToEmbed = usedFallback ? content.substring(0, 800) : desc;
+    const baseText = usedFallback ? content.substring(0, 800) : desc;
+
+    let textToEmbed = baseText;
+    if (embedTextMode === 'name_desc_tags') {
+      const readableName = name.replace(/[/-]/g, ' ');
+      const meta = [category, ...tags].filter(Boolean).join(', ');
+      textToEmbed = meta ? `${readableName} (${meta}): ${baseText}` : `${readableName}: ${baseText}`;
+    }
 
     if (usedFallback) {
       fallbackBodyCount++;
@@ -56,12 +89,13 @@ function scanCorpus(skillsDir = path.join(REPO_ROOT, 'skills')) {
 
     records.push({
       name,
-      category: (fm && fm.category) || 'uncategorized',
+      category: category || 'uncategorized',
+      tags,
       description: desc,
       textToEmbed,
       usedFallback,
       tokenEstimate: Math.ceil(content.length / 4),
-      hash: sha256(content)
+      hash: sha256(`${embedTextMode}|${content}`)
     });
   }
 
@@ -71,6 +105,7 @@ function scanCorpus(skillsDir = path.join(REPO_ROOT, 'skills')) {
     corpusHash,
     embeddedTextStats: {
       totalSkills: records.length,
+      embedTextMode,
       descriptionOnlyCount,
       fallbackBodyCount,
       truncatedFallbacks,
@@ -80,7 +115,11 @@ function scanCorpus(skillsDir = path.join(REPO_ROOT, 'skills')) {
 }
 
 async function buildEvalIndex(options = {}) {
-  const dbPath = options.dbPath || process.env.ASE_EVAL_INDEX_DB || DEFAULT_EVAL_INDEX_DB;
+  const embedTextMode = options.embedTextMode || 'desc';
+  const defaultDb = embedTextMode === 'desc'
+    ? DEFAULT_EVAL_INDEX_DB
+    : path.join(REPO_ROOT, '.cache', `eval-skills-${embedTextMode}.db`);
+  const dbPath = options.dbPath || process.env.ASE_EVAL_INDEX_DB || defaultDb;
   const skillsDir = options.skillsDir || path.join(REPO_ROOT, 'skills');
   const pin = loadModelPin();
 
@@ -122,7 +161,7 @@ async function buildEvalIndex(options = {}) {
     db.exec('DELETE FROM skills; DELETE FROM model_metadata;');
   }
 
-  const { records, corpusHash, embeddedTextStats } = scanCorpus(skillsDir);
+  const { records, corpusHash, embeddedTextStats } = scanCorpus(skillsDir, embedTextMode);
   const existingRows = new Map(
     db.prepare('SELECT name, hash FROM skills').all().map((r) => [r.name, r.hash])
   );
@@ -218,4 +257,4 @@ if (require.main === module) {
     });
 }
 
-module.exports = { buildEvalIndex, scanCorpus, DEFAULT_EVAL_INDEX_DB };
+module.exports = { buildEvalIndex, scanCorpus, collectSkillFiles, DEFAULT_EVAL_INDEX_DB };

@@ -1,7 +1,7 @@
 const { spawn } = require('child_process');
 
 async function runBench() {
-  const server = spawn('node', ['tools/server/ase-mcp-server.js'], {
+  const server = spawn('node', ['ase-mcp-server.js'], {
     stdio: ['pipe', 'pipe', 'inherit']
   });
 

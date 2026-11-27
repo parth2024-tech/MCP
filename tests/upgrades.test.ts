@@ -222,6 +222,22 @@ describe('ASE MCP Server Upgrades', () => {
     expect(completeResSuccess.status).toBe('completed');
   });
 
+  it('persists inline validate_output result before returning (no DB write race)', async () => {
+    const dev = await executeTool('register_agent', { role: 'developer', capabilities: ['*'] });
+    const valRes = await executeTool('validate_output', {
+      code: 'export const ok = 1;',
+      file_path: 'ok.ts',
+      agent_token: dev.agent_token
+    });
+    const row = dbInstance
+      .getDB()
+      .prepare('SELECT passed, details FROM validation_runs WHERE id = ?')
+      .get(valRes.validation_run_id);
+    expect(row).toBeDefined();
+    expect(row.passed).toBe(1);
+    expect(JSON.parse(row.details).status).toBe('completed');
+  });
+
   it('verifies refine_and_write snapshot and rollback_write lock releases', async () => {
     const dev = await executeTool('register_agent', { role: 'developer', capabilities: ['*'] });
     const token = dev.agent_token;

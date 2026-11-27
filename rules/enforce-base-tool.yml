@@ -4,7 +4,6 @@ severity: warning
 language: typescript
 files:
   - "src/tools/**/*.ts"
-  - "tools/server/src/tools/**/*.ts"
 ignores:
   - "**/*.test.ts"
 rule:

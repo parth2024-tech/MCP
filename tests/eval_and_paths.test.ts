@@ -40,10 +40,9 @@ describe('Phase 1: EvalStore & Portable ASE Paths', () => {
     expect(getAseHome()).toBe(path.join(os.homedir(), '.local', 'state', 'ase'));
   });
 
-  it('resolves repo root cleanly across src/ and tools/server/src/', () => {
+  it('resolves repo root cleanly from canonical src/utils', () => {
     const expectedRoot = path.resolve(__dirname, '..');
     expect(getRepoRoot(path.join(expectedRoot, 'src', 'utils'))).toBe(expectedRoot);
-    expect(getRepoRoot(path.join(expectedRoot, 'tools', 'server', 'src', 'utils'))).toBe(expectedRoot);
   });
 
   it('creates eval_runs SQLite table keyed by git_sha and persists rows', () => {

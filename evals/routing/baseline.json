@@ -1,12 +1,15 @@
 {
-  "schema_version": 1,
-  "recorded_at": "2026-11-27T17:38:59.998Z",
-  "git_sha": "13a317caa1270a8c491e8c134dc9d9e7184e2963",
+  "schema_version": 2,
+  "recorded_at": "2026-11-27T17:57:23.918Z",
+  "git_sha": "85c715b336b2b6d6aa52d9a96b8932255748898f",
   "threshold": 0.35,
-  "corpus_hash": "4196667a6d3cccac14d2297b7177f551f7b01cb5cb03767f65c9fcb9d7fbfffd",
+  "embed_text_mode": "desc",
+  "hybrid_bm25": false,
+  "corpus_hash": "3504811ff36dcb39a0c28ffe36ae3713bc192c07393e80561957b9659efc0d30",
   "embedded_text": {
-    "totalSkills": 1497,
-    "descriptionOnlyCount": 1497,
+    "totalSkills": 1508,
+    "embedTextMode": "desc",
+    "descriptionOnlyCount": 1508,
     "fallbackBodyCount": 0,
     "truncatedFallbacks": 0,
     "maxTextChars": 485
@@ -36,11 +39,11 @@
     "cases": 210,
     "hnsw_top1_exact_match": 0.9095,
     "hnsw_recall_at_3_vs_exact": 0.9127,
-    "hnsw_recall_at_10_vs_exact": 0.8529,
-    "exact_latency_ms_median": 1.218,
-    "exact_latency_ms_p95": 1.61,
-    "hnsw_latency_ms_median": 0.091,
-    "hnsw_latency_ms_p95": 0.119,
+    "hnsw_recall_at_10_vs_exact": 0.8543,
+    "exact_latency_ms_median": 1.344,
+    "exact_latency_ms_p95": 1.452,
+    "hnsw_latency_ms_median": 0.101,
+    "hnsw_latency_ms_p95": 0.135,
     "top1_mismatches": [
       {
         "id": "r-0001",
@@ -260,7 +263,7 @@
       "negatives": 35,
       "hit_at_1": 0.5657,
       "hit_at_3": 0.7657,
-      "mrr": 0.6629,
+      "mrr": 0.662,
       "false_trigger_rate": 0.0571,
       "median_margin": 0.0578,
       "near_ties_lt_0_02": 32,
@@ -337,7 +340,7 @@
       "negatives": 24,
       "hit_at_1": 0.5565,
       "hit_at_3": 0.7742,
-      "mrr": 0.6601,
+      "mrr": 0.6587,
       "false_trigger_rate": 0.0417,
       "median_margin": 0.0571,
       "near_ties_lt_0_02": 24,
@@ -421,69 +424,7 @@
       "pos_score_median": 0.5672,
       "neg_score_max": 0.4338,
       "neg_score_median": 0.2502,
-      "covered_skills": 80,
-      "top_confusions": [
-        {
-          "pair": "gpt-researcher|deep-research -> embedding-strategies",
-          "count": 1
-        },
-        {
-          "pair": "seo-page|seo-content -> fixing-metadata",
-          "count": 1
-        },
-        {
-          "pair": "seo-plan|seo-content -> seo-content-planner",
-          "count": 1
-        },
-        {
-          "pair": "objection-preemptor|ux-persuasion-engineer -> churn-prevention",
-          "count": 1
-        },
-        {
-          "pair": "error-debugging-error-trace|error-diagnostics-error-trace|distributed-debugging-debug-trace -> azure-monitor-opentelemetry-ts",
-          "count": 1
-        },
-        {
-          "pair": "docker-expert -> devops-deploy",
-          "count": 1
-        },
-        {
-          "pair": "kubernetes-architect|kubernetes-deployment -> gitops-workflow",
-          "count": 1
-        },
-        {
-          "pair": "terraform-skill -> terraform-aws-modules",
-          "count": 1
-        },
-        {
-          "pair": "postgres-best-practices|postgresql -> postgresql-optimization",
-          "count": 1
-        },
-        {
-          "pair": "typescript-expert -> typescript-advanced-types",
-          "count": 1
-        },
-        {
-          "pair": "playwright-skill|e2e-testing-patterns -> e2e-testing",
-          "count": 1
-        },
-        {
-          "pair": "broken-authentication|auth-implementation-patterns|security-auditor -> security-audit",
-          "count": 1
-        },
-        {
-          "pair": "git-advanced-workflows -> git-pr-review",
-          "count": 1
-        },
-        {
-          "pair": "rag-engineer -> azure-search-documents-ts",
-          "count": 1
-        },
-        {
-          "pair": "makepad-layout|makepad-basics -> makepad-skills",
-          "count": 1
-        }
-      ]
+      "covered_skills": 80
     }
   },
   "clusters_summary": {
@@ -2734,10 +2675,14 @@
       "expected": [
         "android-jetpack-compose-expert"
       ],
-      "got": "expo-ui-jetpack-compose",
-      "score1": 0.4668,
-      "margin": 0.0089,
+      "got": "app-builder/templates",
+      "score1": 0.4731,
+      "margin": 0.0063,
       "top3": [
+        {
+          "name": "app-builder/templates",
+          "score": 0.4731
+        },
         {
           "name": "expo-ui-jetpack-compose",
           "score": 0.4668
@@ -2745,15 +2690,11 @@
         {
           "name": "android-jetpack-compose-expert",
           "score": 0.4579
-        },
-        {
-          "name": "python-development-python-scaffold",
-          "score": 0.3582
         }
       ],
       "hit1": false,
       "hit3": true,
-      "rr": 0.5,
+      "rr": 0.3333,
       "pass": false
     },
     "r-0071": {

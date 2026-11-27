@@ -3,7 +3,7 @@
     "ase": {
       "type": "stdio",
       "command": "mcp-compressor",
-      "args": ["--compression-level", "medium", "npx", "tsx", "./tools/server/ase-mcp-server.ts"]
+      "args": ["--compression-level", "medium", "npx", "tsx", "./ase-mcp-server.ts"]
     },
     "postgres-db": {
       "type": "stdio",

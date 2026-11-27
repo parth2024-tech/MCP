@@ -6,7 +6,7 @@ const { logAccess, logger } = require('../utils/logger');
 const { toolError } = require('../utils/errors');
 const { parseFrontmatter } = require('../utils/context-optimizer');
 const { getAseHome } = require('../utils/ase-home');
-const getSkillsDir = () => process.env.ASE_ROOT || path.resolve(__dirname, __dirname.includes('tools/server') ? '../../../../' : '../../');
+const getSkillsDir = () => process.env.ASE_ROOT || path.resolve(__dirname, '../..');
 const AUTH_FILE = path.join(getAseHome(), 'auth.json');
 // Load authentication registry
 let authRegistry = { tokens: {} };

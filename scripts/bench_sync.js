@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-const EmbeddingService = require('./tools/server/src/embedding-service.js');
-const workerPool = require('./tools/server/src/worker-pool.js');
+const EmbeddingService = require('../src/services/embedding-service.js');
+const workerPool = require('../src/services/worker-pool.js');
 
 async function run() {
   const service = new EmbeddingService();

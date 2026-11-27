@@ -20,7 +20,7 @@ Type=simple
 User=thor
 Group=thor
 WorkingDirectory=${ASE_REPO:-$PWD}
-ExecStart=/usr/bin/node tools/server/ase-mcp-server.js
+ExecStart=/usr/bin/node ase-mcp-server.js
 Restart=on-failure
 RestartSec=5
 

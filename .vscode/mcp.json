@@ -3,7 +3,7 @@
     "ase": {
       "type": "stdio",
       "command": "${userHome}/.local/bin/mcp-compressor",
-      "args": ["--compression-level", "medium", "npx", "tsx", "${workspaceFolder}/tools/server/ase-mcp-server.ts"]
+      "args": ["--compression-level", "medium", "npx", "tsx", "${workspaceFolder}/ase-mcp-server.ts"]
     },
     "toonify": {
       "type": "stdio",

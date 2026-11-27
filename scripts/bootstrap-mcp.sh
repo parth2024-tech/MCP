@@ -18,7 +18,7 @@ mkdir -p "$TARGET_DIR/.vscode"
 # Resolve central repository root dynamically
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-SERVER_PATH="$REPO_ROOT/tools/server/ase-mcp-server.ts"
+SERVER_PATH="$REPO_ROOT/ase-mcp-server.ts"
 MCP_COMPRESSOR="${MCP_COMPRESSOR_BIN:-$HOME/.local/bin/mcp-compressor}"
 
 # 1. Main .cursor/mcp.json

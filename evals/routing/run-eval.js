@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 /**
- * Tier R Routing Evaluation Runner (Exact Brute-Force vs HNSW Parity + Regression Gate).
+ * Tier R Routing Evaluation Runner (Exact Brute-Force vs HNSW Parity + Regression Gate + Step 1c Variants).
  *
  * Usage:
- *   node evals/routing/run-eval.js [--record-baseline] [--threshold 0.35] [--cases evals/routing/cases.jsonl]
+ *   node evals/routing/run-eval.js [--record-baseline] [--split dev|test|all]
+ *     [--embed-text-mode desc|name_desc_tags] [--hybrid-bm25] [--variant name]
+ *     [--show-test-flips] [--threshold 0.35]
  */
 const { execSync } = require('child_process');
 const crypto = require('crypto');
@@ -15,8 +17,9 @@ try {
 } catch (_) {}
 
 const { EvalStore } = require('../eval-store');
-const { buildEvalIndex, DEFAULT_EVAL_INDEX_DB } = require('./build-index');
+const { buildEvalIndex, scanCorpus, DEFAULT_EVAL_INDEX_DB } = require('./build-index');
 const { analyzeClusters } = require('./cluster-skills');
+const { BM25Index, fuseRRF } = require('./hybrid-bm25');
 const { embedText, loadModelPin, REPO_ROOT } = require('./pinned-embedder');
 const EmbeddingService = require('../../src/services/embedding-service');
 
@@ -109,6 +112,12 @@ function summarizeSplit(results) {
 function parseArgs(argv) {
   const opts = {
     recordBaseline: false,
+    split: 'all',
+    showTestFlips: false,
+    embedTextMode: 'desc',
+    hybridBm25: false,
+    variant: null,
+    noGate: false,
     threshold: 0.35,
     casesPath: DEFAULT_CASES,
     baselinePath: DEFAULT_BASELINE
@@ -116,6 +125,12 @@ function parseArgs(argv) {
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--record-baseline') opts.recordBaseline = true;
+    else if (a === '--split' && argv[i + 1]) opts.split = argv[++i];
+    else if (a === '--show-test-flips') opts.showTestFlips = true;
+    else if (a === '--embed-text-mode' && argv[i + 1]) opts.embedTextMode = argv[++i];
+    else if (a === '--hybrid-bm25') opts.hybridBm25 = true;
+    else if (a === '--variant' && argv[i + 1]) opts.variant = argv[++i];
+    else if (a === '--no-gate') opts.noGate = true;
     else if (a === '--threshold' && argv[i + 1]) opts.threshold = parseFloat(argv[++i]);
     else if (a === '--cases' && argv[i + 1]) opts.casesPath = path.resolve(argv[++i]);
     else if (a === '--baseline' && argv[i + 1]) opts.baselinePath = path.resolve(argv[++i]);
@@ -127,32 +142,42 @@ async function main() {
   const opts = parseArgs(process.argv.slice(2));
   const pin = loadModelPin();
   const gitSha = getGitSha();
-  const runId = `routing-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
+  const suiteName = opts.variant ? `routing:${opts.variant}` : 'routing';
+  const runId = `${suiteName}-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
 
   // 1. Rebuild/verify eval embedding index cleanly from skills/
-  const indexRes = await buildEvalIndex({ dbPath: DEFAULT_EVAL_INDEX_DB });
+  const indexRes = await buildEvalIndex({ embedTextMode: opts.embedTextMode });
 
-  // 2. Load cases & validate all referenced skill names exist in corpus
+  // Optional BM25 corpus build for hybrid RRF variant
+  let bm25 = null;
+  if (opts.hybridBm25) {
+    const corpus = scanCorpus(path.join(REPO_ROOT, 'skills'), opts.embedTextMode);
+    bm25 = new BM25Index(corpus.records);
+  }
+
+  // 2. Load cases & filter split if requested
   const lines = fs.readFileSync(opts.casesPath, 'utf8')
     .split('\n')
     .map((l) => l.trim())
     .filter(Boolean);
-  const cases = lines.map((l) => JSON.parse(l));
+  const allCases = lines.map((l) => JSON.parse(l));
+  const cases = opts.split === 'all'
+    ? allCases
+    : allCases.filter((c) => c.split === opts.split);
 
-  // Mock minimal workerPool for EmbeddingService (eval embeds via pinned-embedder directly)
   const stubWorkerPool = {
     generateEmbeddingForeground: async (text) => Array.from(await embedText(text)),
     generateEmbeddingBackground: async (text) => Array.from(await embedText(text))
   };
 
   const svc = new EmbeddingService(stubWorkerPool, {
-    dbPath: DEFAULT_EVAL_INDEX_DB,
+    dbPath: indexRes.dbPath,
     skillsDir: path.join(REPO_ROOT, 'skills'),
     disableWatcher: true
   });
 
   const missingRefs = [];
-  for (const c of cases) {
+  for (const c of allCases) {
     if (c.expect !== null) {
       for (const s of c.expect) {
         if (!svc._skillData.has(s)) missingRefs.push(`${c.id}:expect:${s}`);
@@ -167,7 +192,7 @@ async function main() {
     throw new Error(`Invalid skill IDs in cases.jsonl: ${missingRefs.join(', ')}`);
   }
 
-  // 3. Evaluate all cases through BOTH exact (noCache) and HNSW (noCache)
+  // 3. Evaluate cases
   const exactLatencies = [];
   const hnswLatencies = [];
   const evalRows = [];
@@ -183,7 +208,12 @@ async function main() {
     const embedMs = Number(process.hrtime.bigint() - qStart) / 1e6;
 
     const eStart = process.hrtime.bigint();
-    const exactTop = svc.searchWithEmbedding(queryVec, 10, { mode: 'exact', skipOptimizer: true });
+    const denseTop = svc.searchWithEmbedding(queryVec, opts.hybridBm25 ? 50 : 10, { mode: 'exact', skipOptimizer: true });
+    let rankedTop = denseTop.slice(0, 10);
+    if (opts.hybridBm25 && bm25) {
+      const bm25Top = bm25.search(c.prompt, 50);
+      rankedTop = fuseRRF(denseTop, bm25Top, { k: 60, topK: 10 });
+    }
     const exactMs = Number(process.hrtime.bigint() - eStart) / 1e6;
     exactLatencies.push(exactMs);
 
@@ -192,9 +222,11 @@ async function main() {
     const hnswMs = Number(process.hrtime.bigint() - hStart) / 1e6;
     hnswLatencies.push(hnswMs);
 
-    const top1 = exactTop[0] || { name: 'NONE', score: 0 };
-    const top2 = exactTop[1] || { name: 'NONE', score: 0 };
-    const margin = Number((top1.score - top2.score).toFixed(4));
+    const top1 = rankedTop[0] || { name: 'NONE', score: 0 };
+    const top2 = rankedTop[1] || { name: 'NONE', score: 0 };
+    const margin = opts.hybridBm25
+      ? Number(((top1.rrfScore || 0) - (top2.rrfScore || 0)).toFixed(4))
+      : Number((top1.score - top2.score).toFixed(4));
 
     const expectedSet = c.expect === null ? null : new Set(c.expect);
     let pass = false;
@@ -206,30 +238,30 @@ async function main() {
       pass = top1.score < opts.threshold;
     } else {
       hit1 = expectedSet.has(top1.name) && top1.score >= opts.threshold;
-      hit3 = exactTop.slice(0, 3).some((item) => expectedSet.has(item.name) && item.score >= opts.threshold);
-      const rankIdx = exactTop.findIndex((item) => expectedSet.has(item.name) && item.score >= opts.threshold);
+      hit3 = rankedTop.slice(0, 3).some((item) => expectedSet.has(item.name) && item.score >= opts.threshold);
+      const rankIdx = rankedTop.findIndex((item) => expectedSet.has(item.name) && item.score >= opts.threshold);
       rr = rankIdx !== -1 ? 1 / (rankIdx + 1) : 0;
       pass = hit1;
     }
 
     // HNSW vs Exact parity
     const hTop1 = hnswTop[0] ? hnswTop[0].name : null;
-    if (hTop1 === top1.name) {
+    if (hTop1 === (denseTop[0] ? denseTop[0].name : null)) {
       hnswTop1Matches++;
     } else {
       parityMismatches.push({
         id: c.id,
-        exactTop1: { name: top1.name, score: Number(top1.score.toFixed(4)) },
+        exactTop1: { name: denseTop[0].name, score: Number(denseTop[0].score.toFixed(4)) },
         hnswTop1: { name: hTop1, score: hnswTop[0] ? Number(hnswTop[0].score.toFixed(4)) : 0 }
       });
     }
-    const exact3Set = new Set(exactTop.slice(0, 3).map((x) => x.name));
+    const exact3Set = new Set(denseTop.slice(0, 3).map((x) => x.name));
     const hnsw3Set = new Set(hnswTop.slice(0, 3).map((x) => x.name));
     let inter3 = 0;
     for (const x of exact3Set) if (hnsw3Set.has(x)) inter3++;
     hnswRecall3Sum += inter3 / Math.max(1, exact3Set.size);
 
-    const exact10Set = new Set(exactTop.map((x) => x.name));
+    const exact10Set = new Set(denseTop.slice(0, 10).map((x) => x.name));
     const hnsw10Set = new Set(hnswTop.map((x) => x.name));
     let inter10 = 0;
     for (const x of exact10Set) if (hnsw10Set.has(x)) inter10++;
@@ -242,7 +274,7 @@ async function main() {
       got: top1.name,
       score1: Number(top1.score.toFixed(4)),
       margin,
-      top3: exactTop.slice(0, 3).map((x) => ({ name: x.name, score: Number(x.score.toFixed(4)) })),
+      top3: rankedTop.slice(0, 3).map((x) => ({ name: x.name, score: Number(x.score.toFixed(4)) })),
       hit1,
       hit3,
       rr: Number(rr.toFixed(4)),
@@ -252,11 +284,11 @@ async function main() {
 
     evalRows.push({
       run_id: runId,
-      suite: 'routing',
+      suite: suiteName,
       split: c.split,
       case_id: c.id,
       git_sha: gitSha,
-      embed_model: pin.model_id,
+      embed_model: `${pin.model_id}:${opts.embedTextMode}${opts.hybridBm25 ? '+bm25rrf' : ''}`,
       embed_rev: pin.revision,
       llm_model_id: null,
       prompt_hash: sha256(c.prompt),
@@ -279,11 +311,19 @@ async function main() {
   evalStore.insertRows(evalRows);
   evalStore.close();
 
-  const summary = {
-    overall: summarizeSplit(results),
-    dev: summarizeSplit(results.filter((r) => r.split === 'dev')),
-    test: summarizeSplit(results.filter((r) => r.split === 'test'))
-  };
+  const summary = {};
+  if (opts.split === 'all') {
+    summary.overall = summarizeSplit(results);
+    summary.dev = summarizeSplit(results.filter((r) => r.split === 'dev'));
+    const testSum = summarizeSplit(results.filter((r) => r.split === 'test'));
+    // Test-split hygiene: drop per-case confusion pairs unless explicitly requested
+    if (!opts.showTestFlips) {
+      delete testSum.top_confusions;
+    }
+    summary.test = testSum;
+  } else {
+    summary[opts.split] = summarizeSplit(results);
+  }
 
   const parity = {
     cases: cases.length,
@@ -298,12 +338,14 @@ async function main() {
   };
 
   if (opts.recordBaseline) {
-    const clusters = analyzeClusters(DEFAULT_EVAL_INDEX_DB, 0.78);
+    const clusters = analyzeClusters(indexRes.dbPath, 0.78);
     const baseline = {
-      schema_version: 1,
+      schema_version: 2,
       recorded_at: new Date().toISOString(),
       git_sha: gitSha,
       threshold: opts.threshold,
+      embed_text_mode: opts.embedTextMode,
+      hybrid_bm25: opts.hybridBm25,
       corpus_hash: indexRes.corpusHash,
       embedded_text: indexRes.embeddedTextStats,
       pin,
@@ -319,7 +361,7 @@ async function main() {
     };
     fs.writeFileSync(opts.baselinePath, JSON.stringify(baseline, null, 2) + '\n', 'utf8');
     console.log(`Baseline recorded to ${opts.baselinePath}`);
-    console.log('Summary:', JSON.stringify({ summary, parity }, null, 2));
+    console.log('Summary:', JSON.stringify({ summary, parity: { ...parity, top1_mismatches: parityMismatches.length } }, null, 2));
     return;
   }
 
@@ -332,19 +374,19 @@ async function main() {
     ? JSON.parse(fs.readFileSync(DEFAULT_WAIVERS, 'utf8'))
     : {};
 
-  const passToFail = [];
-  const failToPass = [];
+  const devPassToFail = [];
+  const devFailToPass = [];
+  const testPassToFail = [];
+  const testFailToPass = [];
   const negativeTriggers = [];
 
   for (const r of results) {
     const prev = baseline.cases[r.id];
     if (!prev) continue;
     if (prev.pass && !r.pass) {
-      if (r.expected === null) {
-        negativeTriggers.push({ id: r.id, score1: r.score1, got: r.got });
-      }
+      if (r.expected === null) negativeTriggers.push({ id: r.id, split: r.split, score1: r.score1 });
       if (!waivers[r.id]) {
-        passToFail.push({
+        const entry = {
           id: r.id,
           split: r.split,
           expected: r.expected,
@@ -352,23 +394,39 @@ async function main() {
           got: r.got,
           prevScore: prev.score1,
           score: r.score1
-        });
+        };
+        if (r.split === 'dev') devPassToFail.push(entry);
+        else testPassToFail.push(entry);
       }
     } else if (!prev.pass && r.pass) {
-      failToPass.push({ id: r.id, split: r.split, got: r.got, score: r.score1 });
+      const entry = { id: r.id, split: r.split, got: r.got, score: r.score1 };
+      if (r.split === 'dev') devFailToPass.push(entry);
+      else testFailToPass.push(entry);
     }
   }
 
-  const testHit1Delta = Number((summary.test.hit_at_1 - baseline.summary.test.hit_at_1).toFixed(4));
-  const testHit3Delta = Number((summary.test.hit_at_3 - baseline.summary.test.hit_at_3).toFixed(4));
+  const devHit1Delta = summary.dev && baseline.summary.dev
+    ? Number((summary.dev.hit_at_1 - baseline.summary.dev.hit_at_1).toFixed(4))
+    : null;
+  const devHit3Delta = summary.dev && baseline.summary.dev
+    ? Number((summary.dev.hit_at_3 - baseline.summary.dev.hit_at_3).toFixed(4))
+    : null;
+  const testHit1Delta = summary.test && baseline.summary.test
+    ? Number((summary.test.hit_at_1 - baseline.summary.test.hit_at_1).toFixed(4))
+    : null;
+  const testHit3Delta = summary.test && baseline.summary.test
+    ? Number((summary.test.hit_at_3 - baseline.summary.test.hit_at_3).toFixed(4))
+    : null;
 
   console.log('=== Tier R Routing Evaluation Report ===');
   console.log(JSON.stringify({
     run_id: runId,
+    suite: suiteName,
+    split: opts.split,
     git_sha: gitSha,
     corpus_hash: indexRes.corpusHash,
-    dev: summary.dev,
-    test: summary.test,
+    embedded_text: indexRes.embeddedTextStats,
+    ...summary,
     parity: {
       top1_match: parity.hnsw_top1_exact_match,
       recall_at_3: parity.hnsw_recall_at_3_vs_exact,
@@ -376,27 +434,35 @@ async function main() {
       hnsw_p50_ms: parity.hnsw_latency_ms_median
     },
     deltas_vs_baseline: {
+      dev_hit1_delta: devHit1Delta,
+      dev_hit3_delta: devHit3Delta,
       test_hit1_delta: testHit1Delta,
       test_hit3_delta: testHit3Delta,
-      pass_to_fail_count: passToFail.length,
-      fail_to_pass_count: failToPass.length,
+      dev_pass_to_fail_count: devPassToFail.length,
+      dev_fail_to_pass_count: devFailToPass.length,
+      test_pass_to_fail_count: testPassToFail.length,
+      test_fail_to_pass_count: testFailToPass.length,
       new_negative_triggers: negativeTriggers.length
     },
-    pass_to_fail: passToFail,
-    fail_to_pass: failToPass
+    dev_pass_to_fail: devPassToFail,
+    dev_fail_to_pass: devFailToPass,
+    ...(opts.showTestFlips ? { test_pass_to_fail: testPassToFail, test_fail_to_pass: testFailToPass } : {})
   }, null, 2));
 
+  if (opts.noGate) return;
+
+  const totalPassToFail = devPassToFail.length + testPassToFail.length;
   const failures = [];
-  if (passToFail.length > 0) {
-    failures.push(`${passToFail.length} unjustified pass->fail regression(s)`);
+  if (totalPassToFail > 0) {
+    failures.push(`${totalPassToFail} unjustified pass->fail regression(s)`);
   }
   if (negativeTriggers.length > 0) {
     failures.push(`${negativeTriggers.length} previously passing negative case(s) triggered`);
   }
-  if (testHit1Delta < -0.03) {
+  if (testHit1Delta !== null && testHit1Delta < -0.03) {
     failures.push(`test hit@1 dropped by ${testHit1Delta} (>0.03 threshold)`);
   }
-  if (testHit3Delta < -0.03) {
+  if (testHit3Delta !== null && testHit3Delta < -0.03) {
     failures.push(`test hit@3 dropped by ${testHit3Delta} (>0.03 threshold)`);
   }
 
