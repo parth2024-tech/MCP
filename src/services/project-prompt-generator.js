@@ -13,6 +13,7 @@
 
 const fs = require('fs').promises;
 const path = require('path');
+const { getRepoRoot } = require('../utils/ase-home');
 
 const PROJECT_CONFIG_FILE = '.ase-project.json';
 
@@ -386,7 +387,7 @@ function getConfigTemplate() {
       'Use GPT Researcher (gpt-researcher) exclusively for any research report, technical investigation, or market study'
     ],
     agent_skills: {
-      directory: '/home/thor/skiils/skills',
+      directory: path.join(getRepoRoot(__dirname), 'skills'),
       default_skills: [
         'using-agent-skills',
         'context-engineering',

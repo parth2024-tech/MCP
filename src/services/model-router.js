@@ -2,11 +2,14 @@ const fs = require('fs').promises;
 const path = require('path');
 const { logAccess, logger } = require('../utils/logger');
 
+const { getRepoRoot } = require('../utils/ase-home');
+
+const REPO_ROOT = getRepoRoot(__dirname);
 const CONFIG_PATH = [
   path.join(__dirname, '../../tools/config/model-params.json'),
   path.join(__dirname, '../../../config/model-params.json'),
   path.join(__dirname, '../../../tools/config/model-params.json'),
-  '/home/thor/skiils/tools/config/model-params.json'
+  path.join(REPO_ROOT, 'tools/config/model-params.json')
 ].find(p => require('fs').existsSync(p)) || path.join(__dirname, '../../tools/config/model-params.json');
 
 

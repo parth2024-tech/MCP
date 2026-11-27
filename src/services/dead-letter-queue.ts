@@ -3,8 +3,9 @@ import path from 'path';
 import fs from 'fs';
 import { ASEError } from '../utils/errors';
 const { logger } = require('../utils/logger');
+const { getAseLogsDir } = require('../utils/ase-home');
 
-const DB_DIR = '/home/thor/.agents/logs';
+const DB_DIR = getAseLogsDir();
 const DB_PATH = path.join(DB_DIR, 'dead_letters.db');
 
 export interface DeadLetterEntry {

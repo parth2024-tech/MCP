@@ -13,18 +13,22 @@ const { warn, logger } = require('../utils/logger');
 const metrics = require('../utils/metrics');
 const CircuitBreaker = require('./circuit-breaker');
 
+const { getRepoRoot } = require('../utils/ase-home');
+
+const REPO_ROOT = getRepoRoot(__dirname);
 const SKILLS_DIR = process.env.ASE_SKILLS_DIR || (
-  require('fs').existsSync(path.resolve(__dirname, '../../skills'))
-    ? path.resolve(__dirname, '../../skills')
-    : '/home/thor/skiils/skills'
+  require('fs').existsSync(path.join(REPO_ROOT, 'skills'))
+    ? path.join(REPO_ROOT, 'skills')
+    : path.resolve(__dirname, '../../skills')
 );
-const DB_PATH = path.join(__dirname, 'skills.db');
+const DB_PATH = process.env.ASE_SKILLS_DB || path.join(__dirname, 'skills.db');
 const EMBEDDING_DIMENSIONS = 384;
 
 class EmbeddingService {
-  constructor(workerPool) {
+  constructor(workerPool, options = {}) {
     this.workerPool = workerPool;
-    this.db = new Database(DB_PATH);
+    this.skillsDir = options.skillsDir || SKILLS_DIR;
+    this.db = new Database(options.dbPath || DB_PATH);
     
     // Phase 3: SQLite Tuning
     this.db.pragma('journal_mode = WAL');
@@ -38,12 +42,14 @@ class EmbeddingService {
     // LRU Cache for queries
     this._queryCache = new LRUCache({ max: 200, ttl: 1000 * 60 * 5 });
 
-    // HNSW index state
+    // HNSW & exact-search index state
     this._hnsw = null;
     this._idToName = new Map();
     this._nameToId = new Map();
     this._skillData = new Map();
+    this._vectors = new Map();
     this._nextId = 0;
+    this._watcher = null;
     this.optimizer = new ContextOptimizer();
 
     // Fix 1: Exclusive write lock for all HNSW mutations.
@@ -73,7 +79,9 @@ class EmbeddingService {
     this._cacheGeneration = 0;
 
     this._initDb();
-    this._startWatcher();
+    if (!options.disableWatcher) {
+      this._startWatcher();
+    }
   }
 
   _initDb() {
@@ -119,6 +127,7 @@ class EmbeddingService {
     this._idToName.clear();
     this._nameToId.clear();
     this._skillData.clear();
+    this._vectors.clear();
     this._nextId = 0;
 
     const maxElements = Math.max(rows.length + 1000, 2000);
@@ -136,6 +145,7 @@ class EmbeddingService {
 
       const embBuffer = row.embedding;
       const embArray = new Float32Array(embBuffer.buffer, embBuffer.byteOffset, embBuffer.byteLength / 4);
+      this._vectors.set(row.name, new Float32Array(embArray));
       this._hnsw.addPoint(Array.from(embArray), id);
     }
   }
@@ -180,6 +190,7 @@ class EmbeddingService {
 
         const embBuffer = row.embedding;
         const embArray = new Float32Array(embBuffer.buffer, embBuffer.byteOffset, embBuffer.byteLength / 4);
+        this._vectors.set(row.name, new Float32Array(embArray));
         this._hnsw.addPoint(Array.from(embArray), newId);
         repaired++;
       }
@@ -218,6 +229,7 @@ class EmbeddingService {
         this._hnsw.resizeIndex(currentMax + 1000);
       }
 
+      this._vectors.set(name, Float32Array.from(embeddingArray));
       this._hnsw.addPoint(Array.from(embeddingArray), id);
       this._skillData.set(name, { description, tokenEstimate });
 
@@ -235,7 +247,7 @@ class EmbeddingService {
   }
 
   _startWatcher() {
-    const watcher = chokidar.watch(SKILLS_DIR, {
+    const watcher = chokidar.watch(this.skillsDir, {
       ignored: [
         /(^|[\/\\])\../,      // ignore dotfiles
         '**/tools/**',        // ignore server tools
@@ -246,11 +258,12 @@ class EmbeddingService {
       ignoreInitial: true,
       depth: 2
     });
+    this._watcher = watcher;
 
     watcher.on('all', async (event, filePath) => {
       if (!filePath.endsWith('.md')) return;
 
-      const relative = path.relative(SKILLS_DIR, filePath);
+      const relative = path.relative(this.skillsDir, filePath);
       const parts = relative.split(path.sep);
       if (parts.length >= 2) {
         const skillName = parts[0];
@@ -279,7 +292,7 @@ class EmbeddingService {
   }
 
   async hotReloadSkill(skillName) {
-    const skillPath = path.join(SKILLS_DIR, skillName);
+    const skillPath = path.join(this.skillsDir, skillName);
     let mdFile;
     try {
       mdFile = await findMainMd(skillPath);
@@ -449,9 +462,9 @@ class EmbeddingService {
 
     let files;
     try {
-      files = await fs.readdir(SKILLS_DIR);
+      files = await fs.readdir(this.skillsDir);
     } catch (err) {
-      warn('EmbeddingService', `Cannot read SKILLS_DIR: ${err.message}`, { path: SKILLS_DIR });
+      warn('EmbeddingService', `Cannot read SKILLS_DIR: ${err.message}`, { path: this.skillsDir });
       return;
     }
 
@@ -461,13 +474,13 @@ class EmbeddingService {
 
       let stat;
       try {
-        stat = await fs.stat(path.join(SKILLS_DIR, entry));
+        stat = await fs.stat(path.join(this.skillsDir, entry));
       } catch (err) {
         warn('EmbeddingService', `stat failed for entry "${entry}": ${err.message}`);
         continue;
       }
       if (!stat.isDirectory()) continue;
-      tasks.push({ entry, skillPath: path.join(SKILLS_DIR, entry) });
+      tasks.push({ entry, skillPath: path.join(this.skillsDir, entry) });
     }
 
     const CONCURRENCY_LIMIT = 5;
@@ -554,20 +567,88 @@ class EmbeddingService {
     logger.info('EmbeddingService', 'Sync complete.');
   }
 
-  async search(query, limit = 15, reqLogger = null) {
+  _exactSearch(queryEmbedding, limit) {
+    let qNormSq = 0;
+    for (let i = 0; i < queryEmbedding.length; i++) {
+      qNormSq += queryEmbedding[i] * queryEmbedding[i];
+    }
+    const qNorm = Math.sqrt(qNormSq) || 1;
+
+    const scored = [];
+    for (const [name, vec] of this._vectors.entries()) {
+      let dot = 0;
+      let vNormSq = 0;
+      for (let i = 0; i < vec.length; i++) {
+        dot += queryEmbedding[i] * vec[i];
+        vNormSq += vec[i] * vec[i];
+      }
+      const denom = qNorm * (Math.sqrt(vNormSq) || 1);
+      const score = dot / denom;
+      const data = this._skillData.get(name);
+      scored.push({
+        name,
+        score,
+        tokenEstimate: data ? data.tokenEstimate : 0,
+        description: data ? data.description : ''
+      });
+    }
+
+    scored.sort((a, b) => (b.score - a.score) || a.name.localeCompare(b.name));
+    return scored.slice(0, limit);
+  }
+
+  searchWithEmbedding(queryEmbedding, limit = 15, options = {}) {
+    if (this._nextId === 0) {
+      return [];
+    }
+    const searchLimit = Math.min(limit, this._nextId);
+    const mode = options.mode === 'exact' ? 'exact' : 'hnsw';
+
+    let scored;
+    if (mode === 'exact') {
+      scored = this._exactSearch(queryEmbedding, searchLimit);
+    } else {
+      // HNSW ANN search — searchKnn is safe concurrently with reads; writes use _hnswWriteLock
+      const result = this._hnsw.searchKnn(Array.from(queryEmbedding), searchLimit);
+      scored = [];
+      for (let i = 0; i < result.neighbors.length; i++) {
+        const id = result.neighbors[i];
+        const distance = result.distances[i];
+        const name = this._idToName.get(id);
+        const data = this._skillData.get(name);
+        scored.push({
+          name,
+          score: 1 - distance,
+          tokenEstimate: data.tokenEstimate,
+          description: data.description
+        });
+      }
+      scored.sort((a, b) => (b.score - a.score) || a.name.localeCompare(b.name));
+    }
+
+    if (options.skipOptimizer) {
+      return scored;
+    }
+
+    const { optimized } = this.optimizer.optimize(scored);
+    return optimized;
+  }
+
+  async search(query, limit = 15, reqLogger = null, options = {}) {
     const log = reqLogger || logger;
     const startMs = Date.now();
+    const noCache = Boolean(options.noCache);
     metrics.inc('embedding_searches');
 
     // Fix 5: Cache key includes the current generation counter.
-    // Any addPoint increments _cacheGeneration, making old entries unreachable
-    // on the next lookup without an explicit .clear() pass over the LRU.
     const cacheKey = `${this._cacheGeneration}|${query.trim().toLowerCase()}|${limit}`;
-    const cachedResult = this._queryCache.get(cacheKey);
-    if (cachedResult) {
-      metrics.inc('skill_cache_hits');
-      log.info('EmbeddingService', `Search served from cache (gen=${this._cacheGeneration}) in ${Date.now() - startMs}ms`, { limit });
-      return cachedResult;
+    if (!noCache) {
+      const cachedResult = this._queryCache.get(cacheKey);
+      if (cachedResult) {
+        metrics.inc('skill_cache_hits');
+        log.info('EmbeddingService', `Search served from cache (gen=${this._cacheGeneration}) in ${Date.now() - startMs}ms`, { limit });
+        return cachedResult;
+      }
     }
     metrics.inc('skill_cache_misses');
 
@@ -586,43 +667,39 @@ class EmbeddingService {
       return [];
     }
 
-    const searchLimit = Math.min(limit, this._nextId);
+    const rawScored = this.searchWithEmbedding(queryEmbedding, limit, {
+      mode: options.mode,
+      skipOptimizer: true
+    });
 
-    // HNSW ANN search — searchKnn is a read operation. The write lock
-    // (Mutex) does not block reads; it only serialises concurrent writes.
-    // If a write is in progress, searchKnn proceeds without waiting because
-    // hnswlib's read path is safe for concurrent read-read access.
-    // The only hazard is read-DURING-write, which the Mutex on the write
-    // side prevents by delaying the write until any in-flight search finishes
-    // (event loop turn boundaries ensure this in single-threaded Node.js).
-    const result = this._hnsw.searchKnn(Array.from(queryEmbedding), searchLimit);
-    
-    const scored = [];
-    for (let i = 0; i < result.neighbors.length; i++) {
-      const id = result.neighbors[i];
-      const distance = result.distances[i];
-      const name = this._idToName.get(id);
-      const data = this._skillData.get(name);
-      
-      scored.push({
-        name,
-        score: 1 - distance, // Convert cosine distance to similarity
-        tokenEstimate: data.tokenEstimate,
-        description: data.description
-      });
+    if (options.skipOptimizer) {
+      metrics.record('embedding_search_duration_ms', Date.now() - startMs);
+      return rawScored;
     }
 
-    const { optimized, totalTokens, savedTokens } = this.optimizer.optimize(scored);
-    
+    const { optimized, totalTokens, savedTokens } = this.optimizer.optimize(rawScored);
+
     metrics.histogram('context.tokens_saved', savedTokens, { source: 'skills' });
     metrics.histogram('context.total_tokens', totalTokens, { source: 'skills' });
 
-    this._queryCache.set(cacheKey, optimized);
+    if (!noCache) {
+      this._queryCache.set(cacheKey, optimized);
+    }
 
     metrics.record('embedding_search_duration_ms', Date.now() - startMs);
-    log.info('EmbeddingService', `Search completed in ${Date.now() - startMs}ms. Optimized from ${scored.length} to ${optimized.length} items (saved ${savedTokens} tokens).`, { limit });
-    
+    log.info('EmbeddingService', `Search completed in ${Date.now() - startMs}ms. Optimized from ${rawScored.length} to ${optimized.length} items (saved ${savedTokens} tokens).`, { limit });
+
     return optimized;
+  }
+
+  async close() {
+    if (this._watcher) {
+      await this._watcher.close();
+      this._watcher = null;
+    }
+    if (this.db) {
+      this.db.close();
+    }
   }
 }
 

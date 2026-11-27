@@ -9,8 +9,9 @@
 const pino = require('pino');
 const path = require('path');
 const fs = require('fs');
+const { getAseLogsDir } = require('./ase-home');
 
-const LOG_DIR = '/home/thor/.agents/logs';
+const LOG_DIR = getAseLogsDir();
 const LOG_FILE = path.join(LOG_DIR, 'skills_audit.log');
 
 try {

@@ -21,12 +21,15 @@ const { findMainMdSync } = require('../utils/fs-utils');
 // Canonical parseFrontmatter — imported from context-optimizer to avoid duplication
 const { parseFrontmatter } = require('../utils/context-optimizer');
 
+const { getRepoRoot } = require('../utils/ase-home');
+
+const REPO_ROOT = getRepoRoot(__dirname);
 const SKILLS_DIR = path.join(__dirname, '../../');
 const CONFIG_PATH = [
   path.join(__dirname, '../../tools/config/model-params.json'),
   path.join(__dirname, '../../../config/model-params.json'),
   path.join(__dirname, '../../../tools/config/model-params.json'),
-  '/home/thor/skiils/tools/config/model-params.json'
+  path.join(REPO_ROOT, 'tools/config/model-params.json')
 ].find(p => fs.existsSync(p)) || path.join(__dirname, '../../tools/config/model-params.json');
 
 
