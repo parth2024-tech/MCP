@@ -65,9 +65,16 @@ This skill governs all technical research, market analysis, competitive intellig
   ```
 
 ## 6. Verification
-Run validation on the generated report:
+Run validation on the generated report and its evidence store:
 ```bash
 test -s docs/research/<topic>.md && echo "Report generated successfully"
+python3 scripts/validate_report.py <topic>
+```
+
+To run the Section 11 self-test suite across all validation gates:
+```bash
+just test-report-validator
+# or: python3 scripts/validate_report.py --self-test
 ```
 
 ## 7. Stop & Escalate

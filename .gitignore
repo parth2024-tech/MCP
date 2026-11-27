@@ -13,7 +13,11 @@ node_modules/
 skills_session_state.archive.json
 # Vitest coverage output
 coverage/
-# Temporary test directories
+# Python bytecode cache
+__pycache__/
+*.py[cod]
+*$py.class
+
 /tmp/ase-*/
 # Obsidian knowledge vault output
 vault/

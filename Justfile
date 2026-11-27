@@ -51,3 +51,7 @@ export-vault:
 # Show all learned lessons
 lessons:
     node tools/bin/ase-init --lessons
+
+# Run Section 11 report validator self-test
+test-report-validator:
+    python3 scripts/validate_report.py --self-test
